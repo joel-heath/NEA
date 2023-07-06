@@ -247,6 +247,23 @@ public class Matrix
         return m;
     }
 
+    public static bool operator ==(Matrix a, Matrix b)
+    {
+        if (a.Rows != b.Rows || a.Columns != b.Columns) return false;
+
+        for (int i = 0; i < a.Rows; i++)
+        {
+            for (int j = 0; j < b.Columns; j++)
+            {
+                if (a[i,j] != b[i, j]) return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static bool operator !=(Matrix a, Matrix b) => !(a == b);
+
     public override string ToString()
     {
         System.Text.StringBuilder sb = new();

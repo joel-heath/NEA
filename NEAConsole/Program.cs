@@ -319,9 +319,47 @@ internal class Program
         Console.Clear();
     }
 
+    static int GenerateUniqueGradient(HashSet<int> gradients)
+    {
+        int m = Random.Shared.Next(-5, 0);
+        if (!gradients.Contains(m))
+        {
+            gradients.Add(m);
+            return m; // compiler moment
+        }
+
+        bool newFound = false;
+        while (!newFound)
+        {
+            m = Random.Shared.Next(-5, 0);
+            if (!gradients.Contains(m)) newFound = true;
+        }
+        gradients.Add(m);
+        return m;
+    }
+
     static void SimplexTest()
     {
         (int x, int y) solution = (Random.Shared.Next(2, 6), Random.Shared.Next(2, 6));
+
+        HashSet<int> gradients = new(4);
+
+        int m = GenerateUniqueGradient(gradients);
+        (int m, int c) l1 = (m, m * solution.x + solution.y); // lines that go through solution
+        m = GenerateUniqueGradient(gradients);
+        (int m, int c) l2 = (m, m * solution.x + solution.y); // lines that go through solution
+        m = GenerateUniqueGradient(gradients);
+        (int m, int c) l3 = (m, m * solution.x + solution.y + 2); // lines that goes over solution (redundant, just makes question more complicated)
+
+        m = GenerateUniqueGradient(gradients);
+        (int x, int y) objective = (m, -1); // mx - y
+
+
+        Console.WriteLine($"Maximise {objective.x}x - {objective.y}y");
+        Console.WriteLine($"Subject to ");
+
+
+
     }
 
     static void MathsMenu()

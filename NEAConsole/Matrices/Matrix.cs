@@ -170,21 +170,6 @@ public class Matrix
         values = new double[Rows, Columns];
     }
 
-    public static Matrix operator -(Matrix m)
-    {
-        Matrix output = new(m.Rows, m.Columns);
-
-        for (int i = 0; i < m.Rows; i++)
-        {
-            for (int j = 0; j < m.Columns; j++)
-            {
-                output[i, j] = -m[i, j];
-            }
-        }
-
-        return m;
-    }
-
     public static Matrix operator +(Matrix a, Matrix b)
     {
         Matrix m = new(a.Rows, a.Columns);
@@ -200,7 +185,9 @@ public class Matrix
         return m;
     }
 
+    public static Matrix operator -(Matrix m) => -1 * m;
     public static Matrix operator -(Matrix a, Matrix b) => a + -b;
+
 
     public IEnumerable<double> GetRow(int rowIndex)
     {
@@ -232,6 +219,7 @@ public class Matrix
         return m;
     }
 
+
     public static Matrix operator *(Matrix a, Matrix b)
     {
         Matrix m = new(a.Rows, b.Columns);
@@ -247,22 +235,26 @@ public class Matrix
         return m;
     }
 
-    public static bool operator ==(Matrix a, Matrix b)
+    public override bool Equals(object? obj)
     {
-        if (a.Rows != b.Rows || a.Columns != b.Columns) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj is not Matrix mat) return false;
 
-        for (int i = 0; i < a.Rows; i++)
+        if (Rows != mat.Rows || Columns != mat.Columns) return false;
+
+        for (int i = 0; i < Rows; i++)
         {
-            for (int j = 0; j < b.Columns; j++)
+            for (int j = 0; j < Columns; j++)
             {
-                if (a[i,j] != b[i, j]) return false;
+                if (this[i, j] != mat[i, j]) return false;
             }
         }
 
         return true;
     }
 
-    public static bool operator !=(Matrix a, Matrix b) => !(a == b);
+    public static bool operator ==(Matrix a, Matrix b) => a.Equals(b);
+    public static bool operator !=(Matrix a, Matrix b) => !a.Equals(b);
 
     public override string ToString()
     {
@@ -280,5 +272,19 @@ public class Matrix
         }
 
         return sb.ToString().TrimEnd('\n').TrimEnd('\r');
+    }
+
+    public override int GetHashCode()
+    {
+        HashCode hash = new();
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j < Columns; j++)
+            {
+                hash.Add(this[i, j]);
+            }
+        }
+
+        return HashCode.Combine(hash.ToHashCode(), Rows, Columns);
     }
 }

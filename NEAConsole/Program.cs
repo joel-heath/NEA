@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using NEAConsole.Matrices;
 
 namespace NEAConsole;
@@ -74,34 +75,13 @@ internal class Program
         return choice;
     }
 
-    static void DrawMatrixBasic(Matrix m) // naive; needs centering cols based on number widths
-    {
-        int xIndent = Console.CursorLeft;
-        int initY = Console.CursorTop;
-        for (int i = 0; i < m.Rows; i++)
-        {
-            Console.Write('[');
-            for (int j = 0; j < m.Columns; j++)
-            {
-                Console.Write($"{m[i, j]}{(j == m.Columns - 1 ? ']' : " ")}");
-            }
-            if (i < m.Rows - 1)
-            {
-                Console.CursorLeft = xIndent;
-                Console.CursorTop++;
-            }
-        }
-
-        Console.CursorTop = initY;
-    }
-
     static int[] GetMatrixWidths(Matrix m)
     {
         int[] widths = new int[m.Columns];
-        for (int c = 0;c < m.Columns;c++)
+        for (int c = 0; c < m.Columns; c++)
         {
             int max = 0;
-            for (int r = 0;r < m.Rows;r++)
+            for (int r = 0; r < m.Rows; r++)
             {
                 var len = m[r, c].ToString().Length;
                 if (len > max) max = len;
@@ -113,9 +93,29 @@ internal class Program
         return widths;
     }
 
+    static int[] GetInputMatWidths(string[][] m)
+    {
+        int[] widths = new int[m[0].Length];
+        for (int c = 0; c < m[0].Length; c++)
+        {
+            int max = 0;
+            for (int r = 0; r < m.Length; r++)
+            {
+                var val = m[r][c];
+
+                var len = val == "" ? 1 : m[r][c].ToString().Length;
+                if (len > max) max = len;
+            }
+
+            widths[c] = max;
+        }
+
+        return widths;
+    }
+
     static void DrawMatrix(Matrix m)
     {
-        var widths = GetMatrixWidths(m); // center each column based on width
+        var widths = GetMatrixWidths(m);
 
         int xIndent = Console.CursorLeft;
         int initY = Console.CursorTop;
@@ -124,7 +124,10 @@ internal class Program
             Console.Write('[');
             for (int j = 0; j < m.Columns; j++)
             {
-                Console.Write($"{m[i, j]}{(j == m.Columns - 1 ? ']' : " ")}");
+                var num = m[i, j];
+                var len = num.ToString().Length;
+                var spaces = (widths[j] - len) / 2;
+                Console.Write($"{new string(' ', spaces)}{num}{new string(' ', widths[j] - spaces - len)}{(j < m.Columns - 1 ? " " : "]")}");
             }
             if (i < m.Rows - 1)
             {
@@ -140,6 +143,8 @@ internal class Program
     {
         int xIndent = Console.CursorLeft;
         int yIndent = Console.CursorTop;
+
+        var widths = GetInputMatWidths(m);
 
         for (int i = 0; i < m.Length; i++)
         {
@@ -157,13 +162,18 @@ internal class Program
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
 
-                Console.Write(m[i][j] == "" ? " " : m[i][j]);
+                var value = m[i][j];
+                if (value == "") value = " ";
+                var len = value.ToString().Length;
+                var spaces = (widths[j] - len) / 2;
+                Console.Write($"{new string(' ', spaces)}{value}{new string(' ', widths[j] - spaces - len)}");
+
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write(' ');
             }
             Console.CursorLeft--;
-            Console.Write("] "); // write an extra space in case they backspaced and need to overite old bracket
+            Console.Write("] "); // write an extra space in case they backspaced and need to overwrite old bracket
             Console.CursorLeft = xIndent;
             Console.CursorTop++;
         }
@@ -190,6 +200,7 @@ internal class Program
     static Matrix InputMatrix(int rows, int cols)
     {
         Console.CursorVisible = false;
+        var initY = Console.CursorTop;
 
         Matrix? m = null!; // compilation purposes, wont ever return null
         string[][] inputs = EmptyInputMat(rows, cols); // why is it a jagged array you ask? so i can select through it
@@ -240,6 +251,7 @@ internal class Program
                     break;
 
             }
+
             DrawInputMatrix(inputs, x, y);
 
             if (!entering)
@@ -257,16 +269,17 @@ internal class Program
         }
 
         Console.CursorVisible = true;
+        Console.CursorTop = initY + rows;
         return m;
     }
 
     static void MatricesTest()
     {
         var mode = Random.Shared.Next(0, 3);
-
         (int rows, int cols) = (Random.Shared.Next(1, 4), Random.Shared.Next(1, 4));
+
         Matrix mat1 = new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)));
-        Matrix mat2 = mode == 2 ? new(cols, Random.Shared.Next(0, 4), Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)))
+        Matrix mat2 = mode == 2 ? new(cols, rows = Random.Shared.Next(0, 4), Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)))
                                 : new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)));
 
         (Matrix answer, char sign) = mode switch
@@ -301,12 +314,14 @@ internal class Program
             Console.WriteLine("Incorrect. The correct answer was: ");
             DrawMatrix(answer);
         }
+
         Console.ReadKey();
+        Console.Clear();
     }
 
     static void SimplexTest()
     {
-
+        (int x, int y) solution = (Random.Shared.Next(2, 6), Random.Shared.Next(2, 6));
     }
 
     static void MathsMenu()
@@ -327,7 +342,7 @@ internal class Program
             {
                 case 0: menu = MatricesTest; break;
                 case 1: menu = SimplexTest; break;
-                case 6: @continue = false; break;
+                case 5: @continue = false; break;
             }
 
             if (menu is not null)
@@ -338,6 +353,7 @@ internal class Program
             }
         }
 
+        Console.Clear();
     }
     static void CSciMenu()
     {
@@ -367,6 +383,7 @@ internal class Program
                 Console.Clear();
                 menu.Invoke();
                 menu = null;
+                Console.WriteLine("Choose a subject to revise");
             }
         }
     }

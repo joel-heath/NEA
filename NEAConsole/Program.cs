@@ -345,21 +345,42 @@ internal class Program
         HashSet<int> gradients = new(4);
 
         int m = GenerateUniqueGradient(gradients);
-        (int m, int c) l1 = (m, m * solution.x + solution.y); // lines that go through solution
+        (int m, int c) l1 = (m, m * -solution.x + solution.y); // lines that go through solution
         m = GenerateUniqueGradient(gradients);
-        (int m, int c) l2 = (m, m * solution.x + solution.y); // lines that go through solution
+        (int m, int c) l2 = (m, m * -solution.x + solution.y); // lines that go through solution
         m = GenerateUniqueGradient(gradients);
-        (int m, int c) l3 = (m, m * solution.x + solution.y + 2); // lines that goes over solution (redundant, just makes question more complicated)
+        (int m, int c) l3 = (m, m * -solution.x + solution.y + 2); // lines that goes over solution (redundant, just makes question more complicated)
 
-        m = GenerateUniqueGradient(gradients);
-        (int x, int y) objective = (m, -1); // mx - y
-
-
-        Console.WriteLine($"Maximise {objective.x}x - {objective.y}y");
-        Console.WriteLine($"Subject to ");
+        m = -GenerateUniqueGradient(gradients);
+        (int x, int y) objective = (m, 1); // objective line (no c)
 
 
+        Console.WriteLine($"Maximise P = {objective.x}x + y");
+        Console.WriteLine($"Subject to:");
+        Console.WriteLine($"    {-l1.m}x + y <= {l1.c}");
+        Console.WriteLine($"    {-l2.m}x + y <= {l2.c}");
+        Console.WriteLine($"    {-l3.m}x + y <= {l3.c}");
 
+        Console.Write("\nP = ");
+        double P = double.Parse(Console.ReadLine() ?? "0");
+        Console.Write("x = ");
+        double x = double.Parse(Console.ReadLine() ?? "0");
+        Console.Write("y = ");
+        double y = double.Parse(Console.ReadLine() ?? "0");
+
+        var correctP = objective.x * solution.x + objective.y * solution.y;
+        if (x == solution.x && y == solution.y && P == correctP)
+        {
+            Console.WriteLine("Correct!");
+            Console.ReadKey();
+        }
+        else
+        {
+            Console.WriteLine("Incorrect, the correct answer was:");
+            Console.WriteLine("P = " + correctP);
+            Console.WriteLine("x = " + solution.x);
+            Console.WriteLine("y = " + solution.y);
+        }
     }
 
     static void MathsMenu()

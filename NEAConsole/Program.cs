@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Security.AccessControl;
 using NEAConsole.Matrices;
 
 namespace NEAConsole;
@@ -353,29 +354,86 @@ internal class Program
         }
 
         /// <summary>
-        /// Generates a new inequality for the current LP based on current gradients & solution.
-        /// </summary>
-        /// <param name="x">Solution's x-ordinate</param>
-        /// <param name="y">Solution's y-ordinate</param>
-        /// <param name="inequality">Inequality type: <=, >=, or =</param>
-        /// <param name="gradients">Pre-existing gradients for LP, passed so that there are not infinite solutions</param>
-        public SimplexInequality(int x, int y, InequalityType inequality, HashSet<int> gradients)
-        {
-            var m = GenerateUniqueGradient(gradients);
-            (int m, int c) l1 = (m, m * -x + y); // lines that go through solution
-
-
-        }
-
-        /// <summary>
         /// MAXIMUM 3 VARIABLES (x, y, z)
         /// Does NOT simplify a + -b to a - b
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}{i + 'x'}"));
+        public override string ToString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}{(char)(i + 'x')}"))
+                                             + $" {(int)Inequality switch { 0 => "<=", 1 => ">=", _ => "=" }} {Constant}";
+        public string ToObjectiveString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}{(char)(i + 'x')}"));
+
     }
 
     static void SimplexTest()
+    {
+        int dimensions = Random.Shared.Next(2, 4);
+        int[] solution = Enumerable.Range(0, dimensions).Select(n => Random.Shared.Next(2, 6)).ToArray();
+
+        SimplexInequality[] constraints = new SimplexInequality[dimensions];
+
+        for (int i = 0; i < dimensions; i++)
+        {
+            int[] coeffs = new int[dimensions];
+            var constant = 0;
+            for (int j = 0; j < dimensions; j++)
+            {
+                var coefficient = Random.Shared.Next(1, 6);
+                coeffs[j] = coefficient;
+                constant += coefficient * solution[j];
+            }
+
+            constraints[i] = new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
+        }
+
+        SimplexInequality objective; // just would prefer these to be garbage collected :)
+        {
+            int[] coeffs = new int[dimensions];
+            var constant = 0;
+            for (int j = 0; j < dimensions; j++)
+            {
+                var coefficient = Random.Shared.Next(1, 6);
+                coeffs[j] = coefficient;
+                constant += coefficient * solution[j];
+            }
+
+            objective = new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
+        }
+
+        Console.WriteLine($"Maximise P = {objective.ToObjectiveString()}");
+        Console.WriteLine($"Subject to:");
+
+        for (int i = 0; i < dimensions; i++)
+        {
+            Console.WriteLine($"    {constraints[i]}");
+        }
+
+        Console.Write("\nP = ");
+        var P = int.Parse(Console.ReadLine() ?? "0");
+        var input = new int[dimensions];
+        for (int i = 0; i < dimensions; i++)
+        {
+            Console.Write((char)('x' + i) + " = ");
+            input[i] = int.Parse(Console.ReadLine() ?? "0");
+        }
+        
+        if (input.Where((n, i) => n != solution[i]).Any())
+        {
+            Console.WriteLine("Incorrect, the correct answer was:");
+            Console.WriteLine("P = " + objective.Constant);
+            for (int i = 0; i < dimensions; i++)
+            {
+                Console.Write((char)('x' + i) + " = " + solution[i]);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Correct!");
+        }
+
+        Console.ReadKey();
+    }
+
+    static void SimplexTest2D()
     {
         (int x, int y) solution = (Random.Shared.Next(2, 6), Random.Shared.Next(2, 6));
 

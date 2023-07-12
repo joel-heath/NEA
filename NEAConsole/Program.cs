@@ -69,7 +69,7 @@ internal class Program
                 Console.Write('<');
             }
         }
-        
+
         Console.SetCursorPosition(0, 0);
         Console.CursorVisible = true;
         return choice;
@@ -292,7 +292,7 @@ internal class Program
 
         DrawMatrix(mat1);
 
-        var signSpacing = (rows-1) / 2;
+        var signSpacing = (rows - 1) / 2;
         Console.CursorTop += signSpacing;
         Console.Write($" {sign} ");
         Console.CursorTop -= signSpacing;
@@ -301,7 +301,7 @@ internal class Program
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
         Console.CursorTop -= signSpacing;
-        
+
         Matrix input = InputMatrix(answer.Rows, answer.Columns);
 
         Console.WriteLine();
@@ -336,6 +336,43 @@ internal class Program
         }
         gradients.Add(m);
         return m;
+    }
+
+    public record class SimplexInequality
+    {
+        public enum InequalityType { LessThan, GreaterThan, Equal }
+        public int[] Coefficients { get; }
+        public int Constant { get; }
+        public InequalityType Inequality { get; }
+
+        public SimplexInequality(int[] coeffs, int constant, InequalityType inequality)
+        {
+            Coefficients = coeffs;
+            Constant = constant;
+            Inequality = inequality;
+        }
+
+        /// <summary>
+        /// Generates a new inequality for the current LP based on current gradients & solution.
+        /// </summary>
+        /// <param name="x">Solution's x-ordinate</param>
+        /// <param name="y">Solution's y-ordinate</param>
+        /// <param name="inequality">Inequality type: <=, >=, or =</param>
+        /// <param name="gradients">Pre-existing gradients for LP, passed so that there are not infinite solutions</param>
+        public SimplexInequality(int x, int y, InequalityType inequality, HashSet<int> gradients)
+        {
+            var m = GenerateUniqueGradient(gradients);
+            (int m, int c) l1 = (m, m * -x + y); // lines that go through solution
+
+
+        }
+
+        /// <summary>
+        /// MAXIMUM 3 VARIABLES (x, y, z)
+        /// Does NOT simplify a + -b to a - b
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}{i + 'x'}"));
     }
 
     static void SimplexTest()

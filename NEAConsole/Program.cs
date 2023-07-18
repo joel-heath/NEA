@@ -28,7 +28,7 @@ internal class Program
         while (choosing)
         {
             var changed = false;
-            ConsoleKey key = Console.ReadKey().Key;
+            ConsoleKey key = Console.ReadKey(true).Key;
             switch (key)
             {
                 case ConsoleKey.UpArrow:
@@ -316,7 +316,7 @@ internal class Program
             DrawMatrix(answer);
         }
 
-        Console.ReadKey();
+        Console.ReadKey(true);
         Console.Clear();
     }
 
@@ -381,23 +381,15 @@ internal class Program
                 coeffs[j] = coefficient;
                 constant += coefficient * solution[j];
             }
-
+            var remainder = constant % dimensions; // need to make sure we have integer objective
+                                                   // objective is average of constraints, therefore must be divisible by dimensions
+            coeffs[dimensions - 1] += remainder;
+            constant += remainder;
+            
             constraints[i] = new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
         }
 
-        SimplexInequality objective; // just would prefer these to be garbage collected :)
-        {
-            int[] coeffs = new int[dimensions];
-            var constant = 0;
-            for (int j = 0; j < dimensions; j++)
-            {
-                var coefficient = Random.Shared.Next(1, 6);
-                coeffs[j] = coefficient;
-                constant += coefficient * solution[j];
-            }
-
-            objective = new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
-        }
+        SimplexInequality objective = GenerateObjectiveFunction(dimensions, solution, constraints);
 
         Console.WriteLine($"Maximise P = {objective.ToObjectiveString()}");
         Console.WriteLine($"Subject to:");
@@ -415,7 +407,7 @@ internal class Program
             Console.Write((char)('x' + i) + " = ");
             input[i] = int.Parse(Console.ReadLine() ?? "0");
         }
-        
+
         if (input.Where((n, i) => n != solution[i]).Any())
         {
             Console.WriteLine("Incorrect, the correct answer was:");
@@ -430,7 +422,27 @@ internal class Program
             Console.WriteLine("Correct!");
         }
 
-        Console.ReadKey();
+        Console.ReadKey(true);
+    }
+
+    private static SimplexInequality GenerateObjectiveFunction(int dimensions, int[] solution, SimplexInequality[] constraints)
+    {
+        int[] coeffs = new int[dimensions];
+        var constant = 0;
+        for (int i = 0; i < dimensions; i++)
+        {
+            int coefficient = 0; // AVERAGING TO AN INT!! WE MUST MAKE SURE CONTRAINTS AVERAGE TO AN INT
+                                 // TODO: Generate n-1 rand numbers. gen nth rand number, mod sum by n, add result to final num.
+            for (int j = 0; j < dimensions; j++)
+            {
+                coefficient += constraints[i].Coefficients[j];
+            }
+            coefficient /= dimensions;
+            coeffs[i] = coefficient;
+            constant += coefficient * solution[i];
+        }
+
+        return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan); ;
     }
 
     static void SimplexTest2D()
@@ -467,7 +479,7 @@ internal class Program
         if (x == solution.x && y == solution.y && P == correctP)
         {
             Console.WriteLine("Correct!");
-            Console.ReadKey();
+            Console.ReadKey(true);
         }
         else
         {

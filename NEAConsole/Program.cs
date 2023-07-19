@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using NEAConsole.Matrices;
 
 namespace NEAConsole;
-internal class Program
+public class Program
 {
     static void ListChoices(string[] options)
     {
@@ -320,30 +321,11 @@ internal class Program
         Console.Clear();
     }
 
-    static int GenerateUniqueGradient(HashSet<int> gradients)
-    {
-        int m = Random.Shared.Next(-5, 0);
-        if (!gradients.Contains(m))
-        {
-            gradients.Add(m);
-            return m; // compiler moment
-        }
-
-        bool newFound = false;
-        while (!newFound)
-        {
-            m = Random.Shared.Next(-5, 0);
-            if (!gradients.Contains(m)) newFound = true;
-        }
-        gradients.Add(m);
-        return m;
-    }
-
     public record class SimplexInequality
     {
         public enum InequalityType { LessThan, GreaterThan, Equal }
         public int[] Coefficients { get; }
-        public int Constant { get; }
+        public int Constant { get; set; }
         public InequalityType Inequality { get; }
 
         public SimplexInequality(int[] coeffs, int constant, InequalityType inequality)
@@ -369,24 +351,26 @@ internal class Program
         int dimensions = Random.Shared.Next(2, 4);
         int[] solution = Enumerable.Range(0, dimensions).Select(n => Random.Shared.Next(2, 6)).ToArray();
 
-        SimplexInequality[] constraints = new SimplexInequality[dimensions];
+        var constraints = new SimplexInequality[dimensions];
 
         for (int i = 0; i < dimensions; i++)
         {
-            int[] coeffs = new int[dimensions];
-            var constant = 0;
+            constraints[i] = CreateConstraint(dimensions, solution);
+        }
+
+        // make sure objective is integers (make constraints divisible by dimensions)
+        for (int i = 0; i < dimensions; i++)
+        {
+            var sum = 0;
             for (int j = 0; j < dimensions; j++)
             {
-                var coefficient = Random.Shared.Next(1, 6);
-                coeffs[j] = coefficient;
-                constant += coefficient * solution[j];
+                sum += constraints[j].Coefficients[i];
             }
-            var remainder = constant % dimensions; // need to make sure we have integer objective
-                                                   // objective is average of constraints, therefore must be divisible by dimensions
-            coeffs[dimensions - 1] += remainder;
-            constant += remainder;
-            
-            constraints[i] = new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
+            var remainder = dimensions - (sum % dimensions); // need to make sure we have integer objective
+                                                                // objective is average of constraints, therefore must be divisible by dimensions
+            // suppose sum of coefficients is 11 in a 3D LP. 11 % 3 == 2, 3 - 2 = 1, 11 + 1 = 12 now its divisible by 3.
+            constraints[dimensions - 1].Coefficients[i] += remainder;
+            constraints[dimensions - 1].Constant += remainder * solution[i];
         }
 
         SimplexInequality objective = GenerateObjectiveFunction(dimensions, solution, constraints);
@@ -400,7 +384,7 @@ internal class Program
         }
 
         Console.Write("\nP = ");
-        var P = int.Parse(Console.ReadLine() ?? "0");
+        var P = int.Parse(Console.ReadLine() ?? "0"); // need to catch potential input errors here
         var input = new int[dimensions];
         for (int i = 0; i < dimensions; i++)
         {
@@ -423,9 +407,24 @@ internal class Program
         }
 
         Console.ReadKey(true);
+        Console.Clear();
     }
 
-    private static SimplexInequality GenerateObjectiveFunction(int dimensions, int[] solution, SimplexInequality[] constraints)
+    public static SimplexInequality CreateConstraint(int dimensions, int[] solution)
+    {
+        int[] coeffs = new int[dimensions];
+        var constant = 0;
+        for (int j = 0; j < dimensions; j++)
+        {
+            var coefficient = Random.Shared.Next(1, 6);
+            coeffs[j] = coefficient;
+            constant += coefficient * solution[j];
+        }
+
+        return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
+    }
+
+    private static SimplexInequality GenerateObjectiveFunction(int dimensions, int[] solution, IList<SimplexInequality> constraints)
     {
         int[] coeffs = new int[dimensions];
         var constant = 0;
@@ -435,59 +434,16 @@ internal class Program
                                  // TODO: Generate n-1 rand numbers. gen nth rand number, mod sum by n, add result to final num.
             for (int j = 0; j < dimensions; j++)
             {
-                coefficient += constraints[i].Coefficients[j];
+                coefficient += constraints[j].Coefficients[i];
             }
+
+            if (coefficient % dimensions != 0) throw new Exception("Constraints are not divisible by the number of dimensions");
             coefficient /= dimensions;
             coeffs[i] = coefficient;
             constant += coefficient * solution[i];
         }
 
         return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan); ;
-    }
-
-    static void SimplexTest2D()
-    {
-        (int x, int y) solution = (Random.Shared.Next(2, 6), Random.Shared.Next(2, 6));
-
-        HashSet<int> gradients = new(4);
-
-        int m = GenerateUniqueGradient(gradients);
-        (int m, int c) l1 = (m, m * -solution.x + solution.y); // lines that go through solution
-        m = GenerateUniqueGradient(gradients);
-        (int m, int c) l2 = (m, m * -solution.x + solution.y); // lines that go through solution
-        m = GenerateUniqueGradient(gradients);
-        (int m, int c) l3 = (m, m * -solution.x + solution.y + 2); // lines that goes over solution (redundant, just makes question more complicated)
-
-        m = -GenerateUniqueGradient(gradients);
-        (int x, int y) objective = (m, 1); // objective line (no c)
-
-
-        Console.WriteLine($"Maximise P = {objective.x}x + y");
-        Console.WriteLine($"Subject to:");
-        Console.WriteLine($"    {-l1.m}x + y <= {l1.c}");
-        Console.WriteLine($"    {-l2.m}x + y <= {l2.c}");
-        Console.WriteLine($"    {-l3.m}x + y <= {l3.c}");
-
-        Console.Write("\nP = ");
-        double P = double.Parse(Console.ReadLine() ?? "0");
-        Console.Write("x = ");
-        double x = double.Parse(Console.ReadLine() ?? "0");
-        Console.Write("y = ");
-        double y = double.Parse(Console.ReadLine() ?? "0");
-
-        var correctP = objective.x * solution.x + objective.y * solution.y;
-        if (x == solution.x && y == solution.y && P == correctP)
-        {
-            Console.WriteLine("Correct!");
-            Console.ReadKey(true);
-        }
-        else
-        {
-            Console.WriteLine("Incorrect, the correct answer was:");
-            Console.WriteLine("P = " + correctP);
-            Console.WriteLine("x = " + solution.x);
-            Console.WriteLine("y = " + solution.y);
-        }
     }
 
     static void MathsMenu()
@@ -521,6 +477,7 @@ internal class Program
 
         Console.Clear();
     }
+
     static void CSciMenu()
     {
 

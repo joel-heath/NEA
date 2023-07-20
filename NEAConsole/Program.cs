@@ -7,7 +7,13 @@ using NEAConsole.Matrices;
 namespace NEAConsole;
 public class Program
 {
-    static void ListChoices(string[] options)
+    public record struct MenuOption(string DisplayText, Action OnSelected)
+    {
+        public int Length => DisplayText.Length;
+        public override readonly string ToString() => DisplayText;
+        public static implicit operator MenuOption((string DisplayText, Action OnSelected) tuple) => new(tuple.DisplayText, tuple.OnSelected);
+    }
+    static void ListChoices(MenuOption[] options)
     {
         var yPos = Console.CursorTop;
         Console.WriteLine($"> {options[0]} <");
@@ -15,12 +21,14 @@ public class Program
         {
             Console.WriteLine($"  {options[i]}  ");
         }
+        //Console.WriteLine($"  Exit  ");
 
         Console.CursorTop = yPos;
     }
 
-    static int Choose(string[] options)
+    static int Choose(MenuOption[] options)
     {
+        //options = options.Append("Exit").ToArray();
         Console.CursorVisible = false;
         ListChoices(options);
 
@@ -452,29 +460,8 @@ public class Program
     }
     static void FMathsMenu()
     {
-        string[] options = { "Matrices", "Simplex", "Hypothesis Testing", "Dijkstra's", "Prim's", "Return" };
-
-        Console.WriteLine("Choose a topic to be tested on");
-
-        bool @continue = true;
-        Action? menu = null; // will be resolved
-        while (@continue)
-        {
-            switch (Choose(options))
-            {
-                case 0: menu = MatricesTest; break;
-                case 1: menu = SimplexTest; break;
-                case 5: @continue = false; break;
-            }
-
-            if (menu is not null)
-            {
-                Console.Clear();
-                menu.Invoke();
-                menu = null;
-            }
-        }
-
+        MenuOption[] options = { ("Matrices", MatricesTest), ("Simplex", SimplexTest), ("Hypothesis Testing", CSciMenu), ("Dijkstra's", CSciMenu), ("Prim's", CSciMenu), ("Return", CSciMenu) };
+        GenericMenu(options, "Choose a subject to revise");
         Console.Clear();
     }
 
@@ -485,28 +472,27 @@ public class Program
 
     static void Main(string[] args)
     {
-        string[] options = { "Maths", "Further Maths", "Computer Science", "Exit" };
+        MenuOption[] options = { ("Maths", MathsMenu), ("Further Maths", FMathsMenu), ("Computer Science", CSciMenu) };
+        GenericMenu(options, "Choose a subject to revise");
+        Console.Clear();
+    }
 
-        Console.WriteLine("Choose a subject to revise");
 
+    static void GenericMenu(MenuOption[] options, string prompt)
+    {
         bool @continue = true;
-        Action? menu = null; // will be resolved
         while (@continue)
         {
-            switch (Choose(options))
-            {
-                case 0: menu = MathsMenu; break;
-                case 1: menu = FMathsMenu; break;
-                case 2: menu = CSciMenu; break;
-                case 3: @continue = false; break;
+            Console.WriteLine(prompt);
+            var choice = Choose(options);
+            if (choice >= options.Length)
+            { 
+                @continue = false; 
             }
-
-            if (menu is not null)
+            else
             {
                 Console.Clear();
-                menu.Invoke();
-                menu = null;
-                Console.WriteLine("Choose a subject to revise");
+                options[choice].OnSelected();
             }
         }
     }

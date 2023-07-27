@@ -84,6 +84,8 @@ public class Matrix
         }
     }
 
+    public static Matrix Zero(int dimension) => new(dimension, dimension);
+
     public static Matrix Identity(int dimension)
     {
         Matrix m = Zero(dimension);
@@ -91,7 +93,6 @@ public class Matrix
 
         return m;
     }
-    public static Matrix Zero(int dimension) => new(dimension, dimension);
 
     public Matrix Minor(int row, int col)
     {
@@ -188,7 +189,6 @@ public class Matrix
     public static Matrix operator -(Matrix m) => -1 * m;
     public static Matrix operator -(Matrix a, Matrix b) => a + -b;
 
-
     public IEnumerable<double> GetRow(int rowIndex)
     {
         for (int i = 0; i < Columns; i++)
@@ -218,7 +218,6 @@ public class Matrix
 
         return m;
     }
-
 
     public static Matrix operator *(Matrix a, Matrix b)
     {

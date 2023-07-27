@@ -49,4 +49,20 @@ public static class MatrixExtensions
 
         return widened;
     }
+
+    public static Matrix ToMatrix(this Matrix input) => ToMatrix(input, (el) => el);
+    public static Matrix ToMatrix(this Matrix input, Func<double, double> selector)
+    {
+        var output = new Matrix(input.Rows, input.Columns);
+
+        for (int i = 0; i < output.Rows; i++)
+        {
+            for (int j = 0; j < output.Columns; j++)
+            {
+                output[i, j] = selector(input[i, j]);
+            }
+        }
+
+        return output;
+    }
 }

@@ -61,6 +61,11 @@ internal static class Menu
                 case ConsoleKey.Enter:
                     choosing = false;
                     break;
+
+                case ConsoleKey.Escape:
+                    choice = options.Count - 1; // the exit / return option
+                    choosing = false;
+                    break;
             }
 
             if (changed)

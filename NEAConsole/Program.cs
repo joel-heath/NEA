@@ -9,7 +9,7 @@ public class Program
     }
     static void FMathsMenu()
     {
-        ITest[] options = { new MatricesTest(), new SimplexTest() }; //, ("Hypothesis Testing", CSciMenu), ("Dijkstra's", CSciMenu), ("Prim's", CSciMenu), ("Return", CSciMenu) };
+        ITest[] options = { new MatricesTest(), new SimplexTest(), new PrimsTest() }; //, Hypothesis Testing, Dijkstra's 
         GenericMenu(options, "Choose a subject to revise");
         Console.Clear();
     }

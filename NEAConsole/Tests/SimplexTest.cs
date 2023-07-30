@@ -9,11 +9,12 @@ namespace NEAConsole.Tests;
 internal class SimplexTest : ITest
 {
     public string DisplayText => "Simplex";
+    private readonly Random random;
 
     public void Test()
     {
-        int dimensions = Random.Shared.Next(2, 4);
-        int[] solution = Enumerable.Range(0, dimensions).Select(n => Random.Shared.Next(2, 6)).ToArray();
+        int dimensions = random.Next(2, 4);
+        int[] solution = Enumerable.Range(0, dimensions).Select(n => random.Next(2, 6)).ToArray();
 
         var constraints = new SimplexInequality[dimensions];
 
@@ -74,13 +75,13 @@ internal class SimplexTest : ITest
         Console.Clear();
     }
 
-    public static SimplexInequality CreateConstraint(int dimensions, int[] solution)
+    private SimplexInequality CreateConstraint(int dimensions, int[] solution)
     {
         int[] coeffs = new int[dimensions];
         var constant = 0;
         for (int j = 0; j < dimensions; j++)
         {
-            var coefficient = Random.Shared.Next(1, 6);
+            var coefficient = random.Next(1, 6);
             coeffs[j] = coefficient;
             constant += coefficient * solution[j];
         }
@@ -107,6 +108,9 @@ internal class SimplexTest : ITest
             constant += coefficient * solution[i];
         }
 
-        return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan); ;
+        return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
     }
+
+    public SimplexTest() : this(new Random()) { }
+    public SimplexTest(Random randomNumberGenerator) => random = randomNumberGenerator;
 }

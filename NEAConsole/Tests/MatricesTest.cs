@@ -4,14 +4,15 @@ namespace NEAConsole.Tests;
 internal class MatricesTest : ITest
 {
     public string DisplayText => "Matrices";
+    private readonly Random random;
     public void Test()
     {
-        var mode = Random.Shared.Next(0, 3);
-        (int rows, int cols) = (Random.Shared.Next(1, 4), Random.Shared.Next(1, 4));
+        var mode = random.Next(0, 3);
+        (int rows, int cols) = (random.Next(1, 4), random.Next(1, 4));
 
-        Matrix mat1 = new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)));
-        Matrix mat2 = mode == 2 ? new(cols, rows = Random.Shared.Next(0, 4), Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)))
-                                : new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)Random.Shared.Next(-10, 10)));
+        Matrix mat1 = new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)random.Next(-10, 10)));
+        Matrix mat2 = mode == 2 ? new(cols, rows = random.Next(0, 4), Enumerable.Range(0, rows * cols).Select(n => (double)random.Next(-10, 10)))
+                                : new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)random.Next(-10, 10)));
 
         (Matrix answer, char sign) = mode switch
         {
@@ -50,7 +51,7 @@ internal class MatricesTest : ITest
         Console.Clear();
     }
 
-    static void DrawMatrix(Matrix m)
+    private static void DrawMatrix(Matrix m)
     {
         var widths = GetMatrixWidths(m);
 
@@ -76,7 +77,7 @@ internal class MatricesTest : ITest
         Console.CursorTop = initY;
     }
 
-    static void DrawInputMatrix(string[][] m, int x, int y)
+    private static void DrawInputMatrix(string[][] m, int x, int y)
     {
         int xIndent = Console.CursorLeft;
         int yIndent = Console.CursorTop;
@@ -118,7 +119,7 @@ internal class MatricesTest : ITest
         Console.CursorTop = yIndent;
     }
 
-    static string[][] EmptyInputMat(int rows, int cols) // the pains of a 2d array
+    private static string[][] EmptyInputMat(int rows, int cols) // the pains of a 2d array
     {
         string[][] inputs = new string[rows][];
 
@@ -134,7 +135,7 @@ internal class MatricesTest : ITest
         return inputs;
     }
 
-    static Matrix InputMatrix(int rows, int cols)
+    private static Matrix InputMatrix(int rows, int cols)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
@@ -210,7 +211,7 @@ internal class MatricesTest : ITest
         return m;
     }
 
-    static int[] GetMatrixWidths(Matrix m)
+    private static int[] GetMatrixWidths(Matrix m)
     {
         int[] widths = new int[m.Columns];
         for (int c = 0; c < m.Columns; c++)
@@ -228,7 +229,7 @@ internal class MatricesTest : ITest
         return widths;
     }
 
-    static int[] GetInputMatWidths(string[][] m)
+    private static int[] GetInputMatWidths(string[][] m)
     {
         int[] widths = new int[m[0].Length];
         for (int c = 0; c < m[0].Length; c++)
@@ -247,4 +248,7 @@ internal class MatricesTest : ITest
 
         return widths;
     }
+
+    public MatricesTest() : this(new Random()) { }
+    public MatricesTest(Random randomNumberGenerator) => random = randomNumberGenerator;
 }

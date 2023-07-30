@@ -5,17 +5,19 @@ namespace NEAConsole.Tests;
 internal class PrimsTest : ITest
 {
     public string DisplayText => "Prim's Algorithm";
+    private readonly Random random;
+
     public void Test()
     {
-        var dimension = Random.Shared.Next(8, 11);
+        var dimension = random.Next(8, 11);
         Matrix tree = new(dimension);
 
         for (int i = 1; i < dimension; i++)
         {
             // pick one of the already connected vertices to connect this new one to
-            var connector = Random.Shared.Next(0, i);
+            var connector = random.Next(0, i);
 
-            var weight = Random.Shared.Next(1, 16);
+            var weight = random.Next(1, 16);
 
             tree[connector, i] = weight;
             tree[i, connector] = weight;
@@ -29,10 +31,10 @@ internal class PrimsTest : ITest
             int node1 = 0, node2 = 0;
             while (tree[node1, node2] != 0)
             {
-                node1 = Random.Shared.Next(0, dimension);
-                node2 = Random.Shared.Next(0, dimension);
+                node1 = random.Next(0, dimension);
+                node2 = random.Next(0, dimension);
             }
-            var weight = Random.Shared.Next(1, 16);
+            var weight = random.Next(1, 16);
 
             if (tree[node1, node2] != 0 || tree[node2, node1] != 0) throw new Exception("Did not successfully choose nodes that weren't already connected");
 
@@ -77,7 +79,7 @@ internal class PrimsTest : ITest
         return true;
     }
 
-    static void DrawMatrix(Matrix m, int x, int y, IReadOnlyCollection<(int row, int col)> chosenEdges)
+    private static void DrawMatrix(Matrix m, int x, int y, IReadOnlyCollection<(int row, int col)> chosenEdges)
     {
         int xIndent = Console.CursorLeft;
         int yIndent = Console.CursorTop;
@@ -123,7 +125,7 @@ internal class PrimsTest : ITest
         Console.CursorTop = yIndent;
     }
 
-    static HashSet<(int row, int col)> InputEdges(Matrix adjacency)
+    private static HashSet<(int row, int col)> InputEdges(Matrix adjacency)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
@@ -180,7 +182,7 @@ internal class PrimsTest : ITest
         return chosenEdges;
     }
 
-    static int[] GetMatrixWidths(Matrix m)
+    private static int[] GetMatrixWidths(Matrix m)
     {
         int[] widths = new int[m.Columns];
         for (int c = 0; c < m.Columns; c++)
@@ -197,4 +199,7 @@ internal class PrimsTest : ITest
 
         return widths;
     }
+
+    public PrimsTest() : this(new Random()) { }
+    public PrimsTest(Random randomNumberGenerator) => random = randomNumberGenerator;
 }

@@ -1,4 +1,4 @@
-﻿using NEAConsole.Tests;
+﻿using NEAConsole.Problems;
 
 namespace NEAConsole;
 public class Program
@@ -9,9 +9,7 @@ public class Program
     }
     static void FMathsMenu()
     {
-        ITest[] options = { new MatricesTest(), new SimplexTest(), new PrimsTest() }; //, Hypothesis Testing, Dijkstra's 
-
-
+        IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator() }; // Hypothesis Testing, Dijkstra's
 
         GenericMenu(options, "Choose a subject to revise");
         Console.Clear();
@@ -29,7 +27,7 @@ public class Program
         Console.Clear();
     }
 
-    static void GenericMenu(IEnumerable<ITest> options, string prompt)
+    static void GenericMenu(IEnumerable<IProblemGenerator> options, string prompt)
         => GenericMenu(options.ToMenuOptions(), prompt);
     static void GenericMenu(IEnumerable<MenuOption> options, string prompt)
     {

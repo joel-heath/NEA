@@ -1,82 +1,51 @@
 ﻿using NEAConsole.Matrices;
-using System;
 
-namespace NEAConsole.Tests;
-internal class PrimsTest : ITest
+namespace NEAConsole.Problems;
+internal class PrimsProblem : IProblem
 {
-    public string DisplayText => "Prim's Algorithm";
-    private readonly Random random;
+    private readonly Matrix adjacencyMatrix;
+    private readonly HashSet<(int row, int col)> solution;
+    private HashSet<(int row, int col)>? answer;
 
-    public void Test()
+    public void Display()
     {
-        var dimension = random.Next(8, 11);
-        Matrix tree = new(dimension);
-
-        for (int i = 1; i < dimension; i++)
-        {
-            // pick one of the already connected vertices to connect this new one to
-            var connector = random.Next(0, i);
-
-            var weight = random.Next(1, 16);
-
-            tree[connector, i] = weight;
-            tree[i, connector] = weight;
-        }
-
-        // 5x^2 - 85x + 367   (see 2. Robert J. Prim's algorithm -- pg 10)
-        var edgesToAdd = 5 * dimension * dimension - 85 * dimension + 367;
-
-        for (int i = 0; i < edgesToAdd; i++)
-        {
-            int node1 = 0, node2 = 0;
-            while (tree[node1, node2] != 0)
-            {
-                node1 = random.Next(0, dimension);
-                node2 = random.Next(0, dimension);
-            }
-            var weight = random.Next(1, 16);
-
-            if (tree[node1, node2] != 0 || tree[node2, node1] != 0) throw new Exception("Did not successfully choose nodes that weren't already connected");
-
-            tree[node1, node2] = weight;
-            tree[node2, node1] = weight;
-        }
-
-        var solution = MatrixUtils.Prims(tree.ToMatrix(e => e == 0 ? double.MaxValue : e)).ToHashSet();
-
-        // now need to give it to the user 
-
         Console.WriteLine("Apply Prim's algorithm to the following adjacency matrix to calculate the minimum spanning tree.");
         Console.WriteLine();
+    }
 
-        var uinput = InputEdges(tree);
-
+    public void GetAnswer()
+    {
+        answer = InputEdges(adjacencyMatrix);
         Console.WriteLine();
-        if (EvaluateAnswer(solution, uinput))
+    }
+
+    public bool EvaluateAnswer()
+    {
+        if (solution.Count != (answer ?? throw new NotAnsweredException()).Count) return false;
+        foreach (var e in solution)
+        {
+            if (!answer.Contains(e))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void Summarise()
+    {
+        if (EvaluateAnswer())
         {
             Console.WriteLine("Correct!");
         }
         else
         {
             Console.WriteLine("Incorrect. The correct answer was: ");
-            DrawMatrix(tree, -1, -1, solution);
+            DrawMatrix(adjacencyMatrix, -1, -1, solution);
         }
 
         Console.ReadKey(true);
         Console.Clear();
-    }
-
-    private static bool EvaluateAnswer(IReadOnlyCollection<(int row, int col)> solution, IReadOnlyCollection<(int row, int col)> uinput)
-    {
-        if (uinput.Count != solution.Count) return false;
-        foreach (var e in solution)
-        {
-            if (!uinput.Contains(e))
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     private static void DrawMatrix(Matrix m, int x, int y, IReadOnlyCollection<(int row, int col)> chosenEdges)
@@ -200,6 +169,9 @@ internal class PrimsTest : ITest
         return widths;
     }
 
-    public PrimsTest() : this(new Random()) { }
-    public PrimsTest(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public PrimsProblem(Matrix adjacencyMatrix, HashSet<(int row, int col)> solution)
+    {
+        this.adjacencyMatrix = adjacencyMatrix;
+        this.solution = solution;
+    }
 }

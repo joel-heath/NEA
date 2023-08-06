@@ -1,4 +1,4 @@
-﻿namespace NEAConsole.Tests;
+﻿namespace NEAConsole.Problems;
 public record class SimplexInequality
 {
     public enum InequalityType { LessThan, GreaterThan, Equal }

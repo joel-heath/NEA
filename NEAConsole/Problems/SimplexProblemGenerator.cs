@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static NEAConsole.Program;
-
-namespace NEAConsole.Tests;
-internal class SimplexTest : ITest
+﻿namespace NEAConsole.Problems;
+internal class SimplexProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Simplex";
     private readonly Random random;
 
-    public void Test()
+    public IProblem Generate()
     {
         int dimensions = random.Next(2, 4);
         int[] solution = Enumerable.Range(0, dimensions).Select(n => random.Next(2, 6)).ToArray();
@@ -40,39 +33,7 @@ internal class SimplexTest : ITest
 
         SimplexInequality objective = GenerateObjectiveFunction(dimensions, solution, constraints);
 
-        Console.WriteLine($"Maximise P = {objective.ToObjectiveString()}");
-        Console.WriteLine($"Subject to:");
-
-        for (int i = 0; i < dimensions; i++)
-        {
-            Console.WriteLine($"    {constraints[i]}");
-        }
-
-        Console.Write("\nP = ");
-        var P = int.Parse(Console.ReadLine() ?? "0"); // need to catch potential input errors here
-        var input = new int[dimensions];
-        for (int i = 0; i < dimensions; i++)
-        {
-            Console.Write((char)('x' + i) + " = ");
-            input[i] = int.Parse(Console.ReadLine() ?? "0");
-        }
-
-        if (input.Where((n, i) => n != solution[i]).Any())
-        {
-            Console.WriteLine("Incorrect, the correct answer was:");
-            Console.WriteLine("P = " + objective.Constant);
-            for (int i = 0; i < dimensions; i++)
-            {
-                Console.WriteLine((char)('x' + i) + " = " + solution[i]);
-            }
-        }
-        else
-        {
-            Console.WriteLine("Correct!");
-        }
-
-        Console.ReadKey(true);
-        Console.Clear();
+        return new SimplexProblem(objective, constraints, solution);
     }
 
     private SimplexInequality CreateConstraint(int dimensions, int[] solution)
@@ -111,6 +72,6 @@ internal class SimplexTest : ITest
         return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
     }
 
-    public SimplexTest() : this(new Random()) { }
-    public SimplexTest(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public SimplexProblemGenerator() : this(new Random()) { }
+    public SimplexProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
 }

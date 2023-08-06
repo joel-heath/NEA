@@ -1,50 +1,47 @@
 ﻿using NEAConsole.Matrices;
 
-namespace NEAConsole.Tests;
-internal class MatricesTest : ITest
+namespace NEAConsole.Problems;
+internal class MatricesProblem : IProblem
 {
-    public string DisplayText => "Matrices";
-    private readonly Random random;
-    public void Test()
+    private readonly Matrix mat1;
+    private readonly Matrix mat2;
+    private readonly Matrix solution;
+    private readonly char operand;
+    private Matrix? answer;
+    public void Display()
     {
-        var mode = random.Next(0, 3);
-        (int rows, int cols) = (random.Next(1, 4), random.Next(1, 4));
-
-        Matrix mat1 = new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)random.Next(-10, 10)));
-        Matrix mat2 = mode == 2 ? new(cols, rows = random.Next(0, 4), Enumerable.Range(0, rows * cols).Select(n => (double)random.Next(-10, 10)))
-                                : new(rows, cols, Enumerable.Range(0, rows * cols).Select(n => (double)random.Next(-10, 10)));
-
-        (Matrix answer, char sign) = mode switch
-        {
-            0 => (mat1 + mat2, '+'),
-            1 => (mat1 - mat2, '-'),
-            _ => (mat1 * mat2, '*'),
-        };
-
-
         DrawMatrix(mat1);
 
-        var signSpacing = (rows - 1) / 2;
+        var signSpacing = (mat1.Rows - 1) / 2;
         Console.CursorTop += signSpacing;
-        Console.Write($" {sign} ");
+        Console.Write($" {operand} ");
         Console.CursorTop -= signSpacing;
         DrawMatrix(mat2);
 
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
         Console.CursorTop -= signSpacing;
+    }
 
-        Matrix input = InputMatrix(answer.Rows, answer.Columns);
-
+    public void GetAnswer()
+    {
+        answer = InputMatrix(solution.Rows, solution.Columns);
         Console.WriteLine();
-        if (input == answer)
+    }
+
+    public bool EvaluateAnswer()
+        => (answer ?? throw new NotAnsweredException()) == solution;
+
+    public void Summarise()
+    {
+        if (EvaluateAnswer())
         {
             Console.WriteLine("Correct!");
         }
         else
         {
             Console.WriteLine("Incorrect. The correct answer was: ");
-            DrawMatrix(answer);
+            DrawMatrix(solution);
         }
 
         Console.ReadKey(true);
@@ -249,6 +246,11 @@ internal class MatricesTest : ITest
         return widths;
     }
 
-    public MatricesTest() : this(new Random()) { }
-    public MatricesTest(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public MatricesProblem(Matrix mat1, Matrix mat2, char operand, Matrix solution)
+    {
+        this.mat1 = mat1;
+        this.mat2 = mat2;
+        this.operand = operand;
+        this.solution = solution;
+    }
 }

@@ -56,14 +56,13 @@ internal class SimplexProblemGenerator : IProblemGenerator
         var constant = 0;
         for (int i = 0; i < dimensions; i++)
         {
-            int coefficient = 0; // AVERAGING TO AN INT!! WE MUST MAKE SURE CONTRAINTS AVERAGE TO AN INT
-                                    // TODO: Generate n-1 rand numbers. gen nth rand number, mod sum by n, add result to final num.
+            int coefficient = 0;
             for (int j = 0; j < dimensions; j++)
             {
                 coefficient += constraints[j].Coefficients[i];
             }
 
-            if (coefficient % dimensions != 0) throw new Exception("Constraints are not divisible by the number of dimensions");
+            if (coefficient % dimensions != 0) throw new Exception("Constraints are not divisible by the number of dimensions"); // this _should_ never happen
             coefficient /= dimensions;
             coeffs[i] = coefficient;
             constant += coefficient * solution[i];

@@ -9,7 +9,7 @@ public class Program
     }
     static void FMathsMenu()
     {
-        IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator() }; // Hypothesis Testing, Dijkstra's
+        IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing, Dijkstra's
 
         GenericMenu(options, "Choose a subject to revise");
         Console.Clear();

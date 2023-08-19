@@ -37,9 +37,9 @@ public static class GraphUtils
         return paths;
     }
 
-    public static HashSet<Node> CreateGraph(Matrix adjacencyMatrix)
+    public static IReadOnlyCollection<Node> CreateGraph(Matrix adjacencyMatrix)
     {
-        HashSet<Node> nodes = new();
+        List<Node> nodes = new(adjacencyMatrix.Rows);
         Dictionary<string, (Node node, (string name, int weight)[] connections)> nodeLegend = new();
         for (int i = 0; i < adjacencyMatrix.Rows; i++)
         {
@@ -60,6 +60,37 @@ public static class GraphUtils
 
         return nodes;
     }
+
+    /// <summary>
+    /// Creates a graph based on an adjacency matrix.
+    /// </summary>
+    /// <param name="adjacencyMatrix">Adjacency matrix representing the graph</param>
+    /// <returns>The node represented by the first entry in the adjacency matrix</returns>
+    public static Node CreateGraphNode(Matrix adjacencyMatrix)
+    {
+        //List<Node> nodes = new(adjacencyMatrix.Rows);
+        //      node id     node         (node id, connection weight) array
+        Dictionary<int, (Node node, (int id, int weight)[] connections)> nodeLegend = new();
+        for (int i = 0; i < adjacencyMatrix.Rows; i++)
+        {
+            (int, int)[] connections = new (int, int)[adjacencyMatrix.Columns];
+            for (int j = 0; j < adjacencyMatrix.Columns; j++)
+            {
+                connections[j] = (j, (int)adjacencyMatrix[i, j]);
+            }
+            Node node = new(new());
+            //nodes.Add(node);
+            nodeLegend.Add(i, (node, connections));
+        }
+
+        foreach (var kvp in nodeLegend)
+        {
+            kvp.Value.node.Arcs = kvp.Value.connections.ToDictionary(c => (INode)nodeLegend[c.id].node, c => c.weight);
+        }
+
+        return nodeLegend[0].node;
+    }
+
     public static HashSet<Node> CreateGraph(string input)
     {
         HashSet<Node> nodes = new();

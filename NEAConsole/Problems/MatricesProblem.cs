@@ -48,7 +48,7 @@ internal class MatricesProblem : IProblem
         Console.Clear();
     }
 
-    private static void DrawMatrix(Matrix m)
+    public static void DrawMatrix(Matrix m)
     {
         var widths = GetMatrixWidths(m);
 

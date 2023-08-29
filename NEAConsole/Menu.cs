@@ -21,6 +21,7 @@ internal static class Menu
 
     public static int Choose(IList<MenuOption> options)
     {
+        int initX = Console.CursorLeft, initY = Console.CursorTop;
         Console.CursorVisible = false;
         ListChoices(options);
 
@@ -77,7 +78,7 @@ internal static class Menu
             }
         }
 
-        Console.SetCursorPosition(0, 0);
+        Console.SetCursorPosition(initX, initY);
         Console.CursorVisible = true;
         return choice;
     }

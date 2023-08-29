@@ -14,7 +14,7 @@ internal class DijkstrasProblem : IProblem
         Console.WriteLine($"Perform Dijkstra's algorithm on the graph represented by the following adjacency matrix to find the shortest path from {startNode} to {endNode} and it's total weight.");
         Console.WriteLine();
         DrawMatrix(graph);
-        DebugDrawMatrix(graph);
+        //DebugDrawMatrix(graph);
     }
 
     public void GetAnswer()

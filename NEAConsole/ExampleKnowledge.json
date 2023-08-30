@@ -1,12 +1,12 @@
 [
   {
     "name": "Matrices",
-    "known": false,
+    "known": true,
     "lastRevised": "0001-01-01T00:00:00",
     "children": [
       {
         "name": "Addition",
-        "known": false,
+        "known": true,
         "lastRevised": "0001-01-01T00:00:00",
         "children": []
       },
@@ -16,7 +16,7 @@
         "lastRevised": "0001-01-01T00:00:00",
         "children": [
           {
-            "name": "Invertion",
+            "name": "Inversion",
             "known": false,
             "lastRevised": "0001-01-01T00:00:00",
             "children": []
@@ -27,11 +27,11 @@
   },
   {
     "name": "Graphs",
-    "known": false,
+    "known": true,
     "children": [
       {
         "name": "Prims",
-        "known": false,
+        "known": true,
         "lastRevised": "0001-01-01T00:00:00",
         "children": []
       },

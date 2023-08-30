@@ -1,6 +1,5 @@
 ﻿using NEAConsole.Graphs;
 using NEAConsole.Matrices;
-using System.Transactions;
 
 namespace NEAConsole.Problems;
 internal class DijkstrasProblemGenerator : IProblemGenerator
@@ -44,7 +43,8 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
             tree[node2, node1] = weight;
         }
 
-        (var startingNode, var endingNode) = CreateGraph(tree);
+        // 0s mean no connection -- but the dijksta's is naive and will take a connection weighted at 0, replace with infinities
+        (var startingNode, var endingNode) = CreateGraph(tree);//tree.ToMatrix(e => e == 0 ? double.MaxValue : e));
 
         var distances = GraphUtils.Dijkstras(startingNode);
 
@@ -70,13 +70,14 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
     public static (Node start, Node finish) CreateGraph(Matrix adjacencyMatrix)
     {
         //      node id     node         (node id, connection weight) array
-        Dictionary<int, (Node node, (int id, int weight)[] connections)> nodeLegend = new(); // could just be an array?
+        Dictionary<int, (Node node, List<(int id, int weight)> connections)> nodeLegend = new(); // could just be an array?
         for (int i = 0; i < adjacencyMatrix.Rows; i++)
         {
-            (int, int)[] connections = new (int, int)[adjacencyMatrix.Columns];
+            List<(int, int)> connections = new(adjacencyMatrix.Columns);
             for (int j = 0; j < adjacencyMatrix.Columns; j++)
             {
-                connections[j] = (j, (int)adjacencyMatrix[i, j]);
+                if (adjacencyMatrix[i, j] == 0) continue;
+                connections.Add((j, (int)adjacencyMatrix[i, j]));
             }
             Node node = new(new());
             nodeLegend.Add(i, (node, connections));

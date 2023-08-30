@@ -82,10 +82,10 @@ internal class DijkstrasProblem : IProblem
             Console.Write($"{(char)('A' + i)} [");
             for (int j = 0; j < m.Columns; j++)
             {
-                var num = m[i, j];
-                var len = num.ToString().Length;
+                string val = m[i, j] == 0 ? "-" : m[i,j].ToString();
+                var len = val.Length;
                 var spaces = (widths[j] - len) / 2;
-                Console.Write($"{new string(' ', spaces)}{num}{new string(' ', widths[j] - spaces - len)}{(j < m.Columns - 1 ? " " : "]")}");
+                Console.Write($"{new string(' ', spaces)}{val}{new string(' ', widths[j] - spaces - len)}{(j < m.Columns - 1 ? " " : "]")}");
             }
             if (i < m.Rows - 1)
             {

@@ -6,10 +6,13 @@
         "name": "Addition"
       },
       {
+        "name":  "Multiplication"
+      },
+      {
         "name": "Determinants",
         "children": [
           {
-            "name": "Invertion"
+            "name": "Inversion"
           }
         ]
       }

@@ -1,28 +1,28 @@
 ﻿using NEAConsole.Matrices;
+using System;
 
 namespace NEAConsole.Problems;
-internal class MatricesDeterminantsProblem : IProblem
+internal class MatricesInversionProblem : IProblem
 {
-    private readonly Matrix matrix;
-    private readonly double solution;
-    private double? answer;
+    private readonly Matrix mat;
+    private readonly Matrix solution;
+    private Matrix? answer;
 
     public void Display()
     {
-        var signSpacing = (matrix.Rows - 1) / 2;
+        MatricesProblem.DrawMatrix(mat);
 
-        Console.CursorTop += signSpacing;
-        Console.Write("det");
-        Console.CursorTop -= signSpacing;
-        MatricesProblem.DrawMatrix(matrix);
+        var signSpacing = (mat.Rows - 1) / 2;
 
+        Console.Write("-1");
         Console.CursorTop += signSpacing;
         Console.Write(" = ");
+        Console.CursorTop -= signSpacing;
     }
 
     public void GetAnswer()
     {
-        answer = int.Parse(Console.ReadLine() ?? "0");
+        answer = MatricesProblem.InputMatrix(solution.Rows, solution.Columns);
         Console.WriteLine();
     }
 
@@ -37,16 +37,17 @@ internal class MatricesDeterminantsProblem : IProblem
         }
         else
         {
-            Console.WriteLine($"Incorrect. The correct answer was {solution}.");
+            Console.WriteLine("Incorrect. The correct answer was: ");
+            MatricesProblem.DrawMatrix(solution);
         }
 
         Console.ReadKey(true);
         Console.Clear();
     }
 
-    public MatricesDeterminantsProblem(Matrix matrix, double solution)
+    public MatricesInversionProblem(Matrix mat, Matrix solution)
     {
-        this.matrix = matrix;
+        this.mat = mat;
         this.solution = solution;
     }
 }

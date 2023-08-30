@@ -9,7 +9,7 @@ public class Program
     private const string USER_KNOWLEDGE_PATH = "knowledge.dat",
                          SAMPLE_KNOWLEDGE_PATH = "Skills.dat";
 
-    private static Knowledge Knowledge = new();
+    public static Knowledge Knowledge = new();
     static void GenericMenu(IEnumerable<IProblemGenerator> options, string prompt)
     => GenericMenu(options.Select(opt => opt.ToMenuOption()), prompt);
     static void GenericMenu(IEnumerable<MenuOption> options, string prompt)
@@ -65,6 +65,9 @@ public class Program
         // create skill tree with only names, using defaults (LastRevised = DateTime.Min, Known = false)
         Skill[] skills = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(SAMPLE_KNOWLEDGE_PATH), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         Knowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
+        //Knowledge.Matrices = skills.First(s => s.Name == "Matrices");
+        //Knowledge.Graphs = skills.First(s => s.Name == "Graphs");
+        //Knowledge.Simplex = skills.First(s => s.Name == "Simplex");
 
         // Get user to update Knowns for each skill
         UpdateSkills(Knowledge.AsArray);
@@ -73,7 +76,7 @@ public class Program
         File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(Knowledge.AsArray));//, new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    static void RandomQuestionTest()
+    static void RandomQuestions()
     {
         if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
         {
@@ -81,19 +84,20 @@ public class Program
             Console.ReadKey(false);
             Console.Clear();
             UpdateKnowledge();
+
+            if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
+            {
+                Console.WriteLine("You cannot use random questions if you do not know any topics");
+                Console.ReadKey(false);
+                Console.Clear();
+                return;
+            }
         }
 
-        var generators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
-                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
-                            .Where(g => Knowledge.IsKnown(g.SkillPath)).ToArray();
+        var gen = new RandomProblemGenerator();
 
-
-        var rand = new Random();
         for (int i = 0; i < 10; i++)
         {
-            var gen = generators[rand.Next(generators.Length)];
-
             var problem = gen.Generate();
 
             problem.Display();
@@ -103,6 +107,7 @@ public class Program
             Console.WriteLine($"Continue?");
             if (!Affirm())
             {
+                Console.Clear();
                 break;
             }
             Console.Clear();
@@ -143,7 +148,7 @@ public class Program
             ("Maths", MathsMenu),
             ("Further Maths", FMathsMenu),
             ("Computer Science", CSciMenu),
-            ("Random Questions", RandomQuestionTest),
+            ("Random Questions", RandomQuestions),
             ("Update Knowledge", UpdateKnowledge),
         };
 

@@ -62,6 +62,6 @@ public class Skill
     }
 
     //[JsonConstructor]
-    public Skill(string name, bool known, int weight, DateTime lastRevised, Skill[] children)
-        => (Name, Known, Weight, LastRevised, Children) = (name, known, weight, lastRevised, children);
+    public Skill(string name, bool known, int weight, DateTime lastRevised, Skill[]? children)
+        => (Name, Known, Weight, LastRevised, Children) = (name, known, weight, lastRevised, children ?? Array.Empty<Skill>());
 }

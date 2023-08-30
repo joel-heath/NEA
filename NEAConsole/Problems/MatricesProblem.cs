@@ -1,13 +1,15 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesProblem : IProblem
+internal static class MatricesProblem // : IProblem
 {
+    /*
     private readonly Matrix mat1;
     private readonly Matrix mat2;
     private readonly Matrix solution;
     private readonly char operand;
     private Matrix? answer;
+    
     public void Display()
     {
         DrawMatrix(mat1);
@@ -47,6 +49,7 @@ internal class MatricesProblem : IProblem
         Console.ReadKey(true);
         Console.Clear();
     }
+    */
 
     public static void DrawMatrix(Matrix m, bool resetY=true)
     {
@@ -132,7 +135,7 @@ internal class MatricesProblem : IProblem
         return inputs;
     }
 
-    private static Matrix InputMatrix(int rows, int cols)
+    public static Matrix InputMatrix(int rows, int cols)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
@@ -245,7 +248,7 @@ internal class MatricesProblem : IProblem
 
         return widths;
     }
-
+    /*
     public MatricesProblem(Matrix mat1, Matrix mat2, char operand, Matrix solution)
     {
         this.mat1 = mat1;
@@ -253,4 +256,5 @@ internal class MatricesProblem : IProblem
         this.operand = operand;
         this.solution = solution;
     }
+    */
 }

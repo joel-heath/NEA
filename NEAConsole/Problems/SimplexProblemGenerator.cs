@@ -2,6 +2,7 @@
 internal class SimplexProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Simplex";
+    public string SkillPath => "Simplex";
     private readonly Random random;
 
     public IProblem Generate()

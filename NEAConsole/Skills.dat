@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Matrices",
+    "children": [
+      {
+        "name": "Addition"
+      },
+      {
+        "name": "Determinants",
+        "children": [
+          {
+            "name": "Invertion"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Graphs",
+    "children": [
+      {
+        "name": "Prims"
+      },
+      {
+        "name": "Dijkstras"
+      }
+    ]
+  },
+  {
+    "name": "Simplex"
+  }
+]

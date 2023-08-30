@@ -1,12 +1,17 @@
 ﻿using NEAConsole.Problems;
+using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace NEAConsole;
 public class Program
 {
-    private static Knowledge? Knowledge;
+    private const string USER_KNOWLEDGE_PATH = "knowledge.dat",
+                         SAMPLE_KNOWLEDGE_PATH = "Skills.dat";
+
+    private static Knowledge Knowledge = new();
     static void GenericMenu(IEnumerable<IProblemGenerator> options, string prompt)
-    => GenericMenu(options.ToMenuOptions(), prompt);
+    => GenericMenu(options.Select(opt => opt.ToMenuOption()), prompt);
     static void GenericMenu(IEnumerable<MenuOption> options, string prompt)
     {
         var choices = options.Append(("Exit", null!)).ToList();
@@ -33,93 +38,7 @@ public class Program
         return choice == 0;
     }
 
-    static void InitialiseSkills()
-    {
-        var matrices = new Skill("Matrices", new()
-        {
-            new Skill("Addition"),
-            new Skill("Multiplication"),
-            new Skill("Determinants", new()
-            {
-                new Skill("Minors", new()
-                {
-                    new Skill("Inversion")
-                })
-            }),
-        }, new MatricesProblemGenerator());
-
-        var graphs = new Skill("Graph Theory", new()
-        {
-            new Skill("Prim's Algorithm", new(), new PrimsProblemGenerator()),
-            new Skill("Dijkstra's Algorithm", new(), new DijkstrasProblemGenerator()),
-        });
-
-        var simplex = new Skill("The Simplex Method", new(), new SimplexProblemGenerator());
-        //var rpn = new Skill("Reverse Polish Notation", new());
-        //var hypothesis = new Skill("Hypothesis Testing", new());
-
-        Knowledge = new Knowledge(matrices, graphs, simplex);
-    }
-
-    static IEnumerable<IProblemGenerator> CreateAskableList(IList<Skill> skills)
-    {
-        foreach (Skill skill in skills)
-        {
-            if (!skill.Known)
-            {
-                continue;
-            }
-
-            if (skill.ProblemGenerator is not null)
-            {
-                yield return skill.ProblemGenerator;
-            }
-
-            if (skill.Children.Count > 0)
-            {
-                foreach (var problemGenerator in CreateAskableList(skill.Children))
-                {
-                    yield return problemGenerator;
-                }
-            }
-        }
-    }
-
-    static bool TryImportKnowledge()
-    {
-        try
-        {
-            using var br = new BinaryReader(new FileStream("knowledge.dat", FileMode.Open));
-
-            InitialiseSkills();
-
-            Knowledge!.Matrices.Known = br.ReadBoolean();
-            Knowledge.Matrices.Children[0].Known = br.ReadBoolean();
-            Knowledge.Matrices.Children[1].Known = br.ReadBoolean();
-            Knowledge.Matrices.Children[2].Known = br.ReadBoolean();
-            Knowledge.Matrices.Children[2].Children[0].Known = br.ReadBoolean();
-            Knowledge.Matrices.Children[2].Children[0].Children[0].Known = br.ReadBoolean();
-
-            Knowledge.Graphs.Known = br.ReadBoolean();
-            Knowledge.Graphs.Children[0].Known = br.ReadBoolean();
-            Knowledge.Graphs.Children[1].Known = br.ReadBoolean();
-
-            Knowledge.Simplex.Known = br.ReadBoolean();
-            return true;
-        }
-        catch (FileNotFoundException)
-        {
-            Knowledge = null;
-            return false;
-        }
-        catch (EndOfStreamException)
-        {
-            Knowledge = null;
-            return false;
-        }
-    }
-
-    static void UserUpdateSkills(IList<Skill> skills, IEnumerable<string>? skillPath = null)
+    static void UpdateSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
     {
         skillPath ??= new List<string>();
         foreach (Skill skill in skills)
@@ -133,49 +52,47 @@ public class Program
             if (!response) continue;
 
             skill.Known = true;
-            if (skill.Children.Count > 0)
+            if (skill.Children.Length > 0)
             {
-                UserUpdateSkills(skill.Children, newPath);
+                UpdateSkills(skill.Children, newPath);
             }
         }
     }
+    // update skills will just set Knowns, and search the whole tree. Update knowledge will initialise the knowledge object, update all skills, then save the file to the disk.
 
     static void UpdateKnowledge()
     {
-        UserUpdateSkills(Knowledge!.AsArray);
+        // create skill tree with only names, using defaults (LastRevised = DateTime.Min, Known = false)
+        Skill[] skills = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(SAMPLE_KNOWLEDGE_PATH), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        Knowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
 
-        using var bw = new BinaryWriter(new FileStream("knowledge.dat", FileMode.Create));
+        // Get user to update Knowns for each skill
+        UpdateSkills(Knowledge.AsArray);
 
-        bw.Write(Knowledge.Matrices.Known);
-        bw.Write(Knowledge.Matrices.Children[0].Known);
-        bw.Write(Knowledge.Matrices.Children[1].Known);
-        bw.Write(Knowledge.Matrices.Children[2].Known);
-        bw.Write(Knowledge.Matrices.Children[2].Children[0].Known);
-        bw.Write(Knowledge.Matrices.Children[2].Children[0].Children[0].Known);
-
-        bw.Write(Knowledge.Graphs.Known);
-        bw.Write(Knowledge.Graphs.Children[0].Known);
-        bw.Write(Knowledge.Graphs.Children[1].Known);
-
-        bw.Write(Knowledge.Simplex.Known);
+        // Save to USER_KNOWLEDGE_PATH
+        File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(Knowledge.AsArray));//, new JsonSerializerOptions { WriteIndented = true }));
     }
 
     static void RandomQuestionTest()
     {
-        if (Knowledge is null)
+        if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
         {
             Console.WriteLine("To use random questions, you must first enter the topics you know.");
             Console.ReadKey(false);
-            InitialiseSkills();
+            Console.Clear();
             UpdateKnowledge();
         }
 
-        var generators = CreateAskableList(Knowledge!.AsArray).ToList();
-        var rand = new Random();
+        var generators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
+                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
+                            .Where(g => Knowledge.IsKnown(g.SkillPath)).ToArray();
 
+
+        var rand = new Random();
         for (int i = 0; i < 10; i++)
         {
-            var gen = generators[rand.Next(generators.Count)];
+            var gen = generators[rand.Next(generators.Length)];
 
             var problem = gen.Generate();
 
@@ -211,7 +128,15 @@ public class Program
 
     static void Main(string[] args)
     {
-        TryImportKnowledge();
+        try
+        {
+            string jsonString = File.ReadAllText(USER_KNOWLEDGE_PATH);
+            Skill[] skills = JsonSerializer.Deserialize<Skill[]>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+
+            Knowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
+        }
+        catch (JsonException) { }
+        catch (FileNotFoundException) { }
 
         var options = new MenuOption[]
         {
@@ -219,7 +144,7 @@ public class Program
             ("Further Maths", FMathsMenu),
             ("Computer Science", CSciMenu),
             ("Random Questions", RandomQuestionTest),
-            ("Update Knowledge", UpdateKnowledge)
+            ("Update Knowledge", UpdateKnowledge),
         };
 
         GenericMenu(options, "Main Menu");

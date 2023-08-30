@@ -4,6 +4,7 @@ namespace NEAConsole.Problems;
 internal class PrimsProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Prim's Algorithm";
+    public string SkillPath => "Graphs.Prims";
     private readonly Random random;
 
     public IProblem Generate()

@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Matrices",
+    "known": false,
+    "lastRevised": "0001-01-01T00:00:00",
+    "children": [
+      {
+        "name": "Addition",
+        "known": false,
+        "lastRevised": "0001-01-01T00:00:00",
+        "children": []
+      },
+      {
+        "name": "Determinants",
+        "known": false,
+        "lastRevised": "0001-01-01T00:00:00",
+        "children": [
+          {
+            "name": "Invertion",
+            "known": false,
+            "lastRevised": "0001-01-01T00:00:00",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Graphs",
+    "known": false,
+    "children": [
+      {
+        "name": "Prims",
+        "known": false,
+        "lastRevised": "0001-01-01T00:00:00",
+        "children": []
+      },
+      {
+        "name": "Dijkstras",
+        "known": false,
+        "lastRevised": "0001-01-01T00:00:00",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "Simplex",
+    "known": false,
+    "lastRevised": "0001-01-01T00:00:00",
+    "children": []
+  }
+]

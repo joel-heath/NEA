@@ -6,6 +6,7 @@ namespace NEAConsole.Problems;
 internal class DijkstrasProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Dijkstra's";
+    public string SkillPath => "Graphs.Dijkstras";
     private readonly Random random;
 
     public IProblem Generate()

@@ -4,7 +4,7 @@ namespace NEAConsole.Problems;
 internal class MatricesDeterminantsProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Determinants";
-    //public string SkillPath => "Matrices.Determinants";
+    public string SkillPath => "Matrices.Determinants";
     private readonly Random random;
 
     public IProblem Generate()

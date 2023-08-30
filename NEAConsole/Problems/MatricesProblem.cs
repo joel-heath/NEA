@@ -48,7 +48,7 @@ internal class MatricesProblem : IProblem
         Console.Clear();
     }
 
-    public static void DrawMatrix(Matrix m)
+    public static void DrawMatrix(Matrix m, bool resetY=true)
     {
         var widths = GetMatrixWidths(m);
 
@@ -71,7 +71,7 @@ internal class MatricesProblem : IProblem
             }
         }
 
-        Console.CursorTop = initY;
+        if (resetY) Console.CursorTop = initY;
     }
 
     private static void DrawInputMatrix(string[][] m, int x, int y)

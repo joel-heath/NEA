@@ -1,12 +1,11 @@
 ﻿namespace NEAConsole.Problems;
 internal static class IProblemGeneratorExtensions
 {
-    public static IEnumerable<MenuOption> ToMenuOptions(this IEnumerable<IProblemGenerator> problemGenerators)
-        => problemGenerators.Select(pg => new MenuOption(pg.DisplayText, () =>
+    public static MenuOption ToMenuOption(this IProblemGenerator problemGenerator) => new(problemGenerator.DisplayText, () =>
         {
-            var problem = pg.Generate();
+            var problem = problemGenerator.Generate();
             problem.Display();
             problem.GetAnswer();
             problem.Summarise();
-        }));
+        });
 }

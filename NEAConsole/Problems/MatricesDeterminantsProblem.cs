@@ -9,12 +9,14 @@ internal class MatricesDeterminantsProblem : IProblem
 
     public void Display()
     {
-        Console.WriteLine("Evaluate the determinant of the following matrix. (to 3.s.f)");
-        MatricesProblem.DrawMatrix(matrix);
+        Console.WriteLine("Evaluate the determinant of the following matrix, A. (to 3.s.f)");
+        MatricesProblem.DrawMatrix(matrix, false);
+        Console.WriteLine();
     }
 
     public void GetAnswer()
     {
+        Console.Write("detA = ");
         answer = double.Parse(Console.ReadLine() ?? "0");
         Console.WriteLine();
     }

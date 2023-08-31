@@ -1,4 +1,5 @@
 ﻿using NEAConsole.Matrices;
+using System.Runtime.InteropServices;
 
 namespace NEAConsole.Problems;
 internal class DijkstrasProblem : IProblem
@@ -22,7 +23,8 @@ internal class DijkstrasProblem : IProblem
         //Console.WriteLine("Path taken (abc...) ");
         Console.WriteLine();
         Console.Write("Total weight: ");
-        answer = int.Parse(Console.ReadLine());
+        answer = UIMethods.ReadInt();
+        Console.WriteLine();
     }
 
     public bool EvaluateAnswer()

@@ -117,30 +117,32 @@ public class Matrix
         set => values[i, j] = value;
     }
 
-    public Matrix(IEnumerable<IEnumerable<double>> vals) : this(vals.Count(), vals.First().Count(), vals) { }
-    public Matrix(int rows, int cols, IEnumerable<IEnumerable<double>> vals)
+    public Matrix(IEnumerable<IEnumerable<double>> vals)
     {
-        Rows = rows;
-        Columns = cols;
-        Square = Rows == Columns;
-        values = new double[Rows, Columns];
+        var valsAsList = vals.Select(r => r.ToList()).ToList();
+        if (valsAsList.Count == 0) throw new DimensionLessThanOneException();
 
-        for (int i = 0; i < Rows; i++)
-        {
-            for (int j = 0; j < Columns; j++)
-            {
-                values[i, j] = vals.ElementAt(i).ElementAt(j);
-            }
-        }
+        var mat = new Matrix(valsAsList.Count, valsAsList[0].Count, valsAsList); // makeshift way of calling another constructor
+
+        Rows = mat.Rows;
+        Columns = mat.Columns;
+        Square = mat.Square;
+        values = mat.values;
     }
+
+    public Matrix(int rows, int cols, IEnumerable<IEnumerable<double>> vals) : this(rows,cols, vals.SelectMany(v => v)) { }
 
     public Matrix(int rows, int cols, IEnumerable<double> vals) : this(rows, cols)
     {
-        for (int i = 0; i < Rows; i++)
+        int i = 0;
+        int j = 0;
+        foreach (var val in vals)
         {
-            for (int j = 0; j < Columns; j++)
+            values[i, j++] = val;
+            if (j == Columns)
             {
-                values[i, j] = vals.ElementAt(i * Columns + j);
+                i++;
+                j = 0;
             }
         }
     }

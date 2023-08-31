@@ -23,11 +23,11 @@ internal class SimplexProblem : IProblem
         answer = new int[solution.Length + 1];
 
         Console.Write("\nP = ");
-        answer[solution.Length] = int.Parse(Console.ReadLine() ?? "0"); // need to catch potential input errors here
+        answer[solution.Length] = UIMethods.ReadInt(); // need to catch potential input errors here
         for (int i = 0; i < solution.Length; i++)
         {
             Console.Write((char)('x' + i) + " = ");
-            answer[i] = int.Parse(Console.ReadLine() ?? "0");
+            answer[i] = UIMethods.ReadInt();
         }
     }
 

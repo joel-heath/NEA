@@ -22,7 +22,7 @@ internal class MatricesDeterminantsProblem : IProblem
 
     public void GetAnswer()
     {
-        answer = int.Parse(Console.ReadLine() ?? "0");
+        answer = UIMethods.ReadInt();
         Console.WriteLine();
     }
 

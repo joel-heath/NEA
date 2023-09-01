@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace NEAConsole;
+﻿namespace NEAConsole;
 public class Knowledge
 {
     public bool Entered { get; set; }

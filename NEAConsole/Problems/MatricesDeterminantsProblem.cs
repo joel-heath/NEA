@@ -14,7 +14,7 @@ internal class MatricesDeterminantsProblem : IProblem
         Console.CursorTop += signSpacing;
         Console.Write("det");
         Console.CursorTop -= signSpacing;
-        MatricesProblem.DrawMatrix(matrix);
+        UIMethods.DrawMatrix(matrix);
 
         Console.CursorTop += signSpacing;
         Console.Write(" = ");
@@ -23,6 +23,11 @@ internal class MatricesDeterminantsProblem : IProblem
     public void GetAnswer()
     {
         answer = UIMethods.ReadInt();
+
+        // matrix.Rows -    signSpacing        + 2
+        // matrix.Rows - (matrix.Rows - 1) / 2 + 2
+
+        Console.CursorTop += matrix.Rows - ((matrix.Rows - 1) / 2);
         Console.WriteLine();
     }
 

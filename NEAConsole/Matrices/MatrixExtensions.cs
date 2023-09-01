@@ -1,6 +1,91 @@
-﻿namespace NEAConsole.Matrices;
+﻿using System.Linq.Expressions;
+using System.Net.Security;
+
+namespace NEAConsole.Matrices;
 public static class MatrixExtensions
 {
+    /// <summary>
+    /// Performs a row switch, swapping elements from row1 into row2.
+    /// </summary>
+    /// <param name="input">Matrix input</param>
+    /// <param name="row1">Row index identifying the row to be swapped with row2</param>
+    /// <param name="row2">Row index identifying the row to be swapped with row1</param>
+    /// <returns>A new matrix with row1 and row2 swapped.</returns>
+    public static Matrix RowSwitch(this Matrix input, int row1, int row2)
+    {
+        var rows = new IEnumerable<double>[input.Rows];
+        for (int i = 0; i < input.Rows; i++)
+        {
+            rows[i] = true switch
+            {
+                var _ when i == row1 => input.GetRow(row2),
+                var _ when i == row2 => input.GetRow(row1),
+                _ => input.GetRow(i)
+            };
+        }
+
+        return new Matrix(input.Rows, input.Columns, rows);
+    }
+
+    /// <summary>
+    /// Performs a row multiplication, multiplying all elements in a given row by a scalar.
+    /// </summary>
+    /// <param name="input">Matrix input</param>
+    /// <param name="row">Row index identifying which row will be scaled.</param>
+    /// <param name="scalar">The quantity to multiply each element by.</param>
+    /// <returns>A new matrix with the row scaled.</returns>
+    public static Matrix RowMultiplication(this Matrix input, int row, int scalar)
+    {
+        var rows = new IEnumerable<double>[input.Rows];
+        for (int i = 0; i < input.Rows; i++)
+        {
+            rows[i] = (i == row) ? input.GetRow(row).Select(e => scalar * e) : input.GetRow(i);
+        }
+
+        return new Matrix(input.Rows, input.Columns, rows);
+    }
+
+    /// <summary>
+    /// Performs a row addition, taking elements from rowSource, multiplying them by the scalar, and adding them to thr respective elements of rowDestination.
+    /// </summary>
+    /// <param name="input">Matrix input.</param>
+    /// <param name="rowSource">Row index to be multiplied and added to rowDestination.</param>
+    /// <param name="rowDestination">Row index to be added to.</param>
+    /// <param name="scalar">The quantity elements from rowSource are scaled by, defaults to 1.</param>
+    /// <returns>A new matrix with the row addition applied.</returns>
+    public static Matrix RowAddition(this Matrix input, int rowSource, int rowDestination, int scalar = 1)
+    {
+        var output = input.ToMatrix();
+
+        for (int i = 0; i < input.Columns; i++)
+        {
+            output[rowDestination, i] += output[rowSource, i] * scalar;
+        }
+
+        return output;        
+    }
+
+    /// <summary>
+    /// Performs a column addition, taking elements from colSource, multiplying them by the scalar, and adding them to the respective elements of colDestination.
+    /// </summary>
+    /// <param name="input">Matrix input.</param>
+    /// <param name="colSource">Column index to be multiplied and added to colDestination.</param>
+    /// <param name="colDestination">Column index to be added to.</param>
+    /// <param name="scalar">The quantity elements from colSource are scaled by, defaults to 1.</param>
+    /// <returns>A new matrix with the column addition applied.</returns>
+    public static Matrix ColumnAddition(this Matrix input, int colSource, int colDestination, int scalar = 1)
+    {
+        var output = input.ToMatrix();
+
+        for (int i = 0; i < input.Rows; i++)
+        {
+            output[i, colDestination] += scalar * output[i, colSource];
+        }
+
+        return output;
+    }
+
+
     public static Matrix Translate(this Matrix points, params double[] units)
     {
         Matrix translation = new(points.Rows, points.Columns, units.Select(u => Enumerable.Repeat(u, points.Columns)));

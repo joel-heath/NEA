@@ -1,8 +1,4 @@
 ﻿namespace NEAConsole.Matrices;
-
-public class DimensionLessThanOneException : Exception { }
-public class MatrixNotSquareException : Exception { }
-public class MatrixSingularException : Exception { }
 public class Matrix
 {
     private readonly double[,] values;

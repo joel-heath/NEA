@@ -7,6 +7,14 @@ internal class MatricesProblemGenerator : IProblemGenerator
 
     public IProblem Generate()
     {
+        while (!Program.Knowledge.Entered || !Program.Knowledge.Matrices.Known)
+        {
+            Console.WriteLine("To use random questions, you must first enter the topics you know.");
+            Console.ReadKey(false);
+            Console.Clear();
+            Program.UpdateKnowledge();
+        }
+
         var generators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
                         .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
                         .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)

@@ -15,6 +15,9 @@ public interface IProblem
 }
 public interface IProblemGenerator
 {
+    /// <summary>
+    /// Problem title e.g. Prim's Algorithm
+    /// </summary>
     string DisplayText { get; }
     /// <summary>
     /// Knowledge tree path to skill e.g. Matrices.Determinants.Inversion

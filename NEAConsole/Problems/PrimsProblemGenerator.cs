@@ -17,7 +17,7 @@ internal class PrimsProblemGenerator : IProblemGenerator
             // pick one of the already connected vertices to connect this new one to
             var connector = random.Next(0, i);
 
-            var weight = random.Next(1, 16);
+            var weight = random.Next(1, dimension);
 
             tree[connector, i] = weight;
             tree[i, connector] = weight;
@@ -34,7 +34,7 @@ internal class PrimsProblemGenerator : IProblemGenerator
                 node1 = random.Next(0, dimension);
                 node2 = random.Next(0, dimension);
             }
-            var weight = random.Next(1, 16);
+            var weight = random.Next(dimension, 20);
 
             if (tree[node1, node2] != 0 || tree[node2, node1] != 0) throw new Exception("Did not successfully choose nodes that weren't already connected");
 

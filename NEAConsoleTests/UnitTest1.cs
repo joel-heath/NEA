@@ -11,6 +11,8 @@ namespace NEAConsoleTests
         public void Test1()
         {
             
+
+
             Assert.Pass();
         }
     }

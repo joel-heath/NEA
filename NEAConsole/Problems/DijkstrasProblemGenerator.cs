@@ -16,18 +16,17 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
         for (int i = 1; i < dimension; i++)
         {
             // pick one of the already connected vertices to connect this new one to
-            var connector = random.Next(0, i);
+            // would do 0 to i, but we want the final node to be far from the first node
+            var connector = random.Next(Math.Max(0, i-3), i);
 
-            var weight = random.Next(1, 16);
+            var weight = random.Next(1, 13);
 
             tree[connector, i] = weight;
             tree[i, connector] = weight;
         }
 
-        // 5x^2 - 85x + 367   (see 2. Robert J. Prim's algorithm -- pg 10)
-        var edgesToAdd = 5 * dimension * dimension - 85 * dimension + 367;
-
-        for (int i = 0; i < edgesToAdd; i++)
+        // populate graph a little more
+        for (int i = 0; i < dimension - 5; i++)
         {
             int node1 = 0, node2 = 1;
             while (tree[node1, node2] != 0)
@@ -35,15 +34,15 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
                 node1 = random.Next(0, dimension);
                 node2 = SelectNodeToConnectTo(node1, dimension);
             }
-            var weight = random.Next(1, 16);
+            var weight = random.Next(13, 20);
 
-            if (tree[node1, node2] != 0 || tree[node2, node1] != 0) throw new Exception("Did not successfully choose nodes that weren't already connected");
+            //if (tree[node1, node2] != 0 || tree[node2, node1] != 0) throw new Exception("Did not successfully choose nodes that weren't already connected");
 
             tree[node1, node2] = weight;
             tree[node2, node1] = weight;
         }
 
-        // 0s mean no connection -- but the dijksta's is naive and will take a connection weighted at 0, replace with infinities
+        // 0s mean no connection -- but the dijkstra's is naive and will take a connection weighted at 0, replace with infinities
         (var startingNode, var endingNode) = CreateGraph(tree);//tree.ToMatrix(e => e == 0 ? double.MaxValue : e));
 
         var distances = GraphUtils.Dijkstras(startingNode);
@@ -55,8 +54,8 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
     {
         int connectend = connector;
         while (connector == connectend)
-        {
-            connectend = random.Next(0, dimension);
+        { //                            if were on startign vertex, it may not connect to final vertex directly
+            connectend = random.Next(0, connector == 0 ? dimension - 1 : dimension);
         }
 
         return connectend;

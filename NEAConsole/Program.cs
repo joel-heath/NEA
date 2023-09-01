@@ -1,7 +1,5 @@
 ﻿using NEAConsole.Problems;
-using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace NEAConsole;
 public class Program
@@ -10,33 +8,6 @@ public class Program
                          SAMPLE_KNOWLEDGE_PATH = "Skills.dat";
 
     public static Knowledge Knowledge = new();
-    static void GenericMenu(IEnumerable<IProblemGenerator> options, string prompt)
-    => GenericMenu(options.Select(opt => opt.ToMenuOption()), prompt);
-    static void GenericMenu(IEnumerable<MenuOption> options, string prompt)
-    {
-        var choices = options.Append(("Exit", null!)).ToList();
-
-        bool @continue = true;
-        while (@continue)
-        {
-            Console.WriteLine(prompt);
-            var choice = Menu.Choose(choices);
-            if (choice == choices.Count - 1)
-            {
-                @continue = false;
-            }
-            else
-            {
-                Console.Clear();
-                choices[choice].OnSelected();
-            }
-        }
-    }
-    static bool Affirm()
-    {
-        int choice = Menu.Choose(new MenuOption[] { ("Yes", null!), ("No", null!) });
-        return choice == 0;
-    }
 
     static void UpdateSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
     {
@@ -46,7 +17,7 @@ public class Program
             var newPath = skillPath.Append(skill.Name);
             Console.WriteLine($"Do you know {string.Join(" > ", newPath)}?");
 
-            bool response = Affirm();
+            bool response = Menu.Affirm();
             Console.Clear();
 
             if (!response) continue;
@@ -60,7 +31,7 @@ public class Program
     }
     // update skills will just set Knowns, and search the whole tree. Update knowledge will initialise the knowledge object, update all skills, then save the file to the disk.
 
-    static void UpdateKnowledge()
+    public static void UpdateKnowledge()
     {
         // create skill tree with only names, using defaults (LastRevised = DateTime.Min, Known = false)
         Skill[] skills = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(SAMPLE_KNOWLEDGE_PATH), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
@@ -105,7 +76,7 @@ public class Program
             problem.Summarise();
 
             Console.WriteLine($"Continue?");
-            if (!Affirm())
+            if (!Menu.Affirm())
             {
                 Console.Clear();
                 break;
@@ -122,7 +93,7 @@ public class Program
     {
         IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing
 
-        GenericMenu(options, "Choose a subject to revise");
+        Menu.ExecuteMenu(options, "Choose a subject to revise");
         Console.Clear();
     }
 
@@ -152,7 +123,7 @@ public class Program
             ("Update Knowledge", UpdateKnowledge),
         };
 
-        GenericMenu(options, "Main Menu");
+        Menu.ExecuteMenu(options, "Main Menu");
         Console.Clear();
     }
 }

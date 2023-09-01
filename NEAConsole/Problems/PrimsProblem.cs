@@ -9,7 +9,7 @@ internal class PrimsProblem : IProblem
 
     public void Display()
     {
-        Console.WriteLine("Apply Prim's algorithm to the following adjacency matrix to calculate the minimum spanning tree.");
+        Console.WriteLine("Apply Prim's algorithm starting at vertex A to the following adjacency matrix to calculate the minimum spanning tree.");
         Console.WriteLine();
     }
 
@@ -24,7 +24,7 @@ internal class PrimsProblem : IProblem
         if (solution.Count != (answer ?? throw new NotAnsweredException()).Count) return false;
         foreach (var e in solution)
         {
-            if (!answer.Contains(e))
+            if (!answer.Contains(e) && !answer.Contains((e.col, e.row))) // remember adjacency matrices are symmetric about the leading diagonal, both row,col and col,row are valid
             {
                 return false;
             }
@@ -53,11 +53,22 @@ internal class PrimsProblem : IProblem
         int xIndent = Console.CursorLeft;
         int yIndent = Console.CursorTop;
 
-        var widths = GetMatrixWidths(m);
+        var widths = UIMethods.GetMatrixWidths(m);
 
+        // Column titles
+        Console.Write("   ");
+        for (int i = 0; i < m.Columns; i++)
+        {
+            var name = (char)('A' + i);
+            var spaces = (widths[i] - 1) / 2;
+            Console.Write($"{new string(' ', spaces)}{name}{new string(' ', widths[i] - spaces)}");
+        }
+        Console.WriteLine();
         for (int i = 0; i < m.Rows; i++)
         {
-            Console.Write('[');
+            //                  Row title
+            Console.Write($"{(char)('A' + i)} [");
+            
             for (int j = 0; j < m.Columns; j++)
             {
                 if (i == y && j == x)
@@ -149,24 +160,6 @@ internal class PrimsProblem : IProblem
         Console.CursorVisible = true;
         Console.CursorTop = initY + adjacency.Rows;
         return chosenEdges;
-    }
-
-    private static int[] GetMatrixWidths(Matrix m)
-    {
-        int[] widths = new int[m.Columns];
-        for (int c = 0; c < m.Columns; c++)
-        {
-            int max = 0;
-            for (int r = 0; r < m.Rows; r++)
-            {
-                var len = m[r, c].ToString().Length;
-                if (len > max) max = len;
-            }
-
-            widths[c] = max;
-        }
-
-        return widths;
     }
 
     public PrimsProblem(Matrix adjacencyMatrix, HashSet<(int row, int col)> solution)

@@ -10,13 +10,13 @@ internal class MatricesMultiplicationProblem : IProblem
 
     public void Display()
     {
-        MatricesProblem.DrawMatrix(mat1);
+        UIMethods.DrawMatrix(mat1);
 
         var signSpacing = (mat1.Rows - 1) / 2;
         Console.CursorTop += signSpacing;
         Console.Write($" x ");
         Console.CursorTop -= signSpacing;
-        MatricesProblem.DrawMatrix(mat2);
+        UIMethods.DrawMatrix(mat2);
 
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
@@ -25,7 +25,7 @@ internal class MatricesMultiplicationProblem : IProblem
 
     public void GetAnswer()
     {
-        answer = MatricesProblem.InputMatrix(solution.Rows, solution.Columns);
+        answer = UIMethods.InputMatrix(solution.Rows, solution.Columns);
         Console.WriteLine();
     }
 
@@ -41,7 +41,7 @@ internal class MatricesMultiplicationProblem : IProblem
         else
         {
             Console.WriteLine("Incorrect. The correct answer was: ");
-            MatricesProblem.DrawMatrix(solution);
+            UIMethods.DrawMatrix(solution);
         }
 
         Console.ReadKey(true);

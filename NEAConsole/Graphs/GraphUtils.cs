@@ -28,7 +28,7 @@ public static class GraphUtils
                 if (connections.TryGetValue(newNode, out int oldDistance))
                 {
                     if (newDistance < oldDistance)
-                        paths[newNode] = newDistance;
+                        connections[newNode] = newDistance;
                 }
                 else connections[newNode] = newDistance;
             }

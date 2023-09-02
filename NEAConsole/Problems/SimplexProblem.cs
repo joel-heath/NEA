@@ -4,7 +4,6 @@ internal class SimplexProblem : IProblem
     private readonly SimplexInequality objective;
     private readonly SimplexInequality[] constraints;
     private readonly int[] solution;
-    private int[]? answer;
 
     public void Display()
     {
@@ -18,9 +17,9 @@ internal class SimplexProblem : IProblem
         }
     }
 
-    public void GetAnswer()
+    public IAnswer GetAnswer()
     {
-        answer = new int[solution.Length + 1];
+        var answer = new int[solution.Length + 1];
 
         Console.Write("\nP = ");
         answer[solution.Length] = UIMethods.ReadInt(); // need to catch potential input errors here
@@ -30,14 +29,20 @@ internal class SimplexProblem : IProblem
             answer[i] = UIMethods.ReadInt();
         }
         Console.WriteLine();
+
+        return new SimplexAnswer(answer);
     }
 
-    public bool EvaluateAnswer()
-        => (answer ?? throw new NotAnsweredException())[solution.Length] == objective.Constant && !answer.Take(solution.Length-1).Where((n, i) => n != solution[i]).Any();
-
-    public void Summarise()
+    public bool EvaluateAnswer(IAnswer answer)
     {
-        if (EvaluateAnswer())
+        var attempt = (answer as SimplexAnswer ?? throw new InvalidOperationException()).Answer;
+        return attempt[solution.Length] == objective.Constant
+               && !attempt.Take(solution.Length - 1).Where((n, i) => n != solution[i]).Any(); // Why not just attempt.All()? Because it doesn't have an (item, index) overload
+    }
+
+    public void Summarise(IAnswer answer)
+    {
+        if (EvaluateAnswer(answer))
         {
             Console.WriteLine("Correct!");
         }

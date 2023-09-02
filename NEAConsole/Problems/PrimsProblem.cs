@@ -5,7 +5,6 @@ internal class PrimsProblem : IProblem
 {
     private readonly Matrix adjacencyMatrix;
     private readonly HashSet<(int row, int col)> solution;
-    private HashSet<(int row, int col)>? answer;
 
     public void Display()
     {
@@ -13,19 +12,24 @@ internal class PrimsProblem : IProblem
         Console.WriteLine();
     }
 
-    public void GetAnswer()
+    public IAnswer GetAnswer()
     {
-        answer = InputEdges(adjacencyMatrix);
+        var answer = InputEdges(adjacencyMatrix);
         Console.WriteLine();
         Console.WriteLine();
+
+        return new PrimsAnswer(answer);
     }
 
-    public bool EvaluateAnswer()
+    public bool EvaluateAnswer(IAnswer answer)
     {
-        if (solution.Count != (answer ?? throw new NotAnsweredException()).Count) return false;
+        var attempt = (answer as PrimsAnswer ?? throw new InvalidOperationException()).Answer;
+
+        if (solution.Count != attempt.Count) return false;
+
         foreach (var e in solution)
         {
-            if (!answer.Contains(e) && !answer.Contains((e.col, e.row))) // remember adjacency matrices are symmetric about the leading diagonal, both row,col and col,row are valid
+            if (!attempt.Contains(e) && !attempt.Contains((e.col, e.row))) // remember adjacency matrices are symmetric about the leading diagonal, both row,col and col,row are valid
             {
                 return false;
             }
@@ -33,9 +37,9 @@ internal class PrimsProblem : IProblem
         return true;
     }
 
-    public void Summarise()
+    public void Summarise(IAnswer answer)
     {
-        if (EvaluateAnswer())
+        if (EvaluateAnswer(answer))
         {
             Console.WriteLine("Correct!");
         }

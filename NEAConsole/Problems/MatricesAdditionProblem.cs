@@ -7,7 +7,6 @@ internal class MatricesAdditionProblem : IProblem
     private readonly Matrix mat2;
     private readonly Matrix solution;
     private readonly char operand;
-    private Matrix? answer;
 
     public void Display()
     {
@@ -24,18 +23,20 @@ internal class MatricesAdditionProblem : IProblem
         Console.CursorTop -= signSpacing;
     }
 
-    public void GetAnswer()
+    public IAnswer GetAnswer()
     {
-        answer = UIMethods.InputMatrix(solution.Rows, solution.Columns);
+        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns);
         Console.WriteLine();
+
+        return new MatrixAnswer(answer);
     }
 
-    public bool EvaluateAnswer()
-        => (answer ?? throw new NotAnsweredException()) == solution;
+    public bool EvaluateAnswer(IAnswer answer)
+        => (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer == solution;
 
-    public void Summarise()
+    public void Summarise(IAnswer answer)
     {
-        if (EvaluateAnswer())
+        if (EvaluateAnswer(answer))
         {
             Console.WriteLine("Correct!");
         }

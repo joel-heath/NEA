@@ -56,17 +56,17 @@ public class Program
             var problem = gen.Generate(knowledge);
 
             problem.Display();
-            // IAnswer answer;
+            IAnswer answer;
             try
             {
-                problem.GetAnswer();// answer =
+                answer = problem.GetAnswer();
             }
             catch (EscapeException)
             {
                 Console.Clear();
                 return;
             }
-            problem.Summarise();//answer);
+            problem.Summarise(answer);
 
             Console.WriteLine($"Continue?");
             if (!Menu.Affirm())

@@ -10,8 +10,8 @@ internal static class IProblemGeneratorExtensions
             {
                 var problem = problemGenerator.Generate(knowledge);
                 problem.Display();
-                problem.GetAnswer();
-                problem.Summarise();
+                var answer = problem.GetAnswer();
+                problem.Summarise(answer);
             }
         });
 }

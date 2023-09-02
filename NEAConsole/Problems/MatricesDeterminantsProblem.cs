@@ -5,7 +5,6 @@ internal class MatricesDeterminantsProblem : IProblem
 {
     private readonly Matrix matrix;
     private readonly double solution;
-    private double? answer;
 
     public void Display()
     {
@@ -20,19 +19,20 @@ internal class MatricesDeterminantsProblem : IProblem
         Console.Write(" = ");
     }
 
-    public void GetAnswer()
+    public IAnswer GetAnswer()
     {
-        answer = UIMethods.ReadInt();
-
+        var answer = UIMethods.ReadInt();
         Console.CursorTop += matrix.Rows - ((matrix.Rows - 1) / 2);
+
+        return new IntAnswer(answer);
     }
 
-    public bool EvaluateAnswer()
-        => (answer ?? throw new NotAnsweredException()) == solution;
+    public bool EvaluateAnswer(IAnswer answer)
+        => (answer as IntAnswer ?? throw new InvalidOperationException()).Answer == solution;
 
-    public void Summarise()
+    public void Summarise(IAnswer answer)
     {
-        if (EvaluateAnswer())
+        if (EvaluateAnswer(answer))
         {
             Console.WriteLine("Correct!");
         }

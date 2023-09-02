@@ -7,7 +7,6 @@ internal class DijkstrasProblem : IProblem
     private readonly char startNode;
     private readonly char endNode;
     private readonly int solution; // distance
-    private int? answer;
 
     public void Display()
     {
@@ -19,21 +18,22 @@ internal class DijkstrasProblem : IProblem
 #endif
     }
 
-    public void GetAnswer()
+    public IAnswer GetAnswer()
     {
         //Console.WriteLine("Path taken (abc...) ");
         Console.WriteLine();
         Console.Write("Total weight: ");
-        answer = UIMethods.ReadInt();
+        var answer = UIMethods.ReadInt();
         Console.WriteLine();
+
+        return new IntAnswer(answer);
     }
 
-    public bool EvaluateAnswer()
-        => (answer ?? throw new NotAnsweredException()) == solution;
-
-    public void Summarise()
+    public bool EvaluateAnswer(IAnswer answer)
+        => (answer as IntAnswer ?? throw new InvalidOperationException()).Answer == solution;
+    public void Summarise(IAnswer answer)
     {
-        if (EvaluateAnswer())
+        if (EvaluateAnswer(answer))
         {
             Console.WriteLine("Correct!");
         }

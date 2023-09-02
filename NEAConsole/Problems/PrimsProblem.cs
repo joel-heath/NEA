@@ -17,6 +17,7 @@ internal class PrimsProblem : IProblem
     {
         answer = InputEdges(adjacencyMatrix);
         Console.WriteLine();
+        Console.WriteLine();
     }
 
     public bool EvaluateAnswer()
@@ -41,14 +42,15 @@ internal class PrimsProblem : IProblem
         else
         {
             Console.WriteLine("Incorrect. The correct answer was: ");
-            DrawMatrix(adjacencyMatrix, -1, -1, solution);
+            DrawMatrix(adjacencyMatrix, -1, -1, solution, false);
+            Console.WriteLine();
         }
 
-        Console.ReadKey(true);
+        UIMethods.Wait();
         Console.Clear();
     }
 
-    private static void DrawMatrix(Matrix m, int x, int y, IReadOnlyCollection<(int row, int col)> chosenEdges)
+    private static void DrawMatrix(Matrix m, int x, int y, IReadOnlyCollection<(int row, int col)> chosenEdges, bool resetY=true)
     {
         int xIndent = Console.CursorLeft;
         int yIndent = Console.CursorTop;
@@ -102,7 +104,7 @@ internal class PrimsProblem : IProblem
             Console.CursorTop++;
         }
 
-        Console.CursorTop = yIndent;
+        if (resetY) Console.CursorTop = yIndent;
     }
 
     private static HashSet<(int row, int col)> InputEdges(Matrix adjacency)
@@ -133,25 +135,32 @@ internal class PrimsProblem : IProblem
                     if (y > 0) y--;
                     break;
 
-
-                case ConsoleKey.Enter:
-                case ConsoleKey.Spacebar:
-                    if (adjacency[y, x] != 0 && !chosenEdges.Contains((y, x)))
-                    {
-                        chosenEdges.Add((y, x));
-                    }
-                    break;
-
-                case ConsoleKey.Escape:
-                    selecting = false;
-                    break;
-
                 case ConsoleKey.Backspace:
                     if (chosenEdges.Contains((y, x)))
                     {
-                        chosenEdges.Remove((y,x));
+                        chosenEdges.Remove((y, x));
                     }
                     break;
+
+                case ConsoleKey.Spacebar:
+                    var coords = (y, x);
+                    if (chosenEdges.Contains(coords))
+                    {
+                        chosenEdges.Remove(coords);
+                    }
+                    else if (adjacency[y, x] != 0)
+                    {
+                        chosenEdges.Add(coords);
+                    }
+                    break;
+
+                case ConsoleKey.Enter:
+                    if (chosenEdges.Count > 0)
+                        selecting = false;
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
             }
 
             DrawMatrix(adjacency, x, y, chosenEdges);

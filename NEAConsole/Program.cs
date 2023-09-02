@@ -31,20 +31,39 @@ public class Program
     }
     // update skills will just set Knowns, and search the whole tree. Update knowledge will initialise the knowledge object, update all skills, then save the file to the disk.
 
-    public static void UpdateKnowledge()
+    public static void UpdateKnowledge() => UpdateKnowledge(true);
+    public static void UpdateKnowledge(bool catchEscape)
     {
         // create skill tree with only names, using defaults (LastRevised = DateTime.Min, Known = false)
         Skill[] skills = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(SAMPLE_KNOWLEDGE_PATH), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-        Knowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
+        var newKnowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
         //Knowledge.Matrices = skills.First(s => s.Name == "Matrices");
         //Knowledge.Graphs = skills.First(s => s.Name == "Graphs");
         //Knowledge.Simplex = skills.First(s => s.Name == "Simplex");
 
         // Get user to update Knowns for each skill
-        UpdateSkills(Knowledge.AsArray);
+        try
+        {
+            UpdateSkills(newKnowledge.AsArray);
+        }
+        catch (EscapeException)
+        {
+            Console.Clear();
+            if (!catchEscape) throw new EscapeException(); 
+            return;
+        }
+
+        Knowledge = newKnowledge;
 
         // Save to USER_KNOWLEDGE_PATH
         File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(Knowledge.AsArray));//, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    static void ClearKnowledge()
+    {
+        Knowledge = new();
+        if (File.Exists(USER_KNOWLEDGE_PATH))
+            File.Delete(USER_KNOWLEDGE_PATH);
     }
 
     static void RandomQuestions()
@@ -52,14 +71,14 @@ public class Program
         if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
         {
             Console.WriteLine("To use random questions, you must first enter the topics you know.");
-            Console.ReadKey(false);
+            UIMethods.Wait(string.Empty);
             Console.Clear();
-            UpdateKnowledge();
+            UpdateKnowledge(false);
 
             if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
             {
-                Console.WriteLine("You cannot use random questions if you do not know any topics");
-                Console.ReadKey(false);
+                Console.WriteLine("You cannot use random questions if you do not know any topics.");
+                UIMethods.Wait(string.Empty);
                 Console.Clear();
                 return;
             }
@@ -72,7 +91,15 @@ public class Program
             var problem = gen.Generate();
 
             problem.Display();
-            problem.GetAnswer();
+            try
+            {
+                problem.GetAnswer();
+            }
+            catch (EscapeException)
+            {
+                Console.Clear();
+                return;
+            }
             problem.Summarise();
 
             Console.WriteLine($"Continue?");
@@ -121,6 +148,10 @@ public class Program
             ("Computer Science", CSciMenu),
             ("Random Questions", RandomQuestions),
             ("Update Knowledge", UpdateKnowledge),
+#if DEBUG
+            
+            ("Clear Knowledge", ClearKnowledge)
+#endif
         };
 
         Menu.ExecuteMenu(options, "Main Menu");

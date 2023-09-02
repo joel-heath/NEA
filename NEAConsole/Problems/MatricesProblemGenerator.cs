@@ -10,7 +10,7 @@ internal class MatricesProblemGenerator : IProblemGenerator
         while (!Program.Knowledge.Entered || !Program.Knowledge.Matrices.Known)
         {
             Console.WriteLine("To use random questions, you must first enter the topics you know.");
-            Console.ReadKey(false);
+            UIMethods.Wait(string.Empty);
             Console.Clear();
             Program.UpdateKnowledge();
         }

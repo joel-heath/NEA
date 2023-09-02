@@ -3,7 +3,16 @@
 namespace NEAConsole;
 public static class UIMethods
 {
-    public static int ReadInt()
+    public static void Wait(string message = "Press any key to continue...")
+    {
+        if (message.Length > 0)
+            Console.WriteLine(message);
+
+        if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+            throw new EscapeException();
+    }
+
+    public static int ReadInt(bool newLine = true)
     {
         bool entering = true;
         string rawNum = string.Empty;
@@ -35,6 +44,7 @@ public static class UIMethods
                 case ConsoleKey.End:
                     pos = rawNum.Length;
                     break;
+
                 case ConsoleKey.Delete:
                     if (pos < rawNum.Length)
                     {
@@ -50,13 +60,16 @@ public static class UIMethods
                         rawNum = rawNum[..pos] + rawNum[(pos + 1)..];
                     }
                     break;
-                //case ConsoleKey.Escape:
-                //throw new EscapeException();
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
+
                 case ConsoleKey.Enter:
-                    entering = false;
+                    if (rawNum.Length > 0) entering = false;
                     break;
             }
         }
+        if (newLine) Console.WriteLine();
 
         return int.Parse(rawNum);
     }
@@ -184,25 +197,26 @@ public static class UIMethods
                     if (y > 0) y--;
                     break;
 
-
-                case ConsoleKey.Tab:
-                case ConsoleKey.Enter:
-                case ConsoleKey.Spacebar:
-                    if (x < cols - 1) x++;
-                    else if (y < rows - 1) (x, y) = (0, y + 1);
-                    else entering = false;
-                    break;
-
-                case ConsoleKey.Escape:
-                    entering = false;
-                    break;
-
                 case ConsoleKey.Backspace:
                     if (inputs[y][x].Length > 0)
                     {
                         inputs[y][x] = inputs[y][x][..^1];
                     }
                     break;
+
+                case ConsoleKey.Tab:
+                case ConsoleKey.Spacebar:
+                    if (x < cols - 1) x++;
+                    else if (y < rows - 1) (x, y) = (0, y + 1);
+                    else entering = false;
+                    break;
+
+                case ConsoleKey.Enter:
+                    entering = false;
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
 
                 default:
                     inputs[y][x] += key.KeyChar;

@@ -41,10 +41,11 @@ internal class MatricesMultiplicationProblem : IProblem
         else
         {
             Console.WriteLine("Incorrect. The correct answer was: ");
-            UIMethods.DrawMatrix(solution);
+            UIMethods.DrawMatrix(solution, false);
+            Console.WriteLine();
         }
 
-        Console.ReadKey(true);
+        UIMethods.Wait();
         Console.Clear();
     }
 

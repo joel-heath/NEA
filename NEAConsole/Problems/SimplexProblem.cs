@@ -29,6 +29,7 @@ internal class SimplexProblem : IProblem
             Console.Write((char)('x' + i) + " = ");
             answer[i] = UIMethods.ReadInt();
         }
+        Console.WriteLine();
     }
 
     public bool EvaluateAnswer()
@@ -50,7 +51,7 @@ internal class SimplexProblem : IProblem
             }
         }
 
-        Console.ReadKey(true);
+        UIMethods.Wait();
         Console.Clear();
     }
 

@@ -44,7 +44,10 @@ internal static class Menu
         while (@continue)
         {
             Console.WriteLine(prompt);
-            var choice = Choose(choices);
+            int choice;
+            try { choice = Choose(choices); }
+            catch (EscapeException) { choice = choices.Count - 1; }
+
             if (choice == choices.Count - 1)
             {
                 @continue = false;
@@ -52,7 +55,15 @@ internal static class Menu
             else
             {
                 Console.Clear();
-                choices[choice].OnSelected();
+                try
+                {
+                    choices[choice].OnSelected();
+                }
+                catch (EscapeException)
+                {
+                    Console.Clear();
+                    //@continue = false; this would exit out the current menu--we want to stay in this menu
+                }
             }
         }
     }
@@ -107,9 +118,7 @@ internal static class Menu
                     break;
 
                 case ConsoleKey.Escape:
-                    choice = options.Count - 1; // the exit / return option
-                    choosing = false;
-                    break;
+                    throw new EscapeException();
             }
 
             if (changed)

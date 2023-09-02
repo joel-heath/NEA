@@ -1,5 +1,4 @@
 ﻿using NEAConsole.Matrices;
-using System.Runtime.InteropServices;
 
 namespace NEAConsole.Problems;
 internal class DijkstrasProblem : IProblem
@@ -15,7 +14,9 @@ internal class DijkstrasProblem : IProblem
         Console.WriteLine($"Perform Dijkstra's algorithm on the graph represented by the following adjacency matrix to find the shortest path from {startNode} to {endNode} and it's total weight.");
         Console.WriteLine();
         UIMethods.DrawTitledMatrix(graph);
-        //MatricesProblem.DebugDrawMatrix(graph);
+#if DEBUG
+        UIMethods.DebugDrawMatrix(graph);
+#endif
     }
 
     public void GetAnswer()
@@ -41,7 +42,7 @@ internal class DijkstrasProblem : IProblem
             Console.WriteLine($"Incorrect, the correct answer was {solution}");
         }
 
-        Console.ReadKey(true);
+        UIMethods.Wait();
         Console.Clear();
     }
 

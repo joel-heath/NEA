@@ -24,11 +24,7 @@ internal class MatricesDeterminantsProblem : IProblem
     {
         answer = UIMethods.ReadInt();
 
-        // matrix.Rows -    signSpacing        + 2
-        // matrix.Rows - (matrix.Rows - 1) / 2 + 2
-
         Console.CursorTop += matrix.Rows - ((matrix.Rows - 1) / 2);
-        Console.WriteLine();
     }
 
     public bool EvaluateAnswer()
@@ -45,7 +41,7 @@ internal class MatricesDeterminantsProblem : IProblem
             Console.WriteLine($"Incorrect. The correct answer was {solution}.");
         }
 
-        Console.ReadKey(true);
+        UIMethods.Wait();
         Console.Clear();
     }
 

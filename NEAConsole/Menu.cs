@@ -1,11 +1,11 @@
 ﻿using NEAConsole.Problems;
 
 namespace NEAConsole;
-public record struct MenuOption(string DisplayText, Action OnSelected)
+public record struct MenuOption(string DisplayText, Action<Skill> OnSelected)
 {
     public readonly int Length => DisplayText.Length;
     public override readonly string ToString() => DisplayText;
-    public static implicit operator MenuOption((string DisplayText, Action OnSelected) tuple) => new(tuple.DisplayText, tuple.OnSelected);
+    public static implicit operator MenuOption((string DisplayText, Action<Skill> OnSelected) tuple) => new(tuple.DisplayText, tuple.OnSelected);
 }
 internal static class Menu
 {
@@ -28,15 +28,15 @@ internal static class Menu
     public static bool Affirm()
         => Choose(new MenuOption[] { ("Yes", null!), ("No", null!) }) == 0;
 
-    public static void ExecuteMenu(IEnumerable<IProblemGenerator> options, string prompt)
-        => ExecuteMenu(options.Select(opt => opt.ToMenuOption()), prompt);
+    public static void ExecuteMenu(IEnumerable<IProblemGenerator> options, string prompt, Skill knowledge)
+        => ExecuteMenu(options.Select(opt => opt.ToMenuOption()), prompt, knowledge);
 
     /// <summary>
     /// Displays a menu of MenuOptions, allowing the user to continually pick MenuOptions and running their OnSelected, until the user chooses the "Exit" option.
     /// </summary>
     /// <param name="options">IList of MenuOptions representing all the options the user can pick from, "Exit" or "Return" need not be included.</param>
     /// <param name="prompt">The prompt to show the user preceding each option e.g. "Choose a subject to revise" or "Main Menu".</param>
-    public static void ExecuteMenu(IEnumerable<MenuOption> options, string prompt)
+    public static void ExecuteMenu(IEnumerable<MenuOption> options, string prompt, Skill knowledge)
     {
         var choices = options.Append(("Exit", null!)).ToList();
 
@@ -57,7 +57,7 @@ internal static class Menu
                 Console.Clear();
                 try
                 {
-                    choices[choice].OnSelected();
+                    choices[choice].OnSelected(knowledge);
                 }
                 catch (EscapeException)
                 {

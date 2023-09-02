@@ -6,9 +6,6 @@ public class Program
 {
     private const string USER_KNOWLEDGE_PATH = "knowledge.dat",
                          SAMPLE_KNOWLEDGE_PATH = "Skills.dat";
-
-    public static Knowledge Knowledge = new();
-
     static void UpdateSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
     {
         skillPath ??= new List<string>();
@@ -29,53 +26,47 @@ public class Program
             }
         }
     }
-    // update skills will just set Knowns, and search the whole tree. Update knowledge will initialise the knowledge object, update all skills, then save the file to the disk.
 
-    public static void UpdateKnowledge() => UpdateKnowledge(true);
-    public static void UpdateKnowledge(bool catchEscape)
+    public static void UpdateKnowledge(Skill knowledge) => UpdateKnowledge(knowledge, true);
+    public static void UpdateKnowledge(Skill knowledge, bool catchEscape)
     {
-        // create skill tree with only names, using defaults (LastRevised = DateTime.Min, Known = false)
-        Skill[] skills = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(SAMPLE_KNOWLEDGE_PATH), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-        var newKnowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
-        //Knowledge.Matrices = skills.First(s => s.Name == "Matrices");
-        //Knowledge.Graphs = skills.First(s => s.Name == "Graphs");
-        //Knowledge.Simplex = skills.First(s => s.Name == "Simplex");
+        var oldSkills = knowledge.Children; // so if they escape we can undo our resetting
 
-        // Get user to update Knowns for each skill
+        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
         try
         {
-            UpdateSkills(newKnowledge.AsArray);
+            UpdateSkills(knowledge.Children);
         }
         catch (EscapeException)
         {
+            knowledge.Children = oldSkills; // undo the resetting of knowledge
             Console.Clear();
             if (!catchEscape) throw new EscapeException(); 
-            return;
         }
 
-        Knowledge = newKnowledge;
-
         // Save to USER_KNOWLEDGE_PATH
-        File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(Knowledge.AsArray));//, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(knowledge.Children));//, new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    static void ClearKnowledge()
+    static void ClearKnowledge(Skill knowledge)
     {
-        Knowledge = new();
         if (File.Exists(USER_KNOWLEDGE_PATH))
             File.Delete(USER_KNOWLEDGE_PATH);
+
+        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
     }
 
-    static void RandomQuestions()
+    static void RandomQuestions(Skill knowledge)
     {
-        if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
+        // or a while? NO, client chose to have it this way
+        if (knowledge.Children.All(s => !s.Known))
         {
             Console.WriteLine("To use random questions, you must first enter the topics you know.");
             UIMethods.Wait(string.Empty);
             Console.Clear();
-            UpdateKnowledge(false);
+            UpdateKnowledge(knowledge, false);
 
-            if (!Knowledge.Entered || Knowledge.AsArray.All(s => !s.Known))
+            if (knowledge.Children.All(s => !s.Known))
             {
                 Console.WriteLine("You cannot use random questions if you do not know any topics.");
                 UIMethods.Wait(string.Empty);
@@ -88,7 +79,7 @@ public class Program
 
         for (int i = 0; i < 10; i++)
         {
-            var problem = gen.Generate();
+            var problem = gen.Generate(knowledge);
 
             problem.Display();
             try
@@ -112,35 +103,27 @@ public class Program
         }
     }
 
-    static void MathsMenu()
+    static void MathsMenu(Skill knowledge)
     {
 
     }
-    static void FMathsMenu()
+    static void FMathsMenu(Skill knowledge)
     {
         IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing
 
-        Menu.ExecuteMenu(options, "Choose a subject to revise");
+        Menu.ExecuteMenu(options, "Choose a subject to revise", knowledge);
         Console.Clear();
     }
 
-    static void CSciMenu()
+    static void CSciMenu(Skill knowledge)
     {
 
     }
 
     static void Main(string[] args)
     {
-        try
-        {
-            string jsonString = File.ReadAllText(USER_KNOWLEDGE_PATH);
-            Skill[] skills = JsonSerializer.Deserialize<Skill[]>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-
-            Knowledge = new Knowledge(skills.First(s => s.Name == "Matrices"), skills.First(s => s.Name == "Graphs"), skills.First(s => s.Name == "Simplex"));
-        }
-        catch (JsonException) { }
-        catch (FileNotFoundException) { }
-
+        Skill knowledge = Skill.KnowledgeConstructor(File.Exists(USER_KNOWLEDGE_PATH) ? USER_KNOWLEDGE_PATH : SAMPLE_KNOWLEDGE_PATH);
+        
         var options = new MenuOption[]
         {
             ("Maths", MathsMenu),
@@ -154,7 +137,7 @@ public class Program
 #endif
         };
 
-        Menu.ExecuteMenu(options, "Main Menu");
+        Menu.ExecuteMenu(options, "Main Menu", knowledge);
         Console.Clear();
     }
 }

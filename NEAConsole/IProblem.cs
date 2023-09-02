@@ -23,5 +23,5 @@ public interface IProblemGenerator
     /// Knowledge tree path to skill e.g. Matrices.Determinants.Inversion
     /// </summary>
     string SkillPath { get; }
-    IProblem Generate(); // pure logic - unit tests
+    IProblem Generate(Skill knowledge); // pure logic - unit tests
 }

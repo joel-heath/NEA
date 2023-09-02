@@ -7,7 +7,7 @@ internal class MatricesDeterminantsProblemGenerator : IProblemGenerator
     public string SkillPath => "Matrices.Determinants";
     private readonly Random random;
 
-    public IProblem Generate()
+    public IProblem Generate(Skill knowledge)
     {
         int dimension = random.Next(2, 3);
         Matrix matrix = new(dimension, dimension, Enumerable.Range(0, dimension * dimension).Select(n => (double)random.Next(-10, 10)));

@@ -5,7 +5,7 @@ internal class SimplexProblemGenerator : IProblemGenerator
     public string SkillPath => "Simplex";
     private readonly Random random;
 
-    public IProblem Generate()
+    public IProblem Generate(Skill knowledge)
     {
         int dimensions = random.Next(2, 4);
         int[] solution = Enumerable.Range(0, dimensions).Select(n => random.Next(2, 6)).ToArray();

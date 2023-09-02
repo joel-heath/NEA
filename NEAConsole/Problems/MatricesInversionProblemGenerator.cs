@@ -7,7 +7,7 @@ internal class MatricesInversionProblemGenerator : IProblemGenerator
     public string SkillPath => "Matrices.Determinants.Inversion";
     private readonly Random random;
 
-    public IProblem Generate()
+    public IProblem Generate(Skill knowledge)
     {
         int dimension = random.Next(2, 4);
 

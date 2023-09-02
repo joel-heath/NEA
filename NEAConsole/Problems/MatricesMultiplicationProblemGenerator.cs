@@ -7,7 +7,7 @@ internal class MatricesMultiplicationProblemGenerator : IProblemGenerator
     public string SkillPath => "Matrices.Multiplication";
     private readonly Random random;
 
-    public IProblem Generate()
+    public IProblem Generate(Skill knowledge)
     {
         (int rows, int cols) = (random.Next(1, 4), random.Next(1, 4));
 

@@ -1,33 +1,13 @@
 ﻿namespace NEAConsole;
-public class Knowledge
-{
-    public bool Entered { get; set; }
-    public Skill Matrices { get; }
-    public Skill Graphs { get; }
-    public Skill Simplex { get; }
-    public Skill[] AsArray => new[] { Matrices, Graphs, Simplex };
+using System.Text.Json;
 
-    public bool IsKnown(string skillPath) => AsArray.Any(s => s.Query(skillPath[(skillPath.IndexOf('.')+1)..], out Skill? skill) && skill!.Known);
-
-    public Knowledge()
-    {
-        Entered = false;
-    }
-    public Knowledge(Skill matrices, Skill graphs, Skill simplex)
-    {
-        Matrices = matrices;
-        Graphs = graphs;
-        Simplex = simplex;
-        Entered = true;
-    }
-}
 public class Skill
 {
     public string Name { get; }
     public bool Known { get; set; }
     public int Weight { get; } // settable by user?
     public DateTime LastRevised { get; set; }
-    public Skill[] Children { get; }
+    public Skill[] Children { get; set; }
 
     public bool Query(string skillPath, out Skill? skill)
     {
@@ -58,6 +38,15 @@ public class Skill
             return false;
         }
     }
+
+    public void ResetKnowledge(string treeJSONPath)
+    {
+        Children = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+    }
+    public static Skill KnowledgeConstructor(string treeJSONPath)
+        => KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!);
+    public static Skill KnowledgeConstructor(Skill[] skills)
+        => new(string.Empty, true, 0, DateTime.MinValue, skills);
 
     //[JsonConstructor]
     public Skill(string name, bool known, int weight, DateTime lastRevised, Skill[]? children)

@@ -8,7 +8,7 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
     public string SkillPath => "Graphs.Dijkstras";
     private readonly Random random;
 
-    public IProblem Generate()
+    public IProblem Generate(Skill knowledge)
     {
         var dimension = random.Next(8, 11);
         Matrix tree = new(dimension);

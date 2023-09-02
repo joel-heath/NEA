@@ -1,11 +1,14 @@
 ﻿using NEAConsole.Problems;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+
+[assembly:InternalsVisibleTo("NEAConsoleTests")]
 
 namespace NEAConsole;
 public class Program
 {
-    private const string USER_KNOWLEDGE_PATH = "knowledge.dat",
-                         SAMPLE_KNOWLEDGE_PATH = "Skills.dat";
+    private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",
+                         SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json";
     static void UpdateSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
     {
         skillPath ??= new List<string>();
@@ -25,35 +28,6 @@ public class Program
                 UpdateSkills(skill.Children, newPath);
             }
         }
-    }
-
-    public static void UpdateKnowledge(Skill knowledge) => UpdateKnowledge(knowledge, true);
-    public static void UpdateKnowledge(Skill knowledge, bool catchEscape)
-    {
-        var oldSkills = knowledge.Children; // so if they escape we can undo our resetting
-
-        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
-        try
-        {
-            UpdateSkills(knowledge.Children);
-        }
-        catch (EscapeException)
-        {
-            knowledge.Children = oldSkills; // undo the resetting of knowledge
-            Console.Clear();
-            if (!catchEscape) throw new EscapeException(); 
-        }
-
-        // Save to USER_KNOWLEDGE_PATH
-        File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(knowledge.Children));//, new JsonSerializerOptions { WriteIndented = true }));
-    }
-
-    static void ClearKnowledge(Skill knowledge)
-    {
-        if (File.Exists(USER_KNOWLEDGE_PATH))
-            File.Delete(USER_KNOWLEDGE_PATH);
-
-        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
     }
 
     static void RandomQuestions(Skill knowledge)
@@ -82,16 +56,17 @@ public class Program
             var problem = gen.Generate(knowledge);
 
             problem.Display();
+            // IAnswer answer;
             try
             {
-                problem.GetAnswer();
+                problem.GetAnswer();// answer =
             }
             catch (EscapeException)
             {
                 Console.Clear();
                 return;
             }
-            problem.Summarise();
+            problem.Summarise();//answer);
 
             Console.WriteLine($"Continue?");
             if (!Menu.Affirm())
@@ -103,10 +78,35 @@ public class Program
         }
     }
 
+    public static void UpdateKnowledge(Skill knowledge, bool catchEscape = true)
+    {
+        var oldSkills = knowledge.Children;
+        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
+
+        try { UpdateSkills(knowledge.Children); }
+        catch (EscapeException)
+        {
+            knowledge.Children = oldSkills; // undo the resetting of knowledge
+            Console.Clear();
+            if (!catchEscape) throw new EscapeException();
+        }
+
+        File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(knowledge.Children));//, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    static void ClearKnowledge(Skill knowledge)
+    {
+        if (File.Exists(USER_KNOWLEDGE_PATH))
+            File.Delete(USER_KNOWLEDGE_PATH);
+
+        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
+    }
+
     static void MathsMenu(Skill knowledge)
     {
 
     }
+
     static void FMathsMenu(Skill knowledge)
     {
         IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing
@@ -120,21 +120,45 @@ public class Program
 
     }
 
+    static void SettingsMenu(Skill knowledge)
+    {
+        var options = new MenuOption[]
+        {
+            ("Update Knowledge", (k) => UpdateKnowledge(k, true)),
+            ("Study Break Timer", (k) => Thread.Sleep(0)),
+#if DEBUG
+            ("Clear Knowledge", ClearKnowledge)
+#endif
+        };
+    }
+
+    static void TopicMenu(Skill knowledge)
+    {
+        var options = new MenuOption[]
+        {
+            ("Maths", MathsMenu),
+            ("Further Maths", FMathsMenu),
+            ("Computer Science", CSciMenu),
+        };
+
+        Menu.ExecuteMenu(options, "Select a topic to revise", knowledge);
+        Console.Clear();
+    }
+
+    static void ExamMenu(Skill knowledge)
+    {
+    }
+
     static void Main(string[] args)
     {
         Skill knowledge = Skill.KnowledgeConstructor(File.Exists(USER_KNOWLEDGE_PATH) ? USER_KNOWLEDGE_PATH : SAMPLE_KNOWLEDGE_PATH);
         
         var options = new MenuOption[]
         {
-            ("Maths", MathsMenu),
-            ("Further Maths", FMathsMenu),
-            ("Computer Science", CSciMenu),
-            ("Random Questions", RandomQuestions),
-            ("Update Knowledge", UpdateKnowledge),
-#if DEBUG
-            
-            ("Clear Knowledge", ClearKnowledge)
-#endif
+            ("Mock Exam", ExamMenu),
+            ("Quickfire Questions", RandomQuestions),
+            ("Topic Select", TopicMenu),
+            ("Settings", SettingsMenu),
         };
 
         Menu.ExecuteMenu(options, "Main Menu", knowledge);

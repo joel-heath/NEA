@@ -12,9 +12,9 @@ internal class PrimsProblem : IProblem
         Console.WriteLine();
     }
 
-    public IAnswer GetAnswer()
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
     {
-        var answer = InputEdges(adjacencyMatrix);
+        var answer = InputEdges(adjacencyMatrix, (oldAnswer as PrimsAnswer)?.Answer);
         Console.WriteLine();
         Console.WriteLine();
 
@@ -37,9 +37,12 @@ internal class PrimsProblem : IProblem
         return true;
     }
 
-    public void Summarise(IAnswer answer)
+    public void Summarise(IAnswer? answer)
     {
-        if (EvaluateAnswer(answer))
+        bool correct;
+        try { correct = EvaluateAnswer(answer); }
+        catch (InvalidOperationException) { correct = false; }
+        if (correct)
         {
             Console.WriteLine("Correct!");
         }
@@ -111,13 +114,13 @@ internal class PrimsProblem : IProblem
         if (resetY) Console.CursorTop = yIndent;
     }
 
-    private static HashSet<(int row, int col)> InputEdges(Matrix adjacency)
+    private static HashSet<(int row, int col)> InputEdges(Matrix adjacency, HashSet<(int row, int col)>? oldAnswer = null)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
         int x = 0, y = 0;
 
-        HashSet<(int row, int col)> chosenEdges = new(adjacency.Rows * adjacency.Columns);
+        HashSet<(int row, int col)> chosenEdges = oldAnswer?.ToHashSet() ?? new(adjacency.Rows * adjacency.Columns);
         DrawMatrix(adjacency, x, y, chosenEdges);
 
         bool selecting = true;

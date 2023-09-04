@@ -1,4 +1,5 @@
-﻿using NEAConsole.Matrices;
+﻿using Microsoft.Win32.SafeHandles;
+using NEAConsole.Matrices;
 
 namespace NEAConsole;
 public static class UIMethods
@@ -12,12 +13,13 @@ public static class UIMethods
             throw new EscapeException();
     }
 
-    public static int ReadInt(bool newLine = true, bool natural = true)
+    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null)
     {
         bool entering = true;
-        string rawNum = string.Empty;
-        int pos = 0;
+        string rawNum = startingNum is null || (natural && startingNum <= 0) ? string.Empty : startingNum.Value.ToString();
+        int pos = rawNum.Length;
         int indent = Console.CursorLeft;
+        Console.Write(rawNum);
         while (entering)
         {
             Console.CursorLeft = indent + pos;
@@ -174,14 +176,15 @@ public static class UIMethods
     /// <param name="rows">Number of rows that the matrix the user may enter in will have.</param>
     /// <param name="cols">Number of columns that the matrix the user may enter in will have.</param>
     /// <returns>A matrix with the user's inputs.</returns>
-    public static Matrix InputMatrix(int rows, int cols)
+    public static Matrix InputMatrix(int rows, int cols, Matrix? startingInput = null)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
 
-        Matrix? m = null!; // compilation purposes, wont ever return null
+        Matrix m = null!; // compilation purposes, wont ever return null
 
-        string[][] inputs = InitialiseUserInputMatrix(rows, cols); // why is it a jagged array you ask? so i can select through it
+        // why is it a jagged array you ask? so i can select through it
+        string[][] inputs = startingInput is null ? InitialiseUserInputMatrix(rows, cols) : InitialiseUserInputMatrix(startingInput);
 
         int x = 0, y = 0;
         DrawInputMatrix(inputs, x, y);
@@ -313,6 +316,24 @@ public static class UIMethods
         return inputs;
     }
 
+    private static string[][] InitialiseUserInputMatrix(Matrix m)
+    {
+        // YES, Enumerable.Repeat(Enumerable.Repeat("", cols).ToArray(), rows).ToArray(); would work but that's inefficient
+
+        string[][] inputs = new string[m.Rows][];
+
+        for (int i = 0; i < m.Rows; i++)
+        {
+            inputs[i] = new string[m.Columns];
+            for (int j = 0; j < m.Columns; j++)
+            {
+                inputs[i][j] = m[i,j].ToString();
+            }
+        }
+
+        return inputs;
+    }
+
     public static int[] GetMatrixWidths(Matrix m)
     {
         int[] widths = new int[m.Columns];
@@ -390,5 +411,66 @@ public static class UIMethods
                 UpdateAllSkills(skill.Children, newPath);
             }
         }
+    }
+
+    public static int ExamMenu(string[] options, int question, int totalQuestions)
+    {
+        //var (initX, initY) = (Console.CursorLeft, Console.CursorTop);
+        Console.CursorTop = 1;
+        Console.CursorVisible = false;
+
+        Console.CursorLeft = options[0].Length + 1;
+        Console.BackgroundColor = ConsoleColor.Gray;
+        Console.ForegroundColor = ConsoleColor.Black;
+        Console.Write(options[1]);
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.Gray;
+
+        bool choosing = true;
+        int choice = 0; // -1 is go back a question (left), 0 is stay on this question (middle), 1 is next question (right)
+        while (choosing)
+        {
+            switch (Console.ReadKey(true).Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (choice > -1 && question > 0)
+                    {
+                        Console.CursorLeft = options.Take(choice + 1).Sum(o => o.Length) + choice + 1; // overwrite old selected
+                        Console.Write(options[choice + 1]);
+                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        choice--;
+                        Console.CursorLeft = options.Take(choice + 1).Sum(o => o.Length) + choice + 1; // write new selected
+                        Console.Write(options[choice + 1]);
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (choice < 1 && question <= totalQuestions) // <= bcuz they can go onto end exam
+                    {
+                        Console.CursorLeft = options.Take(choice + 1).Sum(o => o.Length) + choice + 1; // overwrite old selected
+                        Console.Write(options[choice + 1]);
+                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        choice++;
+                        Console.CursorLeft = options.Take(choice + 1).Sum(o => o.Length) + choice + 1; // write new selected
+                        Console.Write(options[choice + 1]);
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                    break;
+                case ConsoleKey.Enter:
+                    choosing = false;
+                    break;
+                case ConsoleKey.Escape:
+                    //or return; need an Are you sure?
+                    throw new EscapeException();
+            }
+        }
+
+        //Console.SetCursorPosition(initX, initY);
+        Console.CursorVisible = true;
+        return choice;
     }
 }

@@ -17,16 +17,16 @@ internal class SimplexProblem : IProblem
         }
     }
 
-    public IAnswer GetAnswer()
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null) // would be nice to be able to navigate up and down like in a matrix
     {
-        var answer = new int[solution.Length + 1];
+        var answer = (oldAnswer as SimplexAnswer)?.Answer ?? new int[solution.Length + 1];
 
         Console.Write("\nP = ");
-        answer[solution.Length] = UIMethods.ReadInt(); // need to catch potential input errors here
+        answer[solution.Length] = UIMethods.ReadInt(startingNum:answer[solution.Length]); // need to catch potential input errors here
         for (int i = 0; i < solution.Length; i++)
         {
             Console.Write((char)('x' + i) + " = ");
-            answer[i] = UIMethods.ReadInt();
+            answer[i] = UIMethods.ReadInt(startingNum: answer[i]);
         }
         Console.WriteLine();
 
@@ -40,9 +40,12 @@ internal class SimplexProblem : IProblem
                && !attempt.Take(solution.Length - 1).Where((n, i) => n != solution[i]).Any(); // Why not just attempt.All()? Because it doesn't have an (item, index) overload
     }
 
-    public void Summarise(IAnswer answer)
+    public void Summarise(IAnswer? answer)
     {
-        if (EvaluateAnswer(answer))
+        bool correct;
+        try { correct = EvaluateAnswer(answer); }
+        catch (InvalidOperationException) { correct = false; }
+        if (correct)
         {
             Console.WriteLine("Correct!");
         }

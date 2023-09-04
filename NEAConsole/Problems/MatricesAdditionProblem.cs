@@ -23,20 +23,22 @@ internal class MatricesAdditionProblem : IProblem
         Console.CursorTop -= signSpacing;
     }
 
-    public IAnswer GetAnswer()
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
     {
-        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns);
+        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer);
         Console.WriteLine();
-
         return new MatrixAnswer(answer);
     }
 
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer == solution;
 
-    public void Summarise(IAnswer answer)
+    public void Summarise(IAnswer? answer)
     {
-        if (EvaluateAnswer(answer))
+        bool correct;
+        try { correct = EvaluateAnswer(answer); }
+        catch (InvalidOperationException) { correct = false; }
+        if (correct)
         {
             Console.WriteLine("Correct!");
         }

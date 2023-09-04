@@ -2,9 +2,10 @@
 public interface IProblem
 {
     void Display(); // Display the problem and - pure UI
-    IAnswer GetAnswer(); // Get the user's attempt at answering - pure UI
+    //IAnswer GetAnswer(); // Get the user's attempt at answering - pure UI
+    IAnswer GetAnswer(IAnswer? oldAnswer = null);
     bool EvaluateAnswer(IAnswer answer); // Check if the user is correct - pure logic, unit tests
-    void Summarise(IAnswer answer); // Tell the user if they were right or wrong - pure UI
+    void Summarise(IAnswer? answer); // Tell the user if they were right or wrong - pure UI
 }
 public interface IProblemGenerator
 {

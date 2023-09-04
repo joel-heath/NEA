@@ -18,12 +18,12 @@ internal class DijkstrasProblem : IProblem
 #endif
     }
 
-    public IAnswer GetAnswer()
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
     {
         //Console.WriteLine("Path taken (abc...) ");
         Console.WriteLine();
         Console.Write("Total weight: ");
-        var answer = UIMethods.ReadInt();
+        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer);
         Console.WriteLine();
 
         return new IntAnswer(answer);
@@ -31,9 +31,12 @@ internal class DijkstrasProblem : IProblem
 
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as IntAnswer ?? throw new InvalidOperationException()).Answer == solution;
-    public void Summarise(IAnswer answer)
+    public void Summarise(IAnswer? answer)
     {
-        if (EvaluateAnswer(answer))
+        bool correct;
+        try { correct = EvaluateAnswer(answer); }
+        catch (InvalidOperationException) { correct = false; }
+        if (correct)
         {
             Console.WriteLine("Correct!");
         }

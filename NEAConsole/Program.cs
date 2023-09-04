@@ -38,40 +38,6 @@ internal class Program
         return true;
     }
 
-    static void QuickfireQuestions(Skill knowledge)
-    {
-        if (!TryUpdateKnowledge(knowledge)) return;
-
-        var gen = new RandomProblemGenerator();
-
-        bool @continue = true;
-        while (@continue)
-        {
-            var problem = gen.Generate(knowledge);
-            problem.Display();
-
-            try
-            {
-                var answer = problem.GetAnswer();
-                problem.Summarise(answer);
-            }
-            catch (EscapeException)
-            {
-                Console.Clear();
-                @continue = false;
-            }
-
-            /*
-            Console.WriteLine($"Continue?");
-            if (!Menu.Affirm())
-            {
-                Console.Clear();
-                break;
-            }*/
-            Console.Clear();
-        }
-    }
-
     public static void UpdateKnowledge(Skill knowledge, bool catchEscape = true)
     {
         var oldSkills = knowledge.Children;
@@ -86,24 +52,6 @@ internal class Program
         }
 
         File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(knowledge.Children));//, new JsonSerializerOptions { WriteIndented = true }));
-    }
-
-    static void MathsMenu(Skill knowledge)
-    {
-
-    }
-
-    static void FMathsMenu(Skill knowledge)
-    {
-        IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing
-
-        Menu.ExecuteMenu(options, "Choose a subject to revise", knowledge);
-        Console.Clear();
-    }
-
-    static void CSciMenu(Skill knowledge)
-    {
-
     }
 
     static void SettingsMenu(Skill knowledge)
@@ -126,6 +74,24 @@ internal class Program
         Console.Clear();
     }
 
+    static void MathsMenu(Skill knowledge)
+    {
+
+    }
+
+    static void FMathsMenu(Skill knowledge)
+    {
+        IProblemGenerator[] options = { new MatricesProblemGenerator(), new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing
+
+        Menu.ExecuteMenu(options, "Choose a subject to revise", knowledge);
+        Console.Clear();
+    }
+
+    static void CSciMenu(Skill knowledge)
+    {
+
+    }
+
     static void TopicMenu(Skill knowledge)
     {
         var options = new MenuOption[]
@@ -137,6 +103,31 @@ internal class Program
 
         Menu.ExecuteMenu(options, "Select a topic to revise", knowledge);
         Console.Clear();
+    }
+
+    static void QuickfireQuestions(Skill knowledge)
+    {
+        if (!TryUpdateKnowledge(knowledge)) return;
+
+        var gen = new RandomProblemGenerator();
+        bool @continue = true;
+        while (@continue)
+        {
+            var problem = gen.Generate(knowledge);
+            problem.Display();
+
+            try
+            {
+                var answer = problem.GetAnswer();
+                problem.Summarise(answer);
+            }
+            catch (EscapeException)
+            {
+                Console.Clear();
+                @continue = false;
+            }
+            Console.Clear();
+        }
     }
 
     static void ExamMenu(Skill knowledge)
@@ -156,20 +147,48 @@ internal class Program
 
         Console.Write("How many questions would you like in the mock exam? ");
         var n = UIMethods.ReadInt();
-
+        
+        
         var gen = new RandomProblemGenerator();
+        var attempts = Enumerable.Range(0, n).Select(i => ((IProblem problem, IAnswer? answer))(gen.Generate(chosenKnowledge), null)).ToList();
+        int question = 1;
 
-        var attempts = new (IProblem problem, IAnswer answer)[n];
-
-        for (int i = 0; i < n; i++)
+        UIMethods.Wait("Press any key to begin the exam...");
+        Console.Clear();
+        while (question < attempts.Count + 1) // needs to become until time is up
         {
-            int j = i + 1;
-            Console.WriteLine('[' + new string('#', j) + new string(' ', n-j) + ']'); // progress bar
-            Console.WriteLine($"Question {j}/{n}");
-            var p = gen.Generate(chosenKnowledge);
+            Console.WriteLine('[' + new string('#', question) + new string(' ', n-question) + ']'); // progress bar
+            Console.WriteLine($"<- Question {question}/{n} ->");
+            var (p, a) = attempts[question-1];
             p.Display();
-            var a = p.GetAnswer();
-            attempts[i] = (p, a);
+            try
+            {
+                a = p.GetAnswer(a);
+                attempts[question-1] = (p, a);
+                question++;
+            }
+            catch (EscapeException)
+            {
+                var choice = UIMethods.ExamMenu(new string[] { "<-", $"Question {question}/{n}", "->" }, question, n);
+                question += choice;
+            }
+
+            Console.Clear();
+
+            if (question == attempts.Count + 1)
+            {
+                Console.WriteLine("Are you sure you want to finish the exam early?");
+                var unanswered = attempts.Select((a, i) => (a, i)).Where(a => a.a.answer is null);
+                foreach (var att in unanswered)
+                {
+                    Console.WriteLine($"WARNING: Question {att.i + 1} is unanswered.");
+                }
+                if (!Menu.Affirm())
+                {
+                    question--;
+                    Console.Clear();
+                }
+            }
         }
 
         Console.WriteLine($"Exam complete.");

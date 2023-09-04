@@ -2,7 +2,7 @@
 internal class MatricesProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Matrices";
-    public string SkillPath => string.Empty;
+    public string SkillPath => "Matrices";
     private readonly Random random;
 
     public IProblem Generate(Skill knowledge)

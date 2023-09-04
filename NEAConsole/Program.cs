@@ -5,75 +5,69 @@ using System.Text.Json;
 [assembly:InternalsVisibleTo("NEAConsoleTests")]
 
 namespace NEAConsole;
-public class Program
+internal class Program
 {
     private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",
                          SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json";
-    static void UpdateSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
-    {
-        skillPath ??= new List<string>();
-        foreach (Skill skill in skills)
-        {
-            var newPath = skillPath.Append(skill.Name);
-            Console.WriteLine($"Do you know {string.Join(" > ", newPath)}?");
 
-            bool response = Menu.Affirm();
-            Console.Clear();
-
-            if (!response) continue;
-
-            skill.Known = true;
-            if (skill.Children.Length > 0)
-            {
-                UpdateSkills(skill.Children, newPath);
-            }
-        }
-    }
-
-    static void RandomQuestions(Skill knowledge)
+    /// <summary>
+    /// If the user's knowledge tree is completely unknown, asks the user to update their knowledge tree, specifying which topics they know.
+    /// </summary>
+    /// <param name="knowledge">Skill representing knowledge tree.</param>
+    /// <param name="quizTitle">Defaults to "random questions", will output "In order to use {quizTitle}, you must first enter the topics you know.</param>
+    /// <returns>False if the user still doesn't know any topics, true if at least one topic is known.</returns>
+    static bool TryUpdateKnowledge(Skill knowledge, string quizTitle = "random questions")
     {
         // or a while? NO, client chose to have it this way
         if (knowledge.Children.All(s => !s.Known))
         {
-            Console.WriteLine("To use random questions, you must first enter the topics you know.");
+            Console.WriteLine($"To use {quizTitle}, you must first enter the topics you know.");
             UIMethods.Wait(string.Empty);
             Console.Clear();
             UpdateKnowledge(knowledge, false);
 
             if (knowledge.Children.All(s => !s.Known))
             {
-                Console.WriteLine("You cannot use random questions if you do not know any topics.");
+                Console.WriteLine($"You cannot use {quizTitle} if you do not know any topics.");
                 UIMethods.Wait(string.Empty);
                 Console.Clear();
-                return;
+                return false;
             }
         }
 
+        return true;
+    }
+
+    static void QuickfireQuestions(Skill knowledge)
+    {
+        if (!TryUpdateKnowledge(knowledge)) return;
+
         var gen = new RandomProblemGenerator();
 
-        for (int i = 0; i < 10; i++)
+        bool @continue = true;
+        while (@continue)
         {
             var problem = gen.Generate(knowledge);
-
             problem.Display();
-            IAnswer answer;
+
             try
             {
-                answer = problem.GetAnswer();
+                var answer = problem.GetAnswer();
+                problem.Summarise(answer);
             }
             catch (EscapeException)
             {
                 Console.Clear();
-                return;
+                @continue = false;
             }
-            problem.Summarise(answer);
 
+            /*
             Console.WriteLine($"Continue?");
             if (!Menu.Affirm())
             {
                 Console.Clear();
                 break;
-            }
+            }*/
             Console.Clear();
         }
     }
@@ -83,7 +77,7 @@ public class Program
         var oldSkills = knowledge.Children;
         knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
 
-        try { UpdateSkills(knowledge.Children); }
+        try { UIMethods.UpdateAllSkills(knowledge.Children); }
         catch (EscapeException)
         {
             knowledge.Children = oldSkills; // undo the resetting of knowledge
@@ -92,14 +86,6 @@ public class Program
         }
 
         File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(knowledge.Children));//, new JsonSerializerOptions { WriteIndented = true }));
-    }
-
-    static void ClearKnowledge(Skill knowledge)
-    {
-        if (File.Exists(USER_KNOWLEDGE_PATH))
-            File.Delete(USER_KNOWLEDGE_PATH);
-
-        knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
     }
 
     static void MathsMenu(Skill knowledge)
@@ -127,9 +113,17 @@ public class Program
             ("Update Knowledge", (k) => UpdateKnowledge(k, true)),
             ("Study Break Timer", (k) => Thread.Sleep(0)),
 #if DEBUG
-            ("Clear Knowledge", ClearKnowledge)
+            ("Clear Knowledge", (k) =>
+            {
+                if (File.Exists(USER_KNOWLEDGE_PATH))
+                    File.Delete(USER_KNOWLEDGE_PATH);
+                k.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
+            })
 #endif
         };
+
+        Menu.ExecuteMenu(options, "Select a topic to revise", knowledge);
+        Console.Clear();
     }
 
     static void TopicMenu(Skill knowledge)
@@ -147,6 +141,45 @@ public class Program
 
     static void ExamMenu(Skill knowledge)
     {
+        //var skills = SelectSkills(knowledge.Traverse().ToList());
+        var chosenKnowledge = Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH); // cheating way to make a deep copy of the user's knowledge object 
+
+        UIMethods.UpdateKnownSkills(chosenKnowledge.Children);
+
+        if (chosenKnowledge.Children.All(s => !s.Known))
+        {
+            Console.WriteLine($"You cannot start a mock exam without any topics.");
+            UIMethods.Wait(string.Empty);
+            Console.Clear();
+            return;
+        }
+
+        Console.Write("How many questions would you like in the mock exam? ");
+        var n = UIMethods.ReadInt();
+
+        var gen = new RandomProblemGenerator();
+
+        var attempts = new (IProblem problem, IAnswer answer)[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            int j = i + 1;
+            Console.WriteLine('[' + new string('#', j) + new string(' ', n-j) + ']'); // progress bar
+            Console.WriteLine($"Question {j}/{n}");
+            var p = gen.Generate(chosenKnowledge);
+            p.Display();
+            var a = p.GetAnswer();
+            attempts[i] = (p, a);
+        }
+
+        Console.WriteLine($"Exam complete.");
+
+        for (int i = 0; i < n; i++)
+        {
+            Console.WriteLine($"Question {i+1}/{n}");
+            var (p, a) = attempts[i];
+            p.Summarise(a); // may need to make this not clear the console.. unless a menu is created then its fine
+        }
     }
 
     static void Main(string[] args)
@@ -156,7 +189,7 @@ public class Program
         var options = new MenuOption[]
         {
             ("Mock Exam", ExamMenu),
-            ("Quickfire Questions", RandomQuestions),
+            ("Quickfire Questions", QuickfireQuestions),
             ("Topic Select", TopicMenu),
             ("Settings", SettingsMenu),
         };

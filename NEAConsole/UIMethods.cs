@@ -12,7 +12,7 @@ public static class UIMethods
             throw new EscapeException();
     }
 
-    public static int ReadInt(bool newLine = true)
+    public static int ReadInt(bool newLine = true, bool natural = true)
     {
         bool entering = true;
         string rawNum = string.Empty;
@@ -65,7 +65,15 @@ public static class UIMethods
                     throw new EscapeException();
 
                 case ConsoleKey.Enter:
-                    if (rawNum.Length > 0) entering = false;
+                    try
+                    {
+                        if (rawNum.Length > 0)
+                        {
+                            var n = int.Parse(rawNum);
+                            if (n > 0 || !natural) entering = false;
+                        }
+                    }
+                    catch (OverflowException) { }
                     break;
             }
         }
@@ -341,5 +349,46 @@ public static class UIMethods
         }
 
         return widths;
+    }
+
+    public static void UpdateAllSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
+    {
+        skillPath ??= new List<string>();
+        foreach (Skill skill in skills)
+        {
+            var newPath = skillPath.Append(skill.Name);
+            Console.WriteLine($"Do you know {string.Join(" > ", newPath)}?");
+
+            bool response = Menu.Affirm();
+            Console.Clear();
+
+            if (response) skill.Known = true;
+            else continue;
+
+            if (skill.Children.Length > 0)
+            {
+                UpdateAllSkills(skill.Children, newPath);
+            }
+        }
+    }
+
+    public static void UpdateKnownSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
+    {
+        skillPath ??= new List<string>();
+        foreach (Skill skill in skills.Where(s => s.Known))
+        {
+            var newPath = skillPath.Append(skill.Name);
+            Console.WriteLine($"Do you want to be tested on {string.Join(" > ", newPath)}?");
+
+            bool response = Menu.Affirm();
+            Console.Clear();
+
+            if (!response) skill.Known = false;
+
+            if (skill.Children.Length > 0)
+            {
+                UpdateAllSkills(skill.Children, newPath);
+            }
+        }
     }
 }

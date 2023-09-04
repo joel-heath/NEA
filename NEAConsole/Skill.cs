@@ -9,9 +9,25 @@ public class Skill
     public DateTime LastRevised { get; set; }
     public Skill[] Children { get; set; }
 
+    public IEnumerable<Skill> Traverse(bool respectKnown = true)
+    {
+        foreach (var child in Children)
+        {
+            if (!respectKnown || child.Known)
+            {
+                foreach (var grandchild in child.Traverse())
+                {
+                    if (!respectKnown || grandchild.Known)
+                        yield return grandchild;
+                }
+                yield return child;
+            }
+        }
+    }
+
     public bool Query(string skillPath, out Skill? skill)
     {
-        if (skillPath == string.Empty || skillPath == Name)
+        if ((skillPath == string.Empty || skillPath == Name) && Known)
         {
             skill = this;
             return true;
@@ -21,7 +37,7 @@ public class Skill
 
         try
         {
-            var child = Children.First(c => c.Name == childName);
+            var child = Children.First(c => c.Name == childName && c.Known);
             if (skillPath == childName)
             {
                 skill = child;

@@ -19,9 +19,9 @@ internal class MatricesDeterminantsProblem : IProblem
         Console.Write(" = ");
     }
 
-    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer);
+        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer, ct: ct);
         Console.CursorTop += matrix.Rows - ((matrix.Rows - 1) / 2);
 
         return new IntAnswer(answer);
@@ -36,7 +36,7 @@ internal class MatricesDeterminantsProblem : IProblem
     public void Summarise(IAnswer? answer)
     {
         bool correct;
-        try { correct = EvaluateAnswer(answer); }
+        try { correct = answer is not null && EvaluateAnswer(answer); }
         catch (InvalidOperationException) { correct = false; }
         if (correct)
         {

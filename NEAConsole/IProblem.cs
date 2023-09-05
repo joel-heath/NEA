@@ -3,7 +3,13 @@ public interface IProblem
 {
     void Display(); // Display the problem and - pure UI
     //IAnswer GetAnswer(); // Get the user's attempt at answering - pure UI
-    IAnswer GetAnswer(IAnswer? oldAnswer = null);
+    /// <summary>
+    /// Get user's attempt to the question through the console.
+    /// </summary>
+    /// <param name="oldAnswer">Preset answer to show when getting the user's answer, used in exams when going back to a previously attempted question.</param>
+    /// <param name="ct">Cancellation token used for exiting early during multithreading.</param>
+    /// <returns>An IAnswer containing the user's answer</returns>
+    IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null);
     void DisplayAnswer(IAnswer answer);
     bool EvaluateAnswer(IAnswer answer); // Check if the user is correct - pure logic, unit tests
     void Summarise(IAnswer? answer); // Tell the user if they were right or wrong - pure UI

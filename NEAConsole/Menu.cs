@@ -24,9 +24,10 @@ internal static class Menu
     /// <summary>
     /// Allows the user to choose between "Yes" or "No".
     /// </summary>
+    /// <param name="ct">Used by Choose() for early exiting during multithreading.</param>
     /// <returns>True if the user chose yes, false if the user chose no.</returns>
-    public static bool Affirm()
-        => Choose(new MenuOption[] { ("Yes", null!), ("No", null!) }) == 0;
+    public static bool Affirm(CancellationToken? ct = null)
+        => Choose(new MenuOption[] { ("Yes", null!), ("No", null!) }, ct) == 0;
 
     public static void ExecuteMenu(IEnumerable<IProblemGenerator> options, string prompt, Skill knowledge)
         => ExecuteMenu(options.Select(opt => opt.ToMenuOption()), prompt, knowledge);
@@ -71,9 +72,10 @@ internal static class Menu
     /// <summary>
     /// Allows the user to choose from a set of options, returning the index of the chosen options. (Hence OnSelected() is not ran, no restrictions are put on chosen options.)
     /// </summary>
-    /// <param name="options">An IList of MenuOptions containing all possible options for the user to choose from</param>
-    /// <returns>Index of selected option</returns>
-    public static int Choose(IList<MenuOption> options)
+    /// <param name="options">An IList of MenuOptions containing all possible options for the user to choose from.</param>
+    /// <param name="ct">Used for early exiting by UIMethods.ReadKey().</param>
+    /// <returns>Index of selected option.</returns>
+    public static int Choose(IList<MenuOption> options, CancellationToken? ct = null)
     {
         int initX = Console.CursorLeft, initY = Console.CursorTop;
         Console.CursorVisible = false;
@@ -84,7 +86,7 @@ internal static class Menu
         while (choosing)
         {
             var changed = false;
-            ConsoleKey key = Console.ReadKey(true).Key;
+            ConsoleKey key = UIMethods.ReadKey(true, ct).Key;
             switch (key)
             {
                 case ConsoleKey.UpArrow:
@@ -135,7 +137,7 @@ internal static class Menu
         return choice;
     }
 
-    public static int ExamMenu(string[] options, int question)
+    public static int ExamMenu(string[] options, int question, CancellationToken? ct = null)
     {
         //var (initX, initY) = (Console.CursorLeft, Console.CursorTop);
         Console.CursorTop = 1;
@@ -152,7 +154,7 @@ internal static class Menu
         int choice = 0; // -1 is go back a question (left), 0 is stay on this question (middle), 1 is next question (right)
         while (choosing)
         {
-            switch (Console.ReadKey(true).Key)
+            switch (UIMethods.ReadKey(true, ct).Key)
             {
                 case ConsoleKey.LeftArrow:
                     if (choice > (question == 1 ? 0 : -1))

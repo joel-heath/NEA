@@ -17,16 +17,16 @@ internal class SimplexProblem : IProblem
         }
     }
 
-    public IAnswer GetAnswer(IAnswer? oldAnswer = null) // would be nice to be able to navigate up and down like in a matrix
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null) // would be nice to be able to navigate up and down like in a matrix
     {
         var answer = (oldAnswer as SimplexAnswer)?.Answer ?? new int[solution.Length + 1];
 
         Console.Write("\nP = ");
-        answer[solution.Length] = UIMethods.ReadInt(startingNum:answer[solution.Length]); // need to catch potential input errors here
+        answer[solution.Length] = UIMethods.ReadInt(startingNum: answer[solution.Length], ct: ct);
         for (int i = 0; i < solution.Length; i++)
         {
             Console.Write((char)('x' + i) + " = ");
-            answer[i] = UIMethods.ReadInt(startingNum: answer[i]);
+            answer[i] = UIMethods.ReadInt(startingNum: answer[i], ct:ct);
         }
         Console.WriteLine();
 
@@ -53,7 +53,7 @@ internal class SimplexProblem : IProblem
     public void Summarise(IAnswer? answer)
     {
         bool correct;
-        try { correct = EvaluateAnswer(answer); }
+        try { correct = answer is not null && EvaluateAnswer(answer); }
         catch (InvalidOperationException) { correct = false; }
         if (correct)
         {

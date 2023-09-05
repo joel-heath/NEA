@@ -12,9 +12,9 @@ internal class PrimsProblem : IProblem
         Console.WriteLine();
     }
 
-    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = InputEdges(adjacencyMatrix, (oldAnswer as PrimsAnswer)?.Answer);
+        var answer = InputEdges(adjacencyMatrix, (oldAnswer as PrimsAnswer)?.Answer, ct);
         Console.WriteLine();
         Console.WriteLine();
 
@@ -22,7 +22,7 @@ internal class PrimsProblem : IProblem
     }
 
     public void DisplayAnswer(IAnswer answer)
-        => DrawMatrix(adjacencyMatrix, -1, -1, (answer as PrimsAnswer ?? throw new InvalidOperationException()).Answer);
+        => DrawMatrix(adjacencyMatrix, -1, -1, (answer as PrimsAnswer ?? throw new InvalidOperationException()).Answer, false);
 
     public bool EvaluateAnswer(IAnswer answer)
     {
@@ -43,7 +43,7 @@ internal class PrimsProblem : IProblem
     public void Summarise(IAnswer? answer)
     {
         bool correct;
-        try { correct = EvaluateAnswer(answer); }
+        try { correct = answer is not null && EvaluateAnswer(answer); }
         catch (InvalidOperationException) { correct = false; }
         if (correct)
         {
@@ -114,7 +114,7 @@ internal class PrimsProblem : IProblem
         if (resetY) Console.CursorTop = yIndent;
     }
 
-    private static HashSet<(int row, int col)> InputEdges(Matrix adjacency, HashSet<(int row, int col)>? oldAnswer = null)
+    private static HashSet<(int row, int col)> InputEdges(Matrix adjacency, HashSet<(int row, int col)>? oldAnswer = null, CancellationToken? ct = null)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
@@ -126,7 +126,7 @@ internal class PrimsProblem : IProblem
         bool selecting = true;
         while (selecting)
         {
-            var key = Console.ReadKey(true);
+            var key = UIMethods.ReadKey(true, ct);
             switch (key.Key)
             {
                 case ConsoleKey.RightArrow:

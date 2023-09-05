@@ -18,12 +18,12 @@ internal class DijkstrasProblem : IProblem
 #endif
     }
 
-    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
         //Console.WriteLine("Path taken (abc...) ");
         Console.WriteLine();
         Console.Write("Total weight: ");
-        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer);
+        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer, ct: ct);
         Console.WriteLine();
 
         return new IntAnswer(answer);
@@ -37,7 +37,7 @@ internal class DijkstrasProblem : IProblem
     public void Summarise(IAnswer? answer)
     {
         bool correct;
-        try { correct = EvaluateAnswer(answer); }
+        try { correct = answer is not null && EvaluateAnswer(answer); }
         catch (InvalidOperationException) { correct = false; }
         if (correct)
         {

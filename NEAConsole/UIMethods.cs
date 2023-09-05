@@ -1,19 +1,31 @@
-﻿using Microsoft.Win32.SafeHandles;
-using NEAConsole.Matrices;
+﻿using NEAConsole.Matrices;
 
 namespace NEAConsole;
 public static class UIMethods
 {
-    public static void Wait(string message = "Press any key to continue...")
+    public static void Wait(string message = "Press any key to continue...", CancellationToken? ct = null)
     {
         if (message.Length > 0)
             Console.WriteLine(message);
 
-        if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+        if (ReadKey(true, ct).Key == ConsoleKey.Escape)
             throw new EscapeException();
     }
 
-    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null)
+    public static ConsoleKeyInfo ReadKey(bool intercept = false, CancellationToken? ct = null)
+    {
+        if (ct is null) return Console.ReadKey(intercept);
+        
+        while (!ct.Value.IsCancellationRequested)
+        {
+            if (Console.KeyAvailable)
+                return Console.ReadKey(intercept);
+        }
+
+        throw new KeyNotFoundException();
+    }
+
+    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null, CancellationToken? ct = null)
     {
         bool entering = true;
         string rawNum = startingNum is null || (natural && startingNum <= 0) ? string.Empty : startingNum.Value.ToString();
@@ -23,7 +35,7 @@ public static class UIMethods
         while (entering)
         {
             Console.CursorLeft = indent + pos;
-            var k = Console.ReadKey(true);
+            var k = UIMethods.ReadKey(true, ct);
             if (k.KeyChar >= '0' && k.KeyChar <= '9')
             {
                 Console.Write(k.KeyChar);
@@ -176,7 +188,7 @@ public static class UIMethods
     /// <param name="rows">Number of rows that the matrix the user may enter in will have.</param>
     /// <param name="cols">Number of columns that the matrix the user may enter in will have.</param>
     /// <returns>A matrix with the user's inputs.</returns>
-    public static Matrix InputMatrix(int rows, int cols, Matrix? startingInput = null)
+    public static Matrix InputMatrix(int rows, int cols, Matrix? startingInput = null, CancellationToken? ct = null)
     {
         Console.CursorVisible = false;
         var initY = Console.CursorTop;
@@ -192,7 +204,7 @@ public static class UIMethods
         bool entering = true;
         while (entering)
         {
-            var key = Console.ReadKey(true);
+            var key = ReadKey(true, ct);
             switch (key.Key)
             {
                 case ConsoleKey.RightArrow:
@@ -395,7 +407,7 @@ public static class UIMethods
 
     public static void UpdateKnownSkills(IEnumerable<Skill> skills, IEnumerable<string>? skillPath = null)
     {
-        skillPath ??= new List<string>();
+        skillPath ??= Array.Empty<string>();
         foreach (Skill skill in skills.Where(s => s.Known))
         {
             var newPath = skillPath.Append(skill.Name);
@@ -408,7 +420,7 @@ public static class UIMethods
 
             if (skill.Children.Length > 0)
             {
-                UpdateAllSkills(skill.Children, newPath);
+                UpdateKnownSkills(skill.Children, skillPath); // or new path if we want Matrices > Determinants > Inverses, but we don't
             }
         }
     }

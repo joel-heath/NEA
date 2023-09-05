@@ -1,4 +1,5 @@
 ﻿using NEAConsole.Matrices;
+using System;
 
 namespace NEAConsole.Problems;
 internal class MatricesMultiplicationProblem : IProblem
@@ -22,16 +23,21 @@ internal class MatricesMultiplicationProblem : IProblem
         Console.CursorTop -= signSpacing;
     }
 
-    public IAnswer GetAnswer(IAnswer? oldAnswer = null)
+    public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer);
+        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer, ct);
         Console.WriteLine();
 
         return new MatrixAnswer(answer);
     }
 
     public void DisplayAnswer(IAnswer answer)
-        => UIMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer);
+    {
+        var mat = (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer;
+        UIMethods.DrawMatrix(mat, false);
+        Console.CursorTop += Math.Max(mat1.Columns, mat2.Columns) - mat.Columns;
+        Console.WriteLine();
+    }
 
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer == solution; 
@@ -39,7 +45,7 @@ internal class MatricesMultiplicationProblem : IProblem
     public void Summarise(IAnswer? answer)
     {
         bool correct;
-        try { correct = EvaluateAnswer(answer); }
+        try { correct = answer is not null && EvaluateAnswer(answer); }
         catch (InvalidOperationException) { correct = false; }
         if (correct)
         {
@@ -47,6 +53,11 @@ internal class MatricesMultiplicationProblem : IProblem
         }
         else
         {
+            if (answer is null)
+            {
+                Console.CursorTop += Math.Max(mat1.Columns, mat2.Columns);
+                Console.WriteLine();
+            }
             Console.WriteLine("Incorrect. The correct answer was: ");
             UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();

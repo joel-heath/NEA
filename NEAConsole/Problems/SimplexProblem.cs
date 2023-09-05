@@ -33,6 +33,16 @@ internal class SimplexProblem : IProblem
         return new SimplexAnswer(answer);
     }
 
+    public void DisplayAnswer(IAnswer answer)
+    {
+        var attempt = (answer as SimplexAnswer ?? throw new InvalidOperationException()).Answer;
+        Console.WriteLine("P = " + attempt[^1]);
+        for (int i = 0; i < attempt.Length - 1; i++)
+        {
+            Console.WriteLine((char)('x' + i) + " = " + attempt[i]);
+        }
+    }
+
     public bool EvaluateAnswer(IAnswer answer)
     {
         var attempt = (answer as SimplexAnswer ?? throw new InvalidOperationException()).Answer;
@@ -58,9 +68,6 @@ internal class SimplexProblem : IProblem
                 Console.WriteLine((char)('x' + i) + " = " + solution[i]);
             }
         }
-
-        UIMethods.Wait();
-        Console.Clear();
     }
 
     public SimplexProblem(SimplexInequality objective, SimplexInequality[] constraints, int[] solution)

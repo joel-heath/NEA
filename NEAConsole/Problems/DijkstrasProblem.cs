@@ -29,6 +29,9 @@ internal class DijkstrasProblem : IProblem
         return new IntAnswer(answer);
     }
 
+    public void DisplayAnswer(IAnswer answer)
+        => Console.WriteLine((answer as IntAnswer ?? throw new InvalidOperationException()).Answer);
+
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as IntAnswer ?? throw new InvalidOperationException()).Answer == solution;
     public void Summarise(IAnswer? answer)
@@ -44,9 +47,6 @@ internal class DijkstrasProblem : IProblem
         {
             Console.WriteLine($"Incorrect, the correct answer was {solution}");
         }
-
-        UIMethods.Wait();
-        Console.Clear();
     }
 
     public DijkstrasProblem(Matrix graph, char startNode, char endNode, int solution)

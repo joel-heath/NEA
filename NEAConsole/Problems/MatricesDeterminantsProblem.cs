@@ -27,6 +27,9 @@ internal class MatricesDeterminantsProblem : IProblem
         return new IntAnswer(answer);
     }
 
+    public void DisplayAnswer(IAnswer answer)
+        => Console.WriteLine((answer as IntAnswer ?? throw new InvalidOperationException()).Answer);
+
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as IntAnswer ?? throw new InvalidOperationException()).Answer == solution;
 
@@ -43,9 +46,6 @@ internal class MatricesDeterminantsProblem : IProblem
         {
             Console.WriteLine($"Incorrect. The correct answer was {solution}.");
         }
-
-        UIMethods.Wait();
-        Console.Clear();
     }
 
     public MatricesDeterminantsProblem(Matrix matrix, double solution)

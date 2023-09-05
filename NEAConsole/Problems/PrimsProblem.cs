@@ -21,6 +21,9 @@ internal class PrimsProblem : IProblem
         return new PrimsAnswer(answer);
     }
 
+    public void DisplayAnswer(IAnswer answer)
+        => DrawMatrix(adjacencyMatrix, -1, -1, (answer as PrimsAnswer ?? throw new InvalidOperationException()).Answer);
+
     public bool EvaluateAnswer(IAnswer answer)
     {
         var attempt = (answer as PrimsAnswer ?? throw new InvalidOperationException()).Answer;
@@ -52,9 +55,6 @@ internal class PrimsProblem : IProblem
             DrawMatrix(adjacencyMatrix, -1, -1, solution, false);
             Console.WriteLine();
         }
-
-        UIMethods.Wait();
-        Console.Clear();
     }
 
     private static void DrawMatrix(Matrix m, int x, int y, IReadOnlyCollection<(int row, int col)> chosenEdges, bool resetY=true)

@@ -130,10 +130,10 @@ internal class Program
         }
     }
 
-    static void ExamMenu(Skill knowledge)
+    static void MockExam(Skill knowledge)
     {
         //var skills = SelectSkills(knowledge.Traverse().ToList());
-        var chosenKnowledge = Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH); // cheating way to make a deep copy of the user's knowledge object 
+        var chosenKnowledge = Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH); // cheating way to make a deep copy of the user's knowledge object, just recreate from the file 
 
         UIMethods.UpdateKnownSkills(chosenKnowledge.Children);
 
@@ -147,7 +147,6 @@ internal class Program
 
         Console.Write("How many questions would you like in the mock exam? ");
         var n = UIMethods.ReadInt();
-        
         
         var gen = new RandomProblemGenerator();
         var attempts = Enumerable.Range(0, n).Select(i => ((IProblem problem, IAnswer? answer))(gen.Generate(chosenKnowledge), null)).ToList();
@@ -169,8 +168,17 @@ internal class Program
             }
             catch (EscapeException)
             {
-                var choice = UIMethods.ExamMenu(new string[] { "<-", $"Question {question}/{n}", "->" }, question, n);
-                question += choice;
+                try
+                {
+                    var choice = Menu.ExamMenu(new string[] { "<-", $"Question {question}/{n}", "->" }, question);
+                    question += choice;
+                }
+                catch (EscapeException e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Are you sure you want to exit the exam without finishing?");
+                    if (Menu.Affirm()) throw e;
+                }
             }
 
             Console.Clear();
@@ -192,12 +200,40 @@ internal class Program
         }
 
         Console.WriteLine($"Exam complete.");
+        UIMethods.Wait();
+        Console.Clear();
 
-        for (int i = 0; i < n; i++)
+        question = 1;
+        while (question < attempts.Count + 1) // needs to become until time is up
         {
-            Console.WriteLine($"Question {i+1}/{n}");
-            var (p, a) = attempts[i];
-            p.Summarise(a); // may need to make this not clear the console.. unless a menu is created then its fine
+            Console.WriteLine('[' + new string('#', question) + new string(' ', n - question) + ']'); // progress bar
+            Console.WriteLine($"<- Question {question}/{n} ->");
+            var (p, a) = attempts[question - 1];
+            p.Display();
+            try
+            {
+                if (a is not null) p.DisplayAnswer(a);
+                else Console.WriteLine("You did not enter an answer."); 
+                p.Summarise(a);
+
+                var choice = Menu.ExamMenu(new string[] { "<-", $"Question {question}/{n}", "->" }, question);
+                question += choice;
+            }
+            catch (EscapeException e)
+            {
+                Console.Clear();
+                Console.WriteLine("Are you sure you want to finish reviewing the exam?");
+                if (Menu.Affirm()) throw e;
+            }
+
+            if (question == attempts.Count + 1)
+            {
+                Console.Clear();
+                Console.WriteLine("Are you sure you want to finish reviewing the exam?");
+                if (!Menu.Affirm()) question--;
+            }
+
+            Console.Clear();
         }
     }
 
@@ -207,7 +243,7 @@ internal class Program
         
         var options = new MenuOption[]
         {
-            ("Mock Exam", ExamMenu),
+            ("Mock Exam", MockExam),
             ("Quickfire Questions", QuickfireQuestions),
             ("Topic Select", TopicMenu),
             ("Settings", SettingsMenu),

@@ -12,6 +12,8 @@ internal static class IProblemGeneratorExtensions
                 problem.Display();
                 var answer = problem.GetAnswer();
                 problem.Summarise(answer);
+                UIMethods.Wait();
+                Console.Clear();
             }
         });
 }

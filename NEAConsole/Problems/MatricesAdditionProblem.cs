@@ -30,6 +30,9 @@ internal class MatricesAdditionProblem : IProblem
         return new MatrixAnswer(answer);
     }
 
+    public void DisplayAnswer(IAnswer answer)
+        => UIMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer);
+
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer == solution;
 
@@ -48,9 +51,6 @@ internal class MatricesAdditionProblem : IProblem
             UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
-
-        UIMethods.Wait();
-        Console.Clear();
     }
 
     public MatricesAdditionProblem(Matrix mat1, Matrix mat2, char operand, Matrix solution)

@@ -9,6 +9,9 @@ internal class Program
 {
     private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",
                          SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json";
+    private static DateTime lastBreak = DateTime.Now;
+    private static TimeSpan studyLength = TimeSpan.FromMinutes(25);
+    private static TimeSpan breakLength = TimeSpan.FromMinutes(5);
 
     /// <summary>
     /// If the user's knowledge tree is completely unknown, asks the user to update their knowledge tree, specifying which topics they know.
@@ -59,7 +62,12 @@ internal class Program
         var options = new MenuOption[]
         {
             ("Update Knowledge", (k) => UpdateKnowledge(k, true)),
-            ("Study Break Timer", (k) => Thread.Sleep(0)),
+            ("Study Break Timer", (k) => {
+                Console.Write("How many minutes do you want to study for? ");
+                studyLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:studyLength.Minutes));
+                Console.Write("How many minutes should the break be? ");
+                breakLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:breakLength.Minutes));
+            }),
 #if DEBUG
             ("Clear Knowledge", (k) =>
             {
@@ -127,13 +135,49 @@ internal class Program
             {
                 var answer = problem.GetAnswer();
                 problem.Summarise(answer);
+                UIMethods.Wait();
+                Console.Clear();
             }
             catch (EscapeException)
             {
                 Console.Clear();
                 @continue = false;
             }
-            Console.Clear();
+
+            if (DateTime.Now - lastBreak > studyLength)
+            {
+                Console.WriteLine($"You've been studying for over {studyLength.Minutes} minutes! Do you want to take a break?");
+                if (Menu.Affirm())
+                {
+                    CancellationTokenSource cts = new();
+                    Console.WriteLine($"Take a rest for the next {breakLength.Minutes} minutes.");
+                    var timeRemaining = breakLength;
+                    var second = TimeSpan.FromSeconds(1);
+
+                    var affirmation = Task.Run(() =>
+                    {
+                        try { UIMethods.Wait("Press any key to skip the break.", cts.Token); }
+                        catch (KeyNotFoundException) { }
+                        finally { cts.Cancel(); }
+                    });
+                    var timer = Task.Run(() => Exam.WriteTimer(timeRemaining));
+
+                    while (!cts.Token.IsCancellationRequested && (timeRemaining.Seconds > 0 || timeRemaining > TimeSpan.Zero)) // do our actual calculation for whether time is up based on datetimes, more accurately
+                    {
+                        Thread.Sleep(second);
+                        timeRemaining -= second;
+                        timer = Task.Run(() => Exam.WriteTimer(timeRemaining));
+                    }
+
+                    cts.Cancel();
+
+                    while (!affirmation.IsCompletedSuccessfully && !timer.IsCompletedSuccessfully) { }
+                    affirmation.Dispose();
+                    timer.Dispose();
+                }
+                lastBreak = DateTime.Now;
+                Console.Clear();
+            }
         }
     }
 
@@ -152,6 +196,8 @@ internal class Program
         if (!File.Exists(USER_KNOWLEDGE_PATH)) File.WriteAllBytes(USER_KNOWLEDGE_PATH, File.ReadAllBytes(SAMPLE_KNOWLEDGE_PATH));
         Skill knowledge = Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH);
         
+        lastBreak = DateTime.Now;
+
         var options = new MenuOption[]
         {
             ("Mock Exam", MockExam),

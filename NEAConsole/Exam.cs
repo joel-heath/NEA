@@ -4,15 +4,14 @@ namespace NEAConsole;
 public class Exam
 {
     private int question;
-    private readonly int questionCount;
+    private readonly int questionCount, totalSeconds;
     private readonly RandomProblemGenerator gen;
     private readonly List<(IProblem problem, IAnswer? answer)> attempts;
 
     public void Begin()
     {
         var cts = new CancellationTokenSource();
-        var examLength = 10;
-        var timeRemaining = new TimeSpan(0, 0, examLength);
+        var timeRemaining = new TimeSpan(0, 0, totalSeconds);
         var second = new TimeSpan(0, 0, 1);
 
         UIMethods.Wait("Press any key to begin the exam...");
@@ -46,7 +45,7 @@ public class Exam
         Summarise();
     }
 
-    private static void WriteTimer(TimeSpan remaining)
+    public static void WriteTimer(TimeSpan remaining)
     {
         int returnX = Console.CursorLeft, returnY = Console.CursorTop;
         Console.SetCursorPosition(Console.WindowWidth - 8, 0);
@@ -177,9 +176,9 @@ public class Exam
     {
         Console.Write("How many questions would you like in the mock exam? ");
         questionCount = UIMethods.ReadInt();
-
         gen = new RandomProblemGenerator();
         attempts = Enumerable.Range(0, questionCount).Select(i => ((IProblem problem, IAnswer? answer))(gen.Generate(knowledge), null)).ToList();
         question = 1;
+        totalSeconds = 120 * questionCount; // multiply each problem by its weight, however there is no link between problem and problem generator (and hence skill path...)
     }
 }

@@ -2,21 +2,18 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
-[assembly:InternalsVisibleTo("NEAConsoleTests")]
+[assembly: InternalsVisibleTo("NEAConsoleTests")]
 
 namespace NEAConsole;
 internal class Program
 {
     private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",
                          SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json";
-    private static DateTime lastBreak = DateTime.Now;
-    private static TimeSpan studyLength = TimeSpan.FromMinutes(25);
-    private static TimeSpan breakLength = TimeSpan.FromMinutes(5);
 
     /// <summary>
-    /// If the user's knowledge tree is completely unknown, asks the user to update their knowledge tree, specifying which topics they know.
+    /// If the user's context.Knowledge tree is completely unknown, asks the user to update their context.Knowledge tree, specifying which topics they know.
     /// </summary>
-    /// <param name="knowledge">Skill representing knowledge tree.</param>
+    /// <param name="context.Knowledge">Skill representing context.Knowledge tree.</param>
     /// <param name="quizTitle">Defaults to "random questions", will output "In order to use {quizTitle}, you must first enter the topics you know.</param>
     /// <returns>False if the user still doesn't know any topics, true if at least one topic is known.</returns>
     static bool TryUpdateKnowledge(Skill knowledge, string quizTitle = "use random questions")
@@ -49,7 +46,7 @@ internal class Program
         try { UIMethods.UpdateAllSkills(knowledge.Children); }
         catch (EscapeException)
         {
-            knowledge.Children = oldSkills; // undo the resetting of knowledge
+            knowledge.Children = oldSkills; // undo the resetting of context.Knowledge
             Console.Clear();
             if (!catchEscape) throw new EscapeException();
         }
@@ -57,57 +54,57 @@ internal class Program
         File.WriteAllText(USER_KNOWLEDGE_PATH, JsonSerializer.Serialize(knowledge.Children));//, new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    static void SettingsMenu(Skill knowledge)
+    static void SettingsMenu(Context context)
     {
         var options = new MenuOption[]
         {
-            ("Update Knowledge", (k) => UpdateKnowledge(k, true)),
-            ("Study Break Timer", (k) => {
+            ("Update Knowledge", (c) => UpdateKnowledge(c.Knowledge, true)),
+            ("Study Break Timer", (c) => {
                 Console.Write("How many minutes do you want to study for? ");
-                studyLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:studyLength.Minutes));
+                c.Timer.StudyLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:c.Timer.StudyLength.Minutes));
                 Console.Write("How many minutes should the break be? ");
-                breakLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:breakLength.Minutes));
+                c.Timer.BreakLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:c.Timer.BreakLength.Minutes));
             }),
 #if DEBUG
-            ("Clear Knowledge", (k) =>
+            ("Clear Knowledge", (c) =>
             {
                 File.WriteAllBytes(USER_KNOWLEDGE_PATH, File.ReadAllBytes(SAMPLE_KNOWLEDGE_PATH));
-                k.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
+                c.Knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
             })
 #endif
         };
 
-        Menu.ExecuteMenu(options, "Settings", knowledge);
+        Menu.ExecuteMenu(options, "Settings", context);
         Console.Clear();
     }
 
-    static void MathsMenu(Skill knowledge)
+    static void MathsMenu(Context context)
     {
 
     }
 
-    static void MatricesMenu(Skill knowledge)
+    static void MatricesMenu(Context context)
     {
         IProblemGenerator[] options = { new MatricesAdditionProblemGenerator(), new MatricesMultiplicationProblemGenerator(), new MatricesDeterminantsProblemGenerator(), new MatricesInversionProblemGenerator() }; // Hypothesis Testing
 
-        Menu.ExecuteMenu(options, "Choose a subject to revise", knowledge);
+        Menu.ExecuteMenu(options, "Choose a subject to revise", context);
         Console.Clear();
     }
 
-    static void FMathsMenu(Skill knowledge)
+    static void FMathsMenu(Context context)
     {
         IProblemGenerator[] options = { new SimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator() }; // Hypothesis Testing
 
-        Menu.ExecuteMenu(options.Select(o => o.ToMenuOption()).Prepend(("Matrices", MatricesMenu)), "Choose a subject to revise", knowledge);
+        Menu.ExecuteMenu(options.Select(o => o.ToMenuOption()).Prepend(("Matrices", MatricesMenu)), "Choose a subject to revise", context);
         Console.Clear();
     }
 
-    static void CSciMenu(Skill knowledge)
+    static void CSciMenu(Context context)
     {
 
     }
 
-    static void TopicMenu(Skill knowledge)
+    static void TopicMenu(Context context)
     {
         var options = new MenuOption[]
         {
@@ -116,19 +113,19 @@ internal class Program
             ("Computer Science", CSciMenu),
         };
 
-        Menu.ExecuteMenu(options, "Select a topic to revise", knowledge);
+        Menu.ExecuteMenu(options, "Select a topic to revise", context);
         Console.Clear();
     }
 
-    static void QuickfireQuestions(Skill knowledge)
+    static void QuickfireQuestions(Context context)
     {
-        if (!TryUpdateKnowledge(knowledge)) return;
+        if (!TryUpdateKnowledge(context.Knowledge)) return;
 
         var gen = new RandomProblemGenerator();
         bool @continue = true;
         while (@continue)
         {
-            var problem = gen.Generate(knowledge);
+            var problem = gen.Generate(context.Knowledge);
             problem.Display();
 
             try
@@ -144,60 +141,27 @@ internal class Program
                 @continue = false;
             }
 
-            if (DateTime.Now - lastBreak > studyLength)
-            {
-                Console.WriteLine($"You've been studying for over {studyLength.Minutes} minutes! Do you want to take a break?");
-                if (Menu.Affirm())
-                {
-                    CancellationTokenSource cts = new();
-                    Console.WriteLine($"Take a rest for the next {breakLength.Minutes} minutes.");
-                    var timeRemaining = breakLength;
-                    var second = TimeSpan.FromSeconds(1);
-
-                    var affirmation = Task.Run(() =>
-                    {
-                        try { UIMethods.Wait("Press any key to skip the break.", cts.Token); }
-                        catch (KeyNotFoundException) { }
-                        finally { cts.Cancel(); }
-                    });
-                    var timer = Task.Run(() => Exam.WriteTimer(timeRemaining));
-
-                    while (!cts.Token.IsCancellationRequested && (timeRemaining.Seconds > 0 || timeRemaining > TimeSpan.Zero)) // do our actual calculation for whether time is up based on datetimes, more accurately
-                    {
-                        Thread.Sleep(second);
-                        timeRemaining -= second;
-                        timer = Task.Run(() => Exam.WriteTimer(timeRemaining));
-                    }
-
-                    cts.Cancel();
-
-                    while (!affirmation.IsCompletedSuccessfully && !timer.IsCompletedSuccessfully) { }
-                    affirmation.Dispose();
-                    timer.Dispose();
-                }
-                lastBreak = DateTime.Now;
-                Console.Clear();
-            }
+            if (context.Timer.TimeForBreak) context.Timer.UseBreak();
         }
     }
 
-    static void MockExam(Skill knowledge)
+    static void MockExam(Context context)
     {
-        TryUpdateKnowledge(knowledge, "start a mock exam");
+        TryUpdateKnowledge(context.Knowledge, "start a mock exam");
         Skill? chosenKnowledge = Exam.CreateKnowledge(USER_KNOWLEDGE_PATH);
         if (chosenKnowledge is null) return;
         Exam exam = new(chosenKnowledge);
 
         exam.Begin();
+
+        if (context.Timer.TimeForBreak) context.Timer.UseBreak();
     }
 
     static void Main()//string[] args)
     {
         if (!File.Exists(USER_KNOWLEDGE_PATH)) File.WriteAllBytes(USER_KNOWLEDGE_PATH, File.ReadAllBytes(SAMPLE_KNOWLEDGE_PATH));
-        Skill knowledge = Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH);
+        Context context = new(Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH), new());
         
-        lastBreak = DateTime.Now;
-
         var options = new MenuOption[]
         {
             ("Mock Exam", MockExam),
@@ -206,7 +170,7 @@ internal class Program
             ("Settings", SettingsMenu),
         };
 
-        Menu.ExecuteMenu(options, "Main Menu", knowledge);
+        Menu.ExecuteMenu(options, "Main Menu", context);
         Console.Clear();
     }
 }

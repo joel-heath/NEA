@@ -1,11 +1,9 @@
-﻿using NEAConsole.Problems;
-
-namespace NEAConsole;
-public record struct MenuOption(string DisplayText, Action<Skill> OnSelected)
+﻿namespace NEAConsole;
+public record struct MenuOption(string DisplayText, Action<Context> OnSelected)
 {
     public readonly int Length => DisplayText.Length;
     public override readonly string ToString() => DisplayText;
-    public static implicit operator MenuOption((string DisplayText, Action<Skill> OnSelected) tuple) => new(tuple.DisplayText, tuple.OnSelected);
+    public static implicit operator MenuOption((string DisplayText, Action<Context> OnSelected) tuple) => new(tuple.DisplayText, tuple.OnSelected);
 }
 internal static class Menu
 {
@@ -29,15 +27,15 @@ internal static class Menu
     public static bool Affirm(CancellationToken? ct = null)
         => Choose(new MenuOption[] { ("Yes", null!), ("No", null!) }, ct) == 0;
 
-    public static void ExecuteMenu(IEnumerable<IProblemGenerator> options, string prompt, Skill knowledge)
-        => ExecuteMenu(options.Select(opt => opt.ToMenuOption()), prompt, knowledge);
+    public static void ExecuteMenu(IEnumerable<IProblemGenerator> options, string prompt, Context context)
+        => ExecuteMenu(options.Select(opt => opt.ToMenuOption()), prompt, context);
 
     /// <summary>
     /// Displays a menu of MenuOptions, allowing the user to continually pick MenuOptions and running their OnSelected, until the user chooses the "Exit" option.
     /// </summary>
     /// <param name="options">IList of MenuOptions representing all the options the user can pick from, "Exit" or "Return" need not be included.</param>
     /// <param name="prompt">The prompt to show the user preceding each option e.g. "Choose a subject to revise" or "Main Menu".</param>
-    public static void ExecuteMenu(IEnumerable<MenuOption> options, string prompt, Skill knowledge)
+    public static void ExecuteMenu(IEnumerable<MenuOption> options, string prompt, Context context)
     {
         var choices = options.Append(("Exit", null!)).ToList();
 
@@ -58,7 +56,7 @@ internal static class Menu
                 Console.Clear();
                 try
                 {
-                    choices[choice].OnSelected(knowledge);
+                    choices[choice].OnSelected(context);
                 }
                 catch (EscapeException)
                 {

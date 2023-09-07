@@ -8,6 +8,7 @@ public static class IProblemGeneratorExtensions
 
             for (int i = 0; i < n; i++)
             {
+                var start = DateTime.Now;
                 var problem = problemGenerator.Generate(context.Knowledge);
                 problem.Display();
                 var answer = problem.GetAnswer();
@@ -15,6 +16,7 @@ public static class IProblemGeneratorExtensions
                 UIMethods.Wait();
                 Console.Clear();
 
+                context.Timer.TimeSinceLastBreak += DateTime.Now - start;
                 if (context.Timer.TimeForBreak) context.Timer.UseBreak();
             }
         });

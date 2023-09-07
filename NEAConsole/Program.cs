@@ -60,6 +60,9 @@ internal class Program
         {
             ("Update Knowledge", (c) => UpdateKnowledge(c.Knowledge, true)),
             ("Study Break Timer", (c) => {
+                Console.WriteLine($"Do you want to {(c.Timer.Enabled ? "dis" : "en")}able the timer? ");
+                if (Menu.Affirm()) c.Timer.Enabled = !c.Timer.Enabled;
+                Console.CursorTop += 2;
                 Console.Write("How many minutes do you want to study for? ");
                 c.Timer.StudyLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:c.Timer.StudyLength.Minutes));
                 Console.Write("How many minutes should the break be? ");
@@ -125,6 +128,8 @@ internal class Program
         bool @continue = true;
         while (@continue)
         {
+            var start = DateTime.Now;
+
             var problem = gen.Generate(context.Knowledge);
             problem.Display();
 
@@ -137,10 +142,12 @@ internal class Program
             }
             catch (EscapeException)
             {
+                context.Timer.TimeSinceLastBreak += DateTime.Now - start;
                 Console.Clear();
                 @continue = false;
             }
 
+            context.Timer.TimeSinceLastBreak += DateTime.Now - start;
             if (context.Timer.TimeForBreak) context.Timer.UseBreak();
         }
     }
@@ -151,8 +158,8 @@ internal class Program
         Skill? chosenKnowledge = Exam.CreateKnowledge(USER_KNOWLEDGE_PATH);
         if (chosenKnowledge is null) return;
         Exam exam = new(chosenKnowledge);
-
-        exam.Begin();
+        
+        exam.Begin(context.Timer);
 
         if (context.Timer.TimeForBreak) context.Timer.UseBreak();
     }

@@ -2,10 +2,10 @@
 public class StudyTimer
 {
     public bool Enabled { get; set; }
-    public DateTime LastBreak { get; set; }
+    public TimeSpan TimeSinceLastBreak { get; set; }
     public TimeSpan StudyLength { get; set; }
     public TimeSpan BreakLength { get; set; }
-    public bool TimeForBreak => DateTime.Now - LastBreak > StudyLength;
+    public bool TimeForBreak => Enabled && TimeSinceLastBreak > StudyLength;
     public void UseBreak()
     {
         Console.WriteLine($"You've been studying for over {StudyLength.Minutes} minutes! Do you want to take a break?");
@@ -33,18 +33,18 @@ public class StudyTimer
 
             cts.Cancel();
 
-            while (!affirmation.IsCompletedSuccessfully && !timer.IsCompletedSuccessfully) { }
+            while (!affirmation.IsCompletedSuccessfully || !timer.IsCompletedSuccessfully) { }
             affirmation.Dispose();
             timer.Dispose();
         }
-        LastBreak = DateTime.Now;
+        TimeSinceLastBreak = TimeSpan.Zero;
         Console.Clear();
     }
 
-    public StudyTimer() : this(DateTime.Now, TimeSpan.FromMinutes(25), TimeSpan.FromMinutes(5), true) { }
-    public StudyTimer(DateTime lastRevised, TimeSpan studyLength, TimeSpan breakLength, bool enabled)
+    public StudyTimer() : this(TimeSpan.Zero, TimeSpan.FromMinutes(25), TimeSpan.FromMinutes(5), true) { }
+    public StudyTimer(TimeSpan timeSinceLastBreak, TimeSpan studyLength, TimeSpan breakLength, bool enabled)
     {
-        LastBreak = lastRevised;
+        TimeSinceLastBreak = timeSinceLastBreak;
         StudyLength = studyLength;
         BreakLength = breakLength;
         Enabled = enabled;

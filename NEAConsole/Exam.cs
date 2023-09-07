@@ -8,7 +8,7 @@ public class Exam
     private readonly RandomProblemGenerator gen;
     private readonly List<(IProblem problem, IAnswer? answer)> attempts;
 
-    public void Begin()
+    public void Begin(StudyTimer timer)
     {
         var cts = new CancellationTokenSource();
         var timeRemaining = TimeSpan.FromSeconds(totalSeconds);
@@ -19,7 +19,7 @@ public class Exam
 
         var exam = Task.Run(() =>
         {
-            try { UseExam(cts); }
+            try { UseExam(cts, timer); }
             catch (KeyNotFoundException) {  } // if user is typing but exam timer runs out, then can early exit this way
         });
         Task.Run(() => WriteTimer(timeRemaining));
@@ -42,7 +42,7 @@ public class Exam
         UIMethods.Wait();
         Console.Clear();
 
-        Summarise();
+        Review(timer);
     }
 
     public static void WriteTimer(TimeSpan remaining)
@@ -53,8 +53,10 @@ public class Exam
         Console.SetCursorPosition(returnX, returnY);
     }
 
-    private void UseExam(CancellationTokenSource cts)
+    private void UseExam(CancellationTokenSource cts, StudyTimer timer)
     {
+        var start = DateTime.Now;
+
         while (question < attempts.Count + 1) // needs to become until time is up
         {
             Console.WriteLine('[' + new string('#', question) + new string(' ', questionCount - question) + ']'); // progress bar
@@ -76,9 +78,14 @@ public class Exam
                 }
                 catch (EscapeException e)
                 {
+                    var now = DateTime.Now;
                     Console.Clear();
                     Console.WriteLine("Are you sure you want to exit the exam without finishing?");
-                    if (Menu.Affirm(cts.Token)) throw e;
+                    if (Menu.Affirm(cts.Token))
+                    {
+                        timer.TimeSinceLastBreak += now - start;
+                        throw e;
+                    }
                 }
             }
 
@@ -100,11 +107,14 @@ public class Exam
             }
         }
 
+        timer.TimeSinceLastBreak += DateTime.Now - start;
         cts.Cancel();
     }
 
-    private void Summarise()
+    private void Review(StudyTimer timer)
     {
+        var start = DateTime.Now;
+
         var question = 1;
         while (question < attempts.Count + 1) // needs to become until time is up
         {
@@ -123,16 +133,23 @@ public class Exam
             }
             catch (EscapeException e)
             {
+                var now = DateTime.Now;
                 Console.Clear();
                 Console.WriteLine("Are you sure you want to finish reviewing the exam?");
-                if (Menu.Affirm()) throw e;
+                if (Menu.Affirm())
+                {
+                    timer.TimeSinceLastBreak += now - start;
+                    throw e;
+                }
             }
 
             if (question == attempts.Count + 1)
             {
+                var now = DateTime.Now;
                 Console.Clear();
                 Console.WriteLine("Are you sure you want to finish reviewing the exam?");
                 if (!Menu.Affirm()) question--;
+                else timer.TimeSinceLastBreak += now - start;
             }
 
             Console.Clear();

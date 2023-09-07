@@ -77,7 +77,7 @@ internal class Program
 #endif
         };
 
-        Menu.ExecuteMenu(options, "Select a topic to revise", knowledge);
+        Menu.ExecuteMenu(options, "Settings", knowledge);
         Console.Clear();
     }
 

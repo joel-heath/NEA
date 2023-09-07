@@ -1,5 +1,3 @@
-
-
 using NEAConsole;
 using NEAConsole.Problems;
 

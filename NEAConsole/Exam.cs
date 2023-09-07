@@ -11,8 +11,8 @@ public class Exam
     public void Begin()
     {
         var cts = new CancellationTokenSource();
-        var timeRemaining = new TimeSpan(0, 0, totalSeconds);
-        var second = new TimeSpan(0, 0, 1);
+        var timeRemaining = TimeSpan.FromSeconds(totalSeconds);
+        var second = TimeSpan.FromSeconds(1);
 
         UIMethods.Wait("Press any key to begin the exam...");
         Console.Clear();
@@ -24,7 +24,7 @@ public class Exam
         });
         Task.Run(() => WriteTimer(timeRemaining));
 
-        while (!cts.Token.IsCancellationRequested && timeRemaining.Seconds > 0) // do our actual calculation for whether time is up based on datetimes, more accurately
+        while (!cts.Token.IsCancellationRequested && (timeRemaining > TimeSpan.Zero || timeRemaining.Seconds > 0)) // do our actual calculation for whether time is up based on datetimes, more accurately
         {
             Thread.Sleep(second);
             timeRemaining -= second;

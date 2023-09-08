@@ -1,4 +1,6 @@
-﻿namespace NEAConsole.Problems;
+﻿using System.Linq;
+
+namespace NEAConsole.Problems;
 internal class SimplexProblem : IProblem
 {
     private readonly SimplexInequality objective;
@@ -19,18 +21,113 @@ internal class SimplexProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null) // would be nice to be able to navigate up and down like in a matrix
     {
-        var answer = (oldAnswer as SimplexAnswer)?.Answer ?? new int[solution.Length + 1];
+        var answer = oldAnswer as SimplexAnswer ?? new SimplexAnswer(new int[solution.Length + 1]);
 
-        Console.Write("\nP = ");
-        answer[solution.Length] = UIMethods.ReadInt(startingNum: answer[solution.Length], ct: ct);
-        for (int i = 0; i < solution.Length; i++)
+        string[] rawNums;
+        if (oldAnswer is null)
         {
-            Console.Write((char)('x' + i) + " = ");
-            answer[i] = UIMethods.ReadInt(startingNum: answer[i], ct:ct);
+            DisplayFirstAnswer(answer.Answer.Length - 1);
+            rawNums = Enumerable.Repeat(string.Empty, answer.Answer.Length).ToArray();
         }
+        else
+        {
+            DisplayAnswer(oldAnswer);
+            rawNums = answer.Answer.Take(answer.Answer.Length - 1).Select(n => n.ToString()).Prepend(answer.Answer.Last().ToString()).ToArray();
+        }
+
+        bool entering = true;
+        int selected = 0;
+        int pos = rawNums[selected].Length;
+        int indent = Console.CursorLeft + 4; // total indent is intial indent + |P = | (4 characters)
+        int yIndent = Console.CursorTop - rawNums.Length;
+
+        while (entering)
+        {
+            Console.CursorTop = yIndent + selected;
+            Console.CursorLeft = indent + pos;
+            var k = UIMethods.ReadKey(true, ct);
+            if (k.KeyChar >= '0' && k.KeyChar <= '9')
+            {
+                Console.Write(k.KeyChar);
+                Console.Write(rawNums[selected][pos..]);
+                rawNums[selected] = rawNums[selected][..pos] + k.KeyChar + rawNums[selected][pos..];
+                pos++;
+                continue;
+            }
+            switch (k.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (pos > 0) pos--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (pos < rawNums[selected].Length) pos++;
+                    break;
+                case ConsoleKey.UpArrow:
+                    if (selected > 0)
+                    {
+                        selected--;
+                        if (pos > rawNums[selected].Length) 
+                            pos = rawNums[selected].Length;
+                    }
+                    break;
+                case ConsoleKey.Tab:
+                case ConsoleKey.DownArrow:
+                    if (selected < rawNums.Length - 1)
+                    {
+                        selected++;
+                        if (pos > rawNums[selected].Length)
+                            pos = rawNums[selected].Length;
+                    }
+                    break;
+                case ConsoleKey.Home:
+                    pos = 0;
+                    break;
+                case ConsoleKey.End:
+                    pos = rawNums[selected].Length;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (pos < rawNums[selected].Length)
+                    {
+                        Console.Write(rawNums[selected][(pos + 1)..] + ' ');
+                        rawNums[selected] = rawNums[selected][..pos] + rawNums[selected][(pos + 1)..];
+                    }
+                    break;
+                case ConsoleKey.Backspace:
+                    if (pos > 0)
+                    {
+                        Console.CursorLeft--;
+                        Console.Write(rawNums[selected][pos--..] + ' ');
+                        rawNums[selected] = rawNums[selected][..pos] + rawNums[selected][(pos + 1)..];
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
+
+                case ConsoleKey.Enter:
+                    if (rawNums.All(n => int.TryParse(n, out int num) && num != 0))
+                    {
+                        entering = false;
+                    }
+                    break;
+            }
+        }
+        Console.CursorTop += rawNums.Length - selected;
         Console.WriteLine();
 
-        return new SimplexAnswer(answer);
+        // constant term is entered by user first, but is in array last... sighhhh
+        return new SimplexAnswer(rawNums.Skip(1).Select(int.Parse).Append(int.Parse(rawNums.First())).ToArray());
+    }
+
+    private static void DisplayFirstAnswer(int count)
+    {
+
+        Console.WriteLine("P = ");
+        for (int i = 0; i < count; i++)
+        {
+            Console.WriteLine((char)('x' + i) + " = ");
+        }
     }
 
     public void DisplayAnswer(IAnswer answer)

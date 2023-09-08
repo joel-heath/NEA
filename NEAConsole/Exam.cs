@@ -171,7 +171,7 @@ public class Exam
         bool noneKnown = true;
         foreach (var child in chosenKnowledge.Children)
         {
-            if (child.Children.Any(c => c.Known))
+            if ((child.Children.Length > 0 && child.Children.Any(c => c.Known)) || child.Children.Length == 0 && child.Known)
             {
                 noneKnown = false;
                 child.Known = true;

@@ -8,7 +8,7 @@ public class Exam
     private readonly RandomProblemGenerator gen;
     private readonly List<(IProblem problem, IAnswer? answer)> attempts;
 
-    public void Begin(StudyTimer timer)
+    public void Begin(StudyTimer timer) // OR COULD USE
     {
         var cts = new CancellationTokenSource();
         var timeRemaining = TimeSpan.FromSeconds(totalSeconds);
@@ -21,6 +21,9 @@ public class Exam
         {
             try { UseExam(cts, timer); }
             catch (KeyNotFoundException) {  } // if user is typing but exam timer runs out, then can early exit this way
+            catch (EscapeException) { cts.Cancel(); return false; }
+            cts.Cancel();
+            return true;
         });
         Task.Run(() => WriteTimer(timeRemaining));
 
@@ -32,6 +35,7 @@ public class Exam
         }
 
         cts.Cancel();
+        if (!exam.Result) throw new EscapeException();
 
         while (!exam.IsCompletedSuccessfully) { }
         exam.Dispose();
@@ -164,7 +168,14 @@ public class Exam
         {
             if (child.Known) // because don't want to say do you want to be tested on matrices, they say no, then ask what about matrices > addition
             {
-                UIMethods.UpdateKnownSkills(child.Children, new string[] { child.Name }); // but they may not want determinants but do want inversion.
+                if (child.Children.Length == 0)
+                {
+                    UIMethods.UpdateKnownSkills(new Skill[] { child });
+                }
+                else
+                {
+                    UIMethods.UpdateKnownSkills(child.Children, new string[] { child.Name }); // but they may not want determinants but do want inversion.
+                }
             }
         }
 
@@ -189,10 +200,9 @@ public class Exam
         return chosenKnowledge;
     }
 
-    public Exam(Skill knowledge)
+    public Exam(Skill knowledge, int questions)
     {
-        Console.Write("How many questions would you like in the mock exam? ");
-        questionCount = UIMethods.ReadInt();
+        questionCount = questions;
         gen = new RandomProblemGenerator();
         attempts = Enumerable.Range(0, questionCount).Select(i => ((IProblem problem, IAnswer? answer))(gen.Generate(knowledge), null)).ToList();
         question = 1;

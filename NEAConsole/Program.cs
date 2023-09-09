@@ -1,4 +1,5 @@
 ﻿using NEAConsole.Problems;
+using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -8,7 +9,8 @@ namespace NEAConsole;
 internal class Program
 {
     private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",
-                         SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json";
+                         SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json",
+                         EXAM_PROFILES_PATH = "ExamProfiles.bin";
 
     /// <summary>
     /// If the user's context.Knowledge tree is completely unknown, asks the user to update their context.Knowledge tree, specifying which topics they know.
@@ -152,12 +154,57 @@ internal class Program
         }
     }
 
+    static Exam? OfferExamProfiles()
+    {
+        List<(string name, Exam? exam)> profiles = new();
+
+        using var br = new BinaryReader(new FileStream(EXAM_PROFILES_PATH, FileMode.OpenOrCreate));
+        while (br.BaseStream.Position < br.BaseStream.Length)
+        {
+            var name = br.ReadString();
+            var questions = br.ReadInt32();
+            var knowledge = Skill.KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(br.ReadString(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!);
+
+            profiles.Add((name, new Exam(knowledge, questions)));
+        }
+        profiles.Add(("New profile", null));
+
+        if (profiles.Count == 1)
+            return null;
+        else
+        {
+            Console.WriteLine("Choose an exam profile.");
+            var choice = profiles[Menu.Choose(profiles.Select(p => (MenuOption)(p.name, null!)).ToArray())].exam;
+            Console.CursorTop += profiles.Count;
+            return choice;
+        }
+    }
+
     static void MockExam(Context context)
     {
-        TryUpdateKnowledge(context.Knowledge, "start a mock exam");
-        Skill? chosenKnowledge = Exam.CreateKnowledge(USER_KNOWLEDGE_PATH);
-        if (chosenKnowledge is null) return;
-        Exam exam = new(chosenKnowledge);
+        var exam = OfferExamProfiles();
+        if (exam is null)
+        {
+            TryUpdateKnowledge(context.Knowledge, "start a mock exam");
+            Skill? chosenKnowledge = Exam.CreateKnowledge(USER_KNOWLEDGE_PATH);
+            if (chosenKnowledge is null) return;
+            Console.Write("How many questions would you like in the mock exam? ");
+            var questionCount = UIMethods.ReadInt();
+            exam = new(chosenKnowledge, questionCount);
+
+            Console.WriteLine("Would you like to save this exam profile?");
+            if (Menu.Affirm())
+            {
+                Console.CursorTop += 2;
+                Console.Write("Profile name: ");
+                var name = UIMethods.ReadLine();
+
+                using var br = new BinaryWriter(new FileStream(EXAM_PROFILES_PATH, FileMode.Append));
+                br.Write(name);
+                br.Write(questionCount);
+                br.Write(JsonSerializer.Serialize(chosenKnowledge.Children));
+            }
+        }
         
         exam.Begin(context.Timer);
 

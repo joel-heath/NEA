@@ -35,7 +35,7 @@ public static class UIMethods
         while (entering)
         {
             Console.CursorLeft = indent + pos;
-            var k = UIMethods.ReadKey(true, ct);
+            var k = ReadKey(true, ct);
             if (k.KeyChar >= '0' && k.KeyChar <= '9')
             {
                 Console.Write(k.KeyChar);
@@ -94,6 +94,72 @@ public static class UIMethods
         if (newLine) Console.WriteLine();
 
         return int.Parse(rawNum);
+    }
+
+    public static string ReadLine(bool newLine = true, string? startingInput = null, CancellationToken? ct = null)
+    {
+        bool entering = true;
+        string input = startingInput is null ? string.Empty : startingInput;
+        int pos = input.Length;
+        int indent = Console.CursorLeft;
+        Console.Write(input);
+        while (entering)
+        {
+            Console.CursorLeft = indent + pos;
+            var k = ReadKey(true, ct);
+            
+            switch (k.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (pos > 0) pos--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (pos < input.Length) pos++;
+                    break;
+                case ConsoleKey.Home:
+                    pos = 0;
+                    break;
+                case ConsoleKey.End:
+                    pos = input.Length;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (pos < input.Length)
+                    {
+                        Console.Write(input[(pos + 1)..] + ' ');
+                        input = input[..pos] + input[(pos + 1)..];
+                    }
+                    break;
+                case ConsoleKey.Backspace:
+                    if (pos > 0)
+                    {
+                        Console.CursorLeft--;
+                        Console.Write(input[pos--..] + ' ');
+                        input = input[..pos] + input[(pos + 1)..];
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
+
+                case ConsoleKey.Enter:
+                    entering = false;
+                    break;
+
+                default:
+                    if (k.KeyChar >= ' ' && k.KeyChar <= '~') // see ascii chart
+                    {
+                        Console.Write(k.KeyChar);
+                        Console.Write(input[pos..]);
+                        input = input[..pos] + k.KeyChar + input[pos..];
+                        pos++;
+                    }
+                    break;
+            }
+        }
+        if (newLine) Console.WriteLine();
+
+        return input;
     }
 
     /// <summary>

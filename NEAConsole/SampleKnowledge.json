@@ -3,16 +3,20 @@
     "name": "Matrices",
     "children": [
       {
-        "name": "Addition"
+        "name": "Addition",
+        "weight": 1
       },
       {
-        "name":  "Multiplication"
+        "name": "Multiplication",
+        "weight": 2
       },
       {
         "name": "Determinants",
+        "weight": 3,
         "children": [
           {
-            "name": "Inversion"
+            "name": "Inversion",
+            "weight": 4
           }
         ]
       }
@@ -22,14 +26,17 @@
     "name": "Graphs",
     "children": [
       {
-        "name": "Prims"
+        "name": "Prims",
+        "weight": 4
       },
       {
-        "name": "Dijkstras"
+        "name": "Dijkstras",
+        "weight": 4
       }
     ]
   },
   {
-    "name": "Simplex"
+    "name": "Simplex",
+    "weight": 5
   }
 ]

@@ -6,6 +6,8 @@ public class Skill
     public string Name { get; }
     public bool Known { get; set; }
     public int Weight { get; } // settable by user?
+    public int TotalCorrect { get; set; }
+    public int TotalAttempts { get; set; }
     public DateTime LastRevised { get; set; }
     public Skill[] Children { get; set; }
 
@@ -62,9 +64,9 @@ public class Skill
     public static Skill KnowledgeConstructor(string treeJSONPath)
         => KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!);
     public static Skill KnowledgeConstructor(Skill[] skills)
-        => new(string.Empty, true, 0, DateTime.MinValue, skills);
+        => new(string.Empty, true, 0, 0, 0, DateTime.MinValue, skills);
 
     //[JsonConstructor]
-    public Skill(string name, bool known, int weight, DateTime lastRevised, Skill[]? children)
-        => (Name, Known, Weight, LastRevised, Children) = (name, known, weight, lastRevised, children ?? Array.Empty<Skill>());
+    public Skill(string name, bool known, int weight, int totalCorrect, int totalAttempts, DateTime lastRevised, Skill[]? children)
+        => (Name, Known, Weight, TotalCorrect, TotalAttempts, LastRevised, Children) = (name, known, weight, totalCorrect, totalAttempts, lastRevised, children ?? Array.Empty<Skill>());
 }

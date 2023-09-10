@@ -1,5 +1,6 @@
 ﻿using NEAConsole.Problems;
-using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -130,15 +131,17 @@ internal class Program
         bool @continue = true;
         while (@continue)
         {
+            bool correct;
             var start = DateTime.Now;
 
-            var problem = gen.Generate(context.Knowledge);
+            var problem = gen.GenerateNextBest(context.Knowledge);
             problem.Display();
 
             try
             {
                 var answer = problem.GetAnswer();
                 problem.Summarise(answer);
+                correct = problem.EvaluateAnswer(answer);
                 UIMethods.Wait();
                 Console.Clear();
             }
@@ -147,7 +150,14 @@ internal class Program
                 context.Timer.TimeSinceLastBreak += DateTime.Now - start;
                 Console.Clear();
                 @continue = false;
+                return;
             }
+
+            // this is very inefficient
+            context.Knowledge.Query(((IProblemGenerator)Activator.CreateInstance(Assembly.GetExecutingAssembly().GetTypes().First(t => t.Name == problem.GetType().Name + "Generator"))!).SkillPath, out Skill? skill);
+            (skill ?? throw new Exception()).LastRevised = DateTime.Now;
+            if (correct) skill.TotalCorrect++;
+            skill.TotalAttempts++;
 
             context.Timer.TimeSinceLastBreak += DateTime.Now - start;
             if (context.Timer.TimeForBreak) context.Timer.UseBreak();

@@ -6,7 +6,7 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Dijkstra's";
     public string SkillPath => "Graphs.Dijkstras";
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -91,5 +91,5 @@ internal class DijkstrasProblemGenerator : IProblemGenerator
     }
 
     public DijkstrasProblemGenerator() : this(new Random()) { }
-    public DijkstrasProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public DijkstrasProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

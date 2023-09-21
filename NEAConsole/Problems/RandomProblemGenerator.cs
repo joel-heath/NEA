@@ -6,7 +6,7 @@ internal class RandomProblemGenerator : IProblemGenerator
     // 2. Make a bogus skill path such that its never satisfied.
     public string DisplayText => "Random Questions";
     public string SkillPath => string.Empty;
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -55,5 +55,5 @@ internal class RandomProblemGenerator : IProblemGenerator
     }
 
     public RandomProblemGenerator() : this(new Random()) { }
-    public RandomProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public RandomProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

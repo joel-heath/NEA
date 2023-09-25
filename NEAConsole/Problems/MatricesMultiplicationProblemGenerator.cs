@@ -5,7 +5,7 @@ internal class MatricesMultiplicationProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Matrix Multiplication";
     public string SkillPath => "Matrices.Multiplication";
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -20,5 +20,5 @@ internal class MatricesMultiplicationProblemGenerator : IProblemGenerator
     }
 
     public MatricesMultiplicationProblemGenerator() : this(new Random()) { }
-    public MatricesMultiplicationProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public MatricesMultiplicationProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

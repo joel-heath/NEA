@@ -5,7 +5,7 @@ internal class MatricesInversionProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Matrix Inversion";
     public string SkillPath => "Matrices.Determinants.Inversion";
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -55,5 +55,5 @@ internal class MatricesInversionProblemGenerator : IProblemGenerator
     }
 
     public MatricesInversionProblemGenerator() : this(new Random()) { }
-    public MatricesInversionProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public MatricesInversionProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

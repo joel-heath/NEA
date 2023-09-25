@@ -5,7 +5,7 @@ internal class PrimsProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Prim's Algorithm";
     public string SkillPath => "Graphs.Prims";
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -48,5 +48,5 @@ internal class PrimsProblemGenerator : IProblemGenerator
     }
 
     public PrimsProblemGenerator() : this(new Random()) { }
-    public PrimsProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public PrimsProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

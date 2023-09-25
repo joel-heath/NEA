@@ -1,5 +1,7 @@
-﻿namespace NEAConsole.Matrices;
-public class Matrix
+﻿using System.Collections;
+
+namespace NEAConsole.Matrices;
+public class Matrix : IEnumerable<double>
 {
     private readonly double[,] values;
     public readonly int Rows;
@@ -284,4 +286,15 @@ public class Matrix
 
         return HashCode.Combine(hash.ToHashCode(), Rows, Columns);
     }
+
+    IEnumerator<double> IEnumerable<double>.GetEnumerator() {
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j < Columns; j++)
+            {
+                yield return values[i, j];
+            }
+        }
+    }
+    IEnumerator IEnumerable.GetEnumerator() => values.GetEnumerator();
 }

@@ -3,7 +3,7 @@ internal class SimplexProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Simplex";
     public string SkillPath => "Simplex";
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -73,5 +73,5 @@ internal class SimplexProblemGenerator : IProblemGenerator
     }
 
     public SimplexProblemGenerator() : this(new Random()) { }
-    public SimplexProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public SimplexProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

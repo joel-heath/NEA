@@ -5,7 +5,7 @@ internal class PMCCProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Product Moment Correlation Coefficient";
     public string SkillPath => "Statistics.PMCC";
-    private readonly Random random;
+    private readonly IRandom random;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -16,5 +16,5 @@ internal class PMCCProblemGenerator : IProblemGenerator
     }
 
     public PMCCProblemGenerator() : this(new Random()) { }
-    public PMCCProblemGenerator(Random randomNumberGenerator) => random = randomNumberGenerator;
+    public PMCCProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

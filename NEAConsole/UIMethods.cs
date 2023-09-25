@@ -96,6 +96,78 @@ public static class UIMethods
         return int.Parse(rawNum);
     }
 
+    public static double ReadDouble(bool newLine = true, double? startingNum = null, CancellationToken? ct = null)
+    {
+        bool entering = true;
+        string rawNum = startingNum is null || startingNum <= 0 ? string.Empty : startingNum.Value.ToString();
+        int pos = rawNum.Length;
+        int indent = Console.CursorLeft;
+        Console.Write(rawNum);
+        while (entering)
+        {
+            Console.CursorLeft = indent + pos;
+            var k = ReadKey(true, ct);
+            if (k.KeyChar >= '0' && k.KeyChar <= '9' || k.KeyChar == '.')
+            {
+                Console.Write(k.KeyChar);
+                Console.Write(rawNum[pos..]);
+                rawNum = rawNum[..pos] + k.KeyChar + rawNum[pos..];
+                pos++;
+                continue;
+            }
+            switch (k.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (pos > 0) pos--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (pos < rawNum.Length) pos++;
+                    break;
+                case ConsoleKey.Home:
+                    pos = 0;
+                    break;
+                case ConsoleKey.End:
+                    pos = rawNum.Length;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (pos < rawNum.Length)
+                    {
+                        Console.Write(rawNum[(pos + 1)..] + ' ');
+                        rawNum = rawNum[..pos] + rawNum[(pos + 1)..];
+                    }
+                    break;
+                case ConsoleKey.Backspace:
+                    if (pos > 0)
+                    {
+                        Console.CursorLeft--;
+                        Console.Write(rawNum[pos--..] + ' ');
+                        rawNum = rawNum[..pos] + rawNum[(pos + 1)..];
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
+
+                case ConsoleKey.Enter:
+                    try
+                    {
+                        if (rawNum.Length > 0)
+                        {
+                            var n = double.Parse(rawNum);
+                            entering = false;
+                        }
+                    }
+                    catch (OverflowException) { }
+                    catch (FormatException) { } // they could put two decimal points
+                    break;
+            }
+        }
+        if (newLine) Console.WriteLine();
+
+        return double.Parse(rawNum);
+    }
+
     public static string ReadLine(bool newLine = true, string? startingInput = null, CancellationToken? ct = null)
     {
         bool entering = true;

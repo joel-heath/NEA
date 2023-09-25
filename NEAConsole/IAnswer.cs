@@ -7,6 +7,11 @@ public class IntAnswer : IAnswer
     public int Answer { get; set; }
     public IntAnswer(int answer) { Answer = answer; }
 }
+public class DoubleAnswer : IAnswer
+{
+    public double Answer { get; set; }
+    public DoubleAnswer(double answer) { Answer = answer; }
+}
 public class MatrixAnswer : IAnswer
 {
     public Matrix Answer { get; set; }

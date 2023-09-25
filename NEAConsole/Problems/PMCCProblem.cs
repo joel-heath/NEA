@@ -16,16 +16,16 @@ internal class PMCCProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer, ct: ct);
+        var answer = UIMethods.ReadDouble(startingNum: (oldAnswer as DoubleAnswer)?.Answer, ct: ct);
 
-        return new IntAnswer(answer);
+        return new DoubleAnswer(answer);
     }
 
     public void DisplayAnswer(IAnswer answer)
         => Console.WriteLine((answer as IntAnswer ?? throw new InvalidOperationException()).Answer);
 
     public bool EvaluateAnswer(IAnswer answer)
-        => (answer as IntAnswer ?? throw new InvalidOperationException()).Answer == solution;
+        => (answer as DoubleAnswer ?? throw new InvalidOperationException()).Answer == Math.Round(solution, 3);
 
     public void Summarise(IAnswer? answer)
     {

@@ -86,7 +86,10 @@ internal class Program
 
     static void MathsMenu(Context context)
     {
+        IProblemGenerator[] options = { new PMCCProblemGenerator() };
 
+        Menu.ExecuteMenu(options, "Choose a subject to revise", context);
+        Console.Clear();
     }
 
     static void MatricesMenu(Context context)

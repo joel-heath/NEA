@@ -107,7 +107,7 @@ public static class UIMethods
         {
             Console.CursorLeft = indent + pos;
             var k = ReadKey(true, ct);
-            if (k.KeyChar >= '0' && k.KeyChar <= '9' || k.KeyChar == '.')
+            if (k.KeyChar >= '0' && k.KeyChar <= '9' || k.KeyChar == '.' && !rawNum.Contains('.') || k.KeyChar == '-' && pos==0 && (rawNum.Length == 0 || rawNum[0] != '-'))
             {
                 Console.Write(k.KeyChar);
                 Console.Write(rawNum[pos..]);

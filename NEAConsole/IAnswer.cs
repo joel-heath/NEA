@@ -27,3 +27,8 @@ public class SimplexAnswer : IAnswer
     public int[] Answer { get; set; }
     public SimplexAnswer(int[] answer) { Answer = answer; }
 }
+public class ManyAnswer<T> : IAnswer
+{
+    public T[] Answer { get; set; }
+    public ManyAnswer(T[] answer) { Answer = answer }
+}

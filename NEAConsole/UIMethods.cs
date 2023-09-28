@@ -1,4 +1,5 @@
 ﻿using NEAConsole.Matrices;
+using System.Runtime.CompilerServices;
 
 namespace NEAConsole;
 public static class UIMethods
@@ -25,7 +26,7 @@ public static class UIMethods
         throw new KeyNotFoundException();
     }
 
-    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null, CancellationToken? ct = null)
+    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null, CancellationToken? ct = null, bool allowUpwardsEscape = false, bool allowDownwardsEscape = false)
     {
         bool entering = true;
         string rawNum = startingNum is null || (natural && startingNum <= 0) ? string.Empty : startingNum.Value.ToString();
@@ -88,6 +89,15 @@ public static class UIMethods
                         }
                     }
                     catch (OverflowException) { }
+                    break;
+
+                case ConsoleKey.UpArrow:
+                    if (allowUpwardsEscape)
+                        throw new EscapeException("Up");
+                    break;
+                case ConsoleKey.DownArrow:
+                    if (allowDownwardsEscape)
+                        throw new EscapeException("Down");
                     break;
             }
         }
@@ -166,6 +176,57 @@ public static class UIMethods
         if (newLine) Console.WriteLine();
 
         return double.Parse(rawNum);
+    }
+
+    /// <summary>
+    /// Reader is an anonymous function taking boolsfor whether we can go up or down or not
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="names"></param>
+    /// <param name="reader"></param>
+    /// <param name="oldVals"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    /// <exception cref="EscapeException"></exception>
+    public static T?[] ReadValues<T>(string[] names, Func<bool, bool, T> reader, IList<T>? oldVals = null, CancellationToken? ct = null) where T : class
+    {
+        var values = oldVals is null
+                        ? new T?[names.Length]
+                        : (oldVals.Count < names.Length
+                            ? oldVals.Concat(Enumerable.Repeat(default(T?), names.Length - oldVals.Count))
+                            : oldVals.Count == names.Length
+                                ? oldVals
+                                : oldVals.Take(names.Length)).ToArray();
+
+        //string[] rawVals = answer.Select(a => a is null ? string.Empty : a.ToString()!).ToArray();
+
+        bool entering = true;
+        int selected = 0;
+        int yIndent = Console.CursorTop - values.Length;
+
+        while (entering)
+        {
+            Console.CursorTop = yIndent + selected;
+            Console.CursorLeft = 0;
+
+            Console.WriteLine(names[selected] + " = ");
+
+            //var xIndent = Console.CursorLeft;
+            try
+            {
+                values[selected] = reader(selected > 0, selected < values.Length - 1);
+            }
+            catch (EscapeException e)
+            {
+                if (e.Message == "Up") selected--;
+                else if (e.Message == "Down") selected++;
+                else throw e;
+            }
+        }
+        Console.CursorTop += values.Length - selected;
+        Console.WriteLine();
+
+        return values;
     }
 
     public static string ReadLine(bool newLine = true, string? startingInput = null, CancellationToken? ct = null)

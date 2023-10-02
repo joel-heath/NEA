@@ -1,4 +1,5 @@
 ﻿using NEAConsole.Problems;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -85,7 +86,7 @@ internal class Program
 
     static void MathsMenu(Context context)
     {
-        IProblemGenerator[] options = { new PMCCProblemGenerator() };
+        IProblemGenerator[] options = { new PMCCProblemGenerator(), new RegressionProblemGenerator() };
 
         Menu.ExecuteMenu(options, "Choose a subject to revise", context);
         Console.Clear();

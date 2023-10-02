@@ -14,7 +14,7 @@ internal class RegressionProblemGenerator : IProblemGenerator
 
         var sealedData = data.ToList();
 
-        return new PMCCProblem(sealedData, new Regression(sealedData).PMCC());
+        return new RegressionProblem(sealedData, new Regression(sealedData).LeastSquaresXonY());
     }
 
     public RegressionProblemGenerator() : this(new Random()) { }

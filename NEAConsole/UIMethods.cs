@@ -106,8 +106,9 @@ public static class UIMethods
         return int.Parse(rawNum);
     }
 
-    public static double ReadDouble(bool newLine = true, double? startingNum = null, CancellationToken? ct = null)
+    public static double ReadDouble(out ConsoleKey exitKey, bool newLine = true, double? startingNum = null, CancellationToken? ct = null, bool allowUpwardsEscape = false, bool allowDownwardsEscape = false)
     {
+        exitKey = default;
         bool entering = true;
         string rawNum = startingNum is null || startingNum <= 0 ? string.Empty : startingNum.Value.ToString();
         int pos = rawNum.Length;
@@ -160,10 +161,14 @@ public static class UIMethods
                     throw new EscapeException();
 
                 case ConsoleKey.Enter:
+                case ConsoleKey.UpArrow:
+                case ConsoleKey.DownArrow:
+                   
                     try
                     {
                         if (rawNum.Length > 0)
                         {
+                            exitKey = k.Key;
                             var n = double.Parse(rawNum);
                             entering = false;
                         }
@@ -179,21 +184,21 @@ public static class UIMethods
     }
 
     /// <summary>
-    /// Reader is an anonymous function taking boolsfor whether we can go up or down or not
+    /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="names"></param>
-    /// <param name="reader"></param>
+    /// <param name="reader">Anonymous function taking the old answer (which can be null if not yet answered), and bools for whether can go up or down or not</param>
     /// <param name="oldVals"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
     /// <exception cref="EscapeException"></exception>
-    public static T?[] ReadValues<T>(string[] names, Func<bool, bool, T> reader, IList<T>? oldVals = null, CancellationToken? ct = null) where T : class
+    public static T?[] ReadValues<T>(string[] names, Func<T?, bool, bool, T> reader, IList<T>? oldVals = null, CancellationToken? ct = null)
     {
         var values = oldVals is null
                         ? new T?[names.Length]
                         : (oldVals.Count < names.Length
-                            ? oldVals.Concat(Enumerable.Repeat(default(T?), names.Length - oldVals.Count))
+                            ? oldVals.Concat<T?>(Enumerable.Repeat(default(T?), names.Length - oldVals.Count))
                             : oldVals.Count == names.Length
                                 ? oldVals
                                 : oldVals.Take(names.Length)).ToArray();
@@ -202,19 +207,22 @@ public static class UIMethods
 
         bool entering = true;
         int selected = 0;
-        int yIndent = Console.CursorTop - values.Length;
+        int yIndent = Console.CursorTop;
+
+        foreach (var n in names)
+        {
+            Console.WriteLine(n + " = ");
+        }
 
         while (entering)
         {
             Console.CursorTop = yIndent + selected;
-            Console.CursorLeft = 0;
-
-            Console.WriteLine(names[selected] + " = ");
+            Console.CursorLeft = names.Length + 3; //+ (values[selected] is null ? 0 : values[selected]!.ToString()!.Length);
 
             //var xIndent = Console.CursorLeft;
             try
             {
-                values[selected] = reader(selected > 0, selected < values.Length - 1);
+                values[selected] = reader(values[selected], selected > 0, selected < values.Length - 1);
             }
             catch (EscapeException e)
             {

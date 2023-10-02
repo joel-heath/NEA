@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace NEAConsole.Problems;
+﻿namespace NEAConsole.Problems;
 internal class SimplexProblem : IProblem
 {
     private readonly SimplexInequality objective;

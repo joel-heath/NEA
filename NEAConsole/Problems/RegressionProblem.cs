@@ -2,32 +2,32 @@
 internal class RegressionProblem : IProblem
 {
     private readonly IList<(double x, double y)> data;
-    private readonly (double m, double c) solution;
+    private readonly double[] solution;
 
     public void Display()
     {
-        Console.WriteLine("Find the PMCC of the following data to 3 s.f.\n");
+        Console.WriteLine("Find the y on x least squares regression line of the following data in the form y = mx + c, giving m and c to 3 s.f.\n");
 
         foreach (var item in data)
             Console.WriteLine(item);
 
-        Console.Write("\nr = ");
+        Console.WriteLine();
+        Console.WriteLine();
     }
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
         var solutionNames = new string[] { "m", "c" };
+        var answer = UIMethods.ReadValues(solutionNames, (o, u, d) => UIMethods.ReadDouble(startingNum:o, allowUpwardsEscape: u, allowDownwardsEscape: d), oldVals: (oldAnswer as ManyAnswer<double?>)?.Answer, ct: ct);
 
-        var answer = UIMethods.ReadValues<double?>(solutionNames, (u, d) => UIMethods.ReadInt(allowUpwardsEscape: u, allowDownwardsEscape: d), oldVals: (oldAnswer as ManyAnswer<double?>)?.Answer, ct: ct);
-
-        return new DoubleAnswer(answer);
+        return new ManyAnswer<double?>(answer);
     }
 
     public void DisplayAnswer(IAnswer answer)
-        => Console.WriteLine((answer as IntAnswer ?? throw new InvalidOperationException()).Answer);
+        => Console.WriteLine((answer as ManyAnswer<double?> ?? throw new InvalidOperationException()).Answer);
 
     public bool EvaluateAnswer(IAnswer answer)
-        => (answer as DoubleAnswer ?? throw new InvalidOperationException()).Answer == Math.Round(solution, 3, MidpointRounding.AwayFromZero);
+        => (answer as ManyAnswer<double?> ?? throw new InvalidOperationException()).Answer.Select((d, i) =>(d, i)).All((t) => t.d == Math.Round(solution[t.i], 3, MidpointRounding.AwayFromZero));
 
     public void Summarise(IAnswer? answer)
     {
@@ -44,9 +44,9 @@ internal class RegressionProblem : IProblem
         }
     }
 
-    public PMCCProblem(IList<(double x, double y)> data, double solution)
+    public RegressionProblem(IList<(double x, double y)> data, (double m, double c) solution)
     {
         this.data = data;
-        this.solution = solution;
+        this.solution = new double[] { solution.m, solution.c };
     }
 }

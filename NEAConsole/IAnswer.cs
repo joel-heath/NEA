@@ -30,5 +30,5 @@ public class SimplexAnswer : IAnswer
 public class ManyAnswer<T> : IAnswer
 {
     public T[] Answer { get; set; }
-    public ManyAnswer(T[] answer) { Answer = answer }
+    public ManyAnswer(T[] answer) { Answer = answer; }
 }

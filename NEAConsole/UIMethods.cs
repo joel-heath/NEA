@@ -26,7 +26,7 @@ public static class UIMethods
         throw new KeyNotFoundException();
     }
 
-    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null, CancellationToken? ct = null, bool allowUpwardsEscape = false, bool allowDownwardsEscape = false)
+    public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null, CancellationToken? ct = null)
     {
         bool entering = true;
         string rawNum = startingNum is null || (natural && startingNum <= 0) ? string.Empty : startingNum.Value.ToString();
@@ -90,15 +90,6 @@ public static class UIMethods
                     }
                     catch (OverflowException) { }
                     break;
-
-                case ConsoleKey.UpArrow:
-                    if (allowUpwardsEscape)
-                        throw new EscapeException("Up");
-                    break;
-                case ConsoleKey.DownArrow:
-                    if (allowDownwardsEscape)
-                        throw new EscapeException("Down");
-                    break;
             }
         }
         if (newLine) Console.WriteLine();
@@ -106,9 +97,8 @@ public static class UIMethods
         return int.Parse(rawNum);
     }
 
-    public static double ReadDouble(out ConsoleKey exitKey, bool newLine = true, double? startingNum = null, CancellationToken? ct = null, bool allowUpwardsEscape = false, bool allowDownwardsEscape = false)
+    public static double ReadDouble(bool newLine = true, double? startingNum = null, CancellationToken? ct = null)
     {
-        exitKey = default;
         bool entering = true;
         string rawNum = startingNum is null || startingNum <= 0 ? string.Empty : startingNum.Value.ToString();
         int pos = rawNum.Length;
@@ -161,14 +151,10 @@ public static class UIMethods
                     throw new EscapeException();
 
                 case ConsoleKey.Enter:
-                case ConsoleKey.UpArrow:
-                case ConsoleKey.DownArrow:
-                   
                     try
                     {
                         if (rawNum.Length > 0)
                         {
-                            exitKey = k.Key;
                             var n = double.Parse(rawNum);
                             entering = false;
                         }
@@ -183,58 +169,130 @@ public static class UIMethods
         return double.Parse(rawNum);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="names"></param>
-    /// <param name="reader">Anonymous function taking the old answer (which can be null if not yet answered), and bools for whether can go up or down or not</param>
-    /// <param name="oldVals"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    /// <exception cref="EscapeException"></exception>
-    public static T?[] ReadValues<T>(string[] names, Func<T?, bool, bool, T> reader, IList<T>? oldVals = null, CancellationToken? ct = null)
+    public static double[] ReadDoubles(string[] prompts, double[]? startingVals = null, bool newLine = true, CancellationToken? ct = null)
     {
-        var values = oldVals is null
-                        ? new T?[names.Length]
-                        : (oldVals.Count < names.Length
-                            ? oldVals.Concat<T?>(Enumerable.Repeat(default(T?), names.Length - oldVals.Count))
-                            : oldVals.Count == names.Length
-                                ? oldVals
-                                : oldVals.Take(names.Length)).ToArray();
+        char[] validChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-' };
+        var vals = startingVals?.Select(x => x.ToString()).ToArray();
+        Func<string, double> parser = double.Parse;
 
-        //string[] rawVals = answer.Select(a => a is null ? string.Empty : a.ToString()!).ToArray();
+        return ReadValues<double>(prompts, validChars, parser, vals, newLine, ct);
+    }
 
+    public static int[] ReadInts(string[] prompts, int[]? startingVals = null, bool newLine = true, CancellationToken? ct = null)
+    {
+        char[] validChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        var vals = startingVals?.Select(x => x.ToString()).ToArray();
+        Func<string, int> parser = int.Parse;
+
+        return ReadValues<int>(prompts, validChars, parser, vals, newLine, ct);
+    }
+
+    private static T[] ReadValues<T>(string[] prompts, char[] validChars, Func<string, T> parser, string[]? startingVals = null, bool newLine = true, CancellationToken? ct = null)
+    {
         bool entering = true;
-        int selected = 0;
-        int yIndent = Console.CursorTop;
+        string[] uInputs = startingVals is null ? Enumerable.Repeat(string.Empty, prompts.Length).ToArray() : startingVals.ToArray();
+        T[]? outputs = null;
 
-        foreach (var n in names)
+        int x = uInputs[0].Length, y = 0;
+        int indent = Console.CursorTop;
+
+        foreach (var p in prompts)
         {
-            Console.WriteLine(n + " = ");
+            Console.WriteLine(p + " = ");
         }
 
         while (entering)
         {
-            Console.CursorTop = yIndent + selected;
-            Console.CursorLeft = names.Length + 3; //+ (values[selected] is null ? 0 : values[selected]!.ToString()!.Length);
+            Console.CursorTop = indent + y;
+            Console.CursorLeft = prompts[y].Length + 3 + x;
 
-            //var xIndent = Console.CursorLeft;
-            try
+            var k = ReadKey(true, ct);
+
+            if (validChars.Contains(k.KeyChar))
             {
-                values[selected] = reader(values[selected], selected > 0, selected < values.Length - 1);
+                Console.Write(k.KeyChar);
+                Console.Write(uInputs[y][x..]);
+                uInputs[y] = uInputs[y][..x] + k.KeyChar + uInputs[y][x..];
+                x++;
+                continue;
             }
-            catch (EscapeException e)
+            switch (k.Key)
             {
-                if (e.Message == "Up") selected--;
-                else if (e.Message == "Down") selected++;
-                else throw e;
+                case ConsoleKey.UpArrow:
+                    if (y > 0)
+                    {
+                        y--;
+                        x = Math.Min(x, uInputs[y].Length);
+                    }
+                    break;
+                case ConsoleKey.DownArrow:
+                    if (y < uInputs.Length - 1)
+                    {
+                        y++;
+                        x = Math.Min(x, uInputs[y].Length);
+                    }
+                    break;
+                case ConsoleKey.LeftArrow:
+                    if (x > 0) x--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (x < uInputs[y].Length) x++;
+                    break;
+                case ConsoleKey.Home:
+                    x = 0;
+                    break;
+                case ConsoleKey.End:
+                    x = uInputs[y].Length;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (x < uInputs[y].Length)
+                    {
+                        Console.Write(uInputs[y][(x + 1)..] + ' ');
+                        uInputs[y] = uInputs[y][..x] + uInputs[y][(x + 1)..];
+                    }
+                    break;
+                case ConsoleKey.Backspace:
+                    if (x > 0)
+                    {
+                        Console.CursorLeft--;
+                        Console.Write(uInputs[y][x--..] + ' ');
+                        uInputs[y] = uInputs[y][..x] + uInputs[y][(x + 1)..];
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
+
+                case ConsoleKey.Enter:
+                    outputs = new T[uInputs.Length];
+                    try
+                    {
+                        for (int i = 0; i < uInputs.Length; i++)
+                        {
+                            var str = uInputs[i];
+                            if (str.Length == 0)
+                            {
+                                outputs = null;
+                                break;
+                            }
+
+                            outputs[i] = parser(str);
+                        }
+                    }
+                    catch (OverflowException) { outputs = null; } // number too massive
+                    catch (FormatException) { outputs = null; } // they put two decimal points or an f etc
+
+                    if (outputs is not null)
+                        entering = false;
+
+                    break;
             }
         }
-        Console.CursorTop += values.Length - selected;
-        Console.WriteLine();
+        Console.CursorTop = indent + prompts.Length + 1;
+        if (newLine) Console.WriteLine();
 
-        return values;
+        return outputs!;
     }
 
     public static string ReadLine(bool newLine = true, string? startingInput = null, CancellationToken? ct = null)

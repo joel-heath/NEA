@@ -21,7 +21,7 @@ internal class MatricesDeterminantsProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer, ct: ct);
+        var answer = InputMethods.ReadInt(startingNum: (oldAnswer as IntAnswer)?.Answer, ct: ct);
         Console.CursorTop += matrix.Rows - ((matrix.Rows - 1) / 2);
 
         return new IntAnswer(answer);

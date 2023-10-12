@@ -84,7 +84,7 @@ internal static class Menu
         while (choosing)
         {
             var changed = false;
-            ConsoleKey key = UIMethods.ReadKey(true, ct).Key;
+            ConsoleKey key = InputMethods.ReadKey(true, ct).Key;
             switch (key)
             {
                 case ConsoleKey.UpArrow:
@@ -152,7 +152,7 @@ internal static class Menu
         int choice = 0; // -1 is go back a question (left), 0 is stay on this question (middle), 1 is next question (right)
         while (choosing)
         {
-            switch (UIMethods.ReadKey(true, ct).Key)
+            switch (InputMethods.ReadKey(true, ct).Key)
             {
                 case ConsoleKey.LeftArrow:
                     if (choice > (question == 1 ? 0 : -1))

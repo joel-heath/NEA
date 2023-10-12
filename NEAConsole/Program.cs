@@ -25,14 +25,14 @@ internal class Program
         if (knowledge.Children.All(s => !s.Known))
         {
             Console.WriteLine($"To {quizTitle} you must first enter the topics you know.");
-            UIMethods.Wait(string.Empty);
+            InputMethods.Wait(string.Empty);
             Console.Clear();
             UpdateKnowledge(knowledge, false);
 
             if (knowledge.Children.All(s => !s.Known))
             {
                 Console.WriteLine($"You cannot {quizTitle} if you do not know any topics.");
-                UIMethods.Wait(string.Empty);
+                InputMethods.Wait(string.Empty);
                 Console.Clear();
                 return false;
             }
@@ -46,7 +46,7 @@ internal class Program
         var oldSkills = knowledge.Children;
         knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
 
-        try { UIMethods.UpdateAllSkills(knowledge.Children); }
+        try { InputMethods.UpdateAllSkills(knowledge.Children); }
         catch (EscapeException)
         {
             knowledge.Children = oldSkills; // undo the resetting of context.Knowledge
@@ -67,9 +67,9 @@ internal class Program
                 if (Menu.Affirm()) c.Timer.Enabled = !c.Timer.Enabled;
                 Console.CursorTop += 2;
                 Console.Write("How many minutes do you want to study for? ");
-                c.Timer.StudyLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:c.Timer.StudyLength.Minutes));
+                c.Timer.StudyLength = TimeSpan.FromMinutes(InputMethods.ReadInt(startingNum:c.Timer.StudyLength.Minutes));
                 Console.Write("How many minutes should the break be? ");
-                c.Timer.BreakLength = TimeSpan.FromMinutes(UIMethods.ReadInt(startingNum:c.Timer.BreakLength.Minutes));
+                c.Timer.BreakLength = TimeSpan.FromMinutes(InputMethods.ReadInt(startingNum:c.Timer.BreakLength.Minutes));
             }),
 #if DEBUG
             ("Clear Knowledge", (c) =>
@@ -145,7 +145,7 @@ internal class Program
                 var answer = problem.GetAnswer();
                 problem.Summarise(answer);
                 correct = problem.EvaluateAnswer(answer);
-                UIMethods.Wait();
+                InputMethods.Wait();
                 Console.Clear();
             }
             catch (EscapeException)
@@ -202,7 +202,7 @@ internal class Program
             Skill? chosenKnowledge = Exam.CreateKnowledge(USER_KNOWLEDGE_PATH);
             if (chosenKnowledge is null) return;
             Console.Write("How many questions would you like in the mock exam? ");
-            var questionCount = UIMethods.ReadInt();
+            var questionCount = InputMethods.ReadInt();
             exam = new(chosenKnowledge, questionCount);
 
             Console.WriteLine("Would you like to save this exam profile?");
@@ -210,7 +210,7 @@ internal class Program
             {
                 Console.CursorTop += 2;
                 Console.Write("Profile name: ");
-                var name = UIMethods.ReadLine();
+                var name = InputMethods.ReadLine();
 
                 using var br = new BinaryWriter(new FileStream(EXAM_PROFILES_PATH, FileMode.Append));
                 br.Write(name);

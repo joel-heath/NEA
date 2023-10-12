@@ -126,7 +126,7 @@ internal class PrimsProblem : IProblem
         bool selecting = true;
         while (selecting)
         {
-            var key = UIMethods.ReadKey(true, ct);
+            var key = InputMethods.ReadKey(true, ct);
             switch (key.Key)
             {
                 case ConsoleKey.RightArrow:

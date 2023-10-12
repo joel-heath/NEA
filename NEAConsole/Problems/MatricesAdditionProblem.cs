@@ -10,13 +10,13 @@ internal class MatricesAdditionProblem : IProblem
 
     public void Display()
     {
-        UIMethods.DrawMatrix(mat1);
+        InputMethods.DrawMatrix(mat1);
 
         var signSpacing = (mat1.Rows - 1) / 2;
         Console.CursorTop += signSpacing;
         Console.Write($" {operand} ");
         Console.CursorTop -= signSpacing;
-        UIMethods.DrawMatrix(mat2);
+        InputMethods.DrawMatrix(mat2);
 
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
@@ -25,14 +25,14 @@ internal class MatricesAdditionProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer, ct);
+        var answer = InputMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer, ct);
         Console.WriteLine();
         return new MatrixAnswer(answer);
     }
 
     public void DisplayAnswer(IAnswer answer)
     {
-        UIMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer, false);
+        InputMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer, false);
         Console.WriteLine();
     }
     public bool EvaluateAnswer(IAnswer answer)
@@ -55,7 +55,7 @@ internal class MatricesAdditionProblem : IProblem
                 Console.WriteLine();
             }
             Console.WriteLine("Incorrect. The correct answer was: ");
-            UIMethods.DrawMatrix(solution, false);
+            InputMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
     }

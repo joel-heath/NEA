@@ -10,13 +10,13 @@ internal class MatricesMultiplicationProblem : IProblem
 
     public void Display()
     {
-        UIMethods.DrawMatrix(mat1);
+        InputMethods.DrawMatrix(mat1);
 
         var signSpacing = (mat1.Rows - 1) / 2;
         Console.CursorTop += signSpacing;
         Console.Write($" x ");
         Console.CursorTop -= signSpacing;
-        UIMethods.DrawMatrix(mat2);
+        InputMethods.DrawMatrix(mat2);
 
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
@@ -25,7 +25,7 @@ internal class MatricesMultiplicationProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer, ct);
+        var answer = InputMethods.InputMatrix(solution.Rows, solution.Columns, (oldAnswer as MatrixAnswer)?.Answer, ct);
         Console.WriteLine();
 
         return new MatrixAnswer(answer);
@@ -34,7 +34,7 @@ internal class MatricesMultiplicationProblem : IProblem
     public void DisplayAnswer(IAnswer answer)
     {
         var mat = (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer;
-        UIMethods.DrawMatrix(mat, false);
+        InputMethods.DrawMatrix(mat, false);
         Console.CursorTop += Math.Max(mat1.Columns, mat2.Columns) - mat.Columns;
         Console.WriteLine();
     }
@@ -59,7 +59,7 @@ internal class MatricesMultiplicationProblem : IProblem
                 Console.WriteLine();
             }
             Console.WriteLine("Incorrect. The correct answer was: ");
-            UIMethods.DrawMatrix(solution, false);
+            InputMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
     }

@@ -43,7 +43,7 @@ internal class SimplexProblem : IProblem
         {
             Console.CursorTop = yIndent + selected;
             Console.CursorLeft = indent + pos;
-            var k = UIMethods.ReadKey(true, ct);
+            var k = InputMethods.ReadKey(true, ct);
             if (k.KeyChar >= '0' && k.KeyChar <= '9')
             {
                 Console.Write(k.KeyChar);

@@ -14,7 +14,7 @@ public class Exam
         var timeRemaining = TimeSpan.FromSeconds(totalSeconds);
         var second = TimeSpan.FromSeconds(1);
 
-        UIMethods.Wait("Press any key to begin the exam...");
+        InputMethods.Wait("Press any key to begin the exam...");
         Console.Clear();
 
         var exam = Task.Run(() =>
@@ -43,7 +43,7 @@ public class Exam
         Console.Clear();
         Console.WriteLine($"Exam complete.");
 
-        UIMethods.Wait();
+        InputMethods.Wait();
         Console.Clear();
 
         Review(timer);
@@ -170,11 +170,11 @@ public class Exam
             {
                 if (child.Children.Length == 0)
                 {
-                    UIMethods.UpdateKnownSkills(new Skill[] { child });
+                    InputMethods.UpdateKnownSkills(new Skill[] { child });
                 }
                 else
                 {
-                    UIMethods.UpdateKnownSkills(child.Children, new string[] { child.Name }); // but they may not want determinants but do want inversion.
+                    InputMethods.UpdateKnownSkills(child.Children, new string[] { child.Name }); // but they may not want determinants but do want inversion.
                 }
             }
         }
@@ -192,7 +192,7 @@ public class Exam
         if (noneKnown)
         {
             Console.WriteLine($"You cannot start a mock exam without any topics.");
-            UIMethods.Wait(string.Empty);
+            InputMethods.Wait(string.Empty);
             Console.Clear();
             return null;
         }

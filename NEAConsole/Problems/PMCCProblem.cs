@@ -16,7 +16,7 @@ internal class PMCCProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.ReadDouble(startingNum: (oldAnswer as DoubleAnswer)?.Answer, ct: ct);
+        var answer = InputMethods.ReadDouble(startingNum: (oldAnswer as DoubleAnswer)?.Answer, ct: ct);
 
         return new DoubleAnswer(answer);
     }

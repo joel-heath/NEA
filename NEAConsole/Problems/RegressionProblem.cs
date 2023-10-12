@@ -19,7 +19,7 @@ internal class RegressionProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = UIMethods.ReadDoubles(solutionNames, startingVals: (oldAnswer as ManyAnswer<double>)?.Answer, ct: ct);
+        var answer = InputMethods.ReadDoubles(solutionNames, startingVals: (oldAnswer as ManyAnswer<double>)?.Answer, ct: ct);
 
         return new ManyAnswer<double>(answer);
     }

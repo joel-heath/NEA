@@ -18,7 +18,7 @@ public class StudyTimer
 
             var affirmation = Task.Run(() =>
             {
-                try { UIMethods.Wait("Press any key to skip the break.", cts.Token); }
+                try { InputMethods.Wait("Press any key to skip the break.", cts.Token); }
                 catch (KeyNotFoundException) { }
                 finally { cts.Cancel(); }
             });

@@ -17,6 +17,22 @@ internal class PMCCProblemGenerator : IProblemGenerator
         return new PMCCProblem(sealedData, new Regression(sealedData).PMCC());
     }
 
+    public static IEnumerable<(double, double)> GenerateData(IRandom random, int n)
+    {
+        int m = random.NextNotZero(-10, 13), c = random.NextNotZero(-5, 6), leniency = random.Next(2, 4);
+
+        for (int i = 0; i < n; i++)
+        {
+            int x = random.Next(-10, 13);
+            int y = m * i + c;
+            int offset = (int)Math.Round(random.NextDouble() * random.Next(1, leniency));
+
+            y += (random.NextDouble() < 0.5 ? -1 : 1) * offset;
+
+            yield return (x, y);
+        }
+    }
+
     public PMCCProblemGenerator() : this(new Random()) { }
     public PMCCProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

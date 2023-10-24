@@ -10,13 +10,13 @@ internal class MatricesMultiplicationProblem : IProblem
 
     public void Display()
     {
-        InputMethods.DrawMatrix(mat1);
+        UIMethods.DrawMatrix(mat1);
 
         var signSpacing = (mat1.Rows - 1) / 2;
         Console.CursorTop += signSpacing;
         Console.Write($" x ");
         Console.CursorTop -= signSpacing;
-        InputMethods.DrawMatrix(mat2);
+        UIMethods.DrawMatrix(mat2);
 
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
@@ -34,7 +34,7 @@ internal class MatricesMultiplicationProblem : IProblem
     public void DisplayAnswer(IAnswer answer)
     {
         var mat = (answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer;
-        InputMethods.DrawMatrix(mat, false);
+        UIMethods.DrawMatrix(mat, false);
         Console.CursorTop += Math.Max(mat1.Columns, mat2.Columns) - mat.Columns;
         Console.WriteLine();
     }
@@ -59,7 +59,7 @@ internal class MatricesMultiplicationProblem : IProblem
                 Console.WriteLine();
             }
             Console.WriteLine("Incorrect. The correct answer was: ");
-            InputMethods.DrawMatrix(solution, false);
+            UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
     }

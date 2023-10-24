@@ -9,7 +9,7 @@ internal class MatricesInversionProblem : IProblem
 
     public void Display()
     {
-        InputMethods.DrawMatrix(mat);
+        UIMethods.DrawMatrix(mat);
 
         var signSpacing = (mat.Rows - 1) / 2;
 
@@ -29,7 +29,7 @@ internal class MatricesInversionProblem : IProblem
 
     public void DisplayAnswer(IAnswer answer)
     {
-        InputMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer, false);
+        UIMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer, false);
         Console.WriteLine();
     }
 
@@ -53,7 +53,7 @@ internal class MatricesInversionProblem : IProblem
                 Console.WriteLine();
             }
             Console.WriteLine("Incorrect. The correct answer was: ");
-            InputMethods.DrawMatrix(solution, false);
+            UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
     }

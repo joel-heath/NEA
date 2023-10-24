@@ -8,7 +8,7 @@ public class Exam
     private readonly RandomProblemGenerator gen;
     private readonly List<(IProblem problem, IAnswer? answer)> attempts;
 
-    public void Begin(StudyTimer timer) // OR COULD USE
+    async public Task Begin(StudyTimer studyTimer)
     {
         var cts = new CancellationTokenSource();
         var timeRemaining = TimeSpan.FromSeconds(totalSeconds);
@@ -19,26 +19,25 @@ public class Exam
 
         var exam = Task.Run(() =>
         {
-            try { UseExam(cts, timer); }
-            catch (KeyNotFoundException) {  } // if user is typing but exam timer runs out, then can early exit this way
-            catch (EscapeException) { cts.Cancel(); return false; }
-            cts.Cancel();
+            try { UseExam(cts, studyTimer); }
+            catch (KeyNotFoundException) { } // if user is typing but exam timer runs out, then can early exit this way
+            catch (EscapeException) { return false; }
             return true;
         });
-        Task.Run(() => WriteTimer(timeRemaining));
+        var examTimer = Task.Delay(timeRemaining, cts.Token);
+        var timeRemainingWriter = new Timer((_) => {
+            timeRemaining -= second;            
+            WriteTimer(timeRemaining);
+        }, null, second, second);
 
-        while (!cts.Token.IsCancellationRequested && (timeRemaining > TimeSpan.Zero || timeRemaining.Seconds > 0)) // do our actual calculation for whether time is up based on datetimes, more accurately
-        {
-            Thread.Sleep(second);
-            timeRemaining -= second;
-            Task.Run(() => WriteTimer(timeRemaining));
-        }
-
+        await Task.WhenAny(exam, examTimer);
         cts.Cancel();
-        if (!exam.Result) throw new EscapeException();
 
-        while (!exam.IsCompletedSuccessfully) { }
+        timeRemainingWriter.Dispose();
+        await exam;
+        if (!exam.Result) throw new EscapeException();
         exam.Dispose();
+        examTimer.Dispose();
 
         Console.Clear();
         Console.WriteLine($"Exam complete.");
@@ -46,7 +45,7 @@ public class Exam
         InputMethods.Wait();
         Console.Clear();
 
-        Review(timer);
+        Review(studyTimer);
     }
 
     public static void WriteTimer(TimeSpan remaining)
@@ -80,7 +79,7 @@ public class Exam
                     var choice = Menu.ExamMenu(new string[] { "<-", $"Question {question}/{questionCount}", "->" }, question, cts.Token);
                     question += choice;
                 }
-                catch (EscapeException e)
+                catch (EscapeException)
                 {
                     var now = DateTime.Now;
                     Console.Clear();
@@ -88,7 +87,7 @@ public class Exam
                     if (Menu.Affirm(cts.Token))
                     {
                         timer.TimeSinceLastBreak += now - start;
-                        throw e;
+                        throw;
                     }
                 }
             }
@@ -135,7 +134,7 @@ public class Exam
                 var choice = Menu.ExamMenu(new string[] { "<-", $"Question {question}/{questionCount}", "->" }, question);
                 question += choice;
             }
-            catch (EscapeException e)
+            catch (EscapeException)
             {
                 var now = DateTime.Now;
                 Console.Clear();
@@ -143,7 +142,7 @@ public class Exam
                 if (Menu.Affirm())
                 {
                     timer.TimeSinceLastBreak += now - start;
-                    throw e;
+                    throw;
                 }
             }
 

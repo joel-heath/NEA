@@ -10,13 +10,13 @@ internal class MatricesAdditionProblem : IProblem
 
     public void Display()
     {
-        InputMethods.DrawMatrix(mat1);
+        UIMethods.DrawMatrix(mat1);
 
         var signSpacing = (mat1.Rows - 1) / 2;
         Console.CursorTop += signSpacing;
         Console.Write($" {operand} ");
         Console.CursorTop -= signSpacing;
-        InputMethods.DrawMatrix(mat2);
+        UIMethods.DrawMatrix(mat2);
 
         Console.CursorTop += signSpacing;
         Console.Write($" = ");
@@ -32,7 +32,7 @@ internal class MatricesAdditionProblem : IProblem
 
     public void DisplayAnswer(IAnswer answer)
     {
-        InputMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer, false);
+        UIMethods.DrawMatrix((answer as MatrixAnswer ?? throw new InvalidOperationException()).Answer, false);
         Console.WriteLine();
     }
     public bool EvaluateAnswer(IAnswer answer)
@@ -55,7 +55,7 @@ internal class MatricesAdditionProblem : IProblem
                 Console.WriteLine();
             }
             Console.WriteLine("Incorrect. The correct answer was: ");
-            InputMethods.DrawMatrix(solution, false);
+            UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
     }

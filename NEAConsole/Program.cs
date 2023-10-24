@@ -182,15 +182,14 @@ internal class Program
         }
         profiles.Add(("New profile", null));
 
-        if (profiles.Count == 1)
-            return null;
-        else
-        {
-            Console.WriteLine("Choose an exam profile.");
-            var choice = profiles[Menu.Choose(profiles.Select(p => (MenuOption)(p.name, null!)).ToArray())].exam;
-            Console.CursorTop += profiles.Count;
-            return choice;
-        }
+        if (profiles.Count == 1) return null;
+        
+        Console.WriteLine("Choose an exam profile.");
+        var choice = profiles[Menu.Choose(profiles.Select(p => (MenuOption)(p.name, null!)).ToArray())].exam;
+        Console.CursorTop += profiles.Count;
+        Console.WriteLine();
+
+        return choice;
     }
 
     static void MockExam(Context context)
@@ -217,9 +216,20 @@ internal class Program
                 br.Write(questionCount);
                 br.Write(JsonSerializer.Serialize(chosenKnowledge.Children));
             }
+
+            Console.WriteLine();
         }
         
-        exam.Begin(context.Timer);
+        var t = exam.Begin(context.Timer);
+        try
+        {
+            t.Wait();
+        }
+        catch (AggregateException ex)
+        {
+            if (ex.InnerException is null) throw;
+            throw ex.InnerException;
+        }
 
         if (context.Timer.TimeForBreak) context.Timer.UseBreak();
     }

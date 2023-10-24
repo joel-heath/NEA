@@ -49,7 +49,7 @@ public static class InputMethods
         Func<string, double> parser = double.Parse;
         var opts = new ReadValuesOptions() { DoubleRules = true, NewLine = newLine };
 
-        return ReadValues(prompts, validChars, parser, vals, ct);
+        return ReadValues(prompts, validChars, parser, vals, ct, opts);
     }
 
     public static int[] ReadInts(string[] prompts, int[]? startingVals = null, bool natural = true, bool newLine = true, CancellationToken? ct = null)
@@ -59,7 +59,7 @@ public static class InputMethods
         Func<string, int> parser = int.Parse;
         var opts = new ReadValuesOptions() { IntRules = !natural, NewLine = newLine };
 
-        return ReadValues(prompts, validChars, parser, vals, ct);
+        return ReadValues(prompts, validChars, parser, vals, ct, opts);
     }
 
     private static T[] ReadValues<T>(string[] prompts, char[] validChars, Func<string, T> parser, string[]? startingVals = null, CancellationToken? ct = null, ReadValuesOptions options = default)
@@ -69,17 +69,19 @@ public static class InputMethods
         T[]? outputs = null;
 
         int x = uInputs[0].Length, y = 0;
-        int indent = Console.CursorTop;
+        int yIndent = Console.CursorTop;
+        int xIndent = Console.CursorLeft;
 
-        foreach (var p in prompts)
+        for (int i = 0; i < prompts.Length; i++)
         {
-            Console.WriteLine(p + " = ");
+            if (prompts[i] == string.Empty) continue;
+            Console.WriteLine(prompts[i] += " = ");
         }
 
         while (entering)
         {
-            Console.CursorTop = indent + y;
-            Console.CursorLeft = prompts[y].Length + 3 + x;
+            Console.CursorTop = yIndent + y;
+            Console.CursorLeft = xIndent + prompts[y].Length + x;
 
             var k = ReadKey(true, ct);
 
@@ -164,7 +166,8 @@ public static class InputMethods
                     break;
             }
         }
-        Console.CursorTop = indent + prompts.Length + 1;
+        Console.CursorTop = yIndent + prompts.Length;
+
         if (options.NewLine) Console.WriteLine();
 
         return outputs!;

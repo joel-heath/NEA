@@ -25,7 +25,15 @@ internal class RegressionProblem : IProblem
     }
 
     public void DisplayAnswer(IAnswer answer)
-        => Console.WriteLine((answer as ManyAnswer<double> ?? throw new InvalidOperationException()).Answer);
+    {
+        var ans = (answer as ManyAnswer<double> ?? throw new InvalidOperationException()).Answer;
+        if (ans.Length != solutionNames.Length) throw new InvalidOperationException();
+
+        for (int i = 0; i < ans.Length; i++)
+        {
+            Console.WriteLine($"{solutionNames[i]} = {ans[i]}");
+        }
+    }
 
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as ManyAnswer<double> ?? throw new InvalidOperationException()).Answer.Select((d, i) =>(d, i)).All((t) => t.d == Math.Round(solution[t.i], 3, MidpointRounding.AwayFromZero));

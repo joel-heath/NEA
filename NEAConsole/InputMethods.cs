@@ -64,6 +64,7 @@ public static class InputMethods
 
     private static T[] ReadValues<T>(string[] prompts, char[] validChars, Func<string, T> parser, string[]? startingVals = null, CancellationToken? ct = null, ReadValuesOptions options = default)
     {
+        prompts = prompts.ToArray(); // NOT PURE
         bool entering = true;
         string[] uInputs = startingVals is null ? Enumerable.Repeat(string.Empty, prompts.Length).ToArray() : startingVals.ToArray();
         T[]? outputs = null;

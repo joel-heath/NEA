@@ -1,4 +1,6 @@
-﻿using System.Runtime.Versioning;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading.Tasks.Dataflow;
 
 namespace NEAConsole;
@@ -86,8 +88,20 @@ public static class Console
     public static int WindowHeight => System.Console.WindowHeight;
     public static bool KeyAvailable => System.Console.KeyAvailable;
 
-    [SupportedOSPlatform("windows")]
-    public static bool CursorVisible { get => System.Console.CursorVisible; set => System.Console.CursorVisible = value; }
+    public static bool CursorVisible
+    {
+        get
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return System.Console.CursorVisible;
+            return false;
+        }
+        set
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                System.Console.CursorVisible = value;
+        }
+    }
 
     public static ConsoleKeyInfo ReadKey(bool intercept) => System.Console.ReadKey(intercept);
 

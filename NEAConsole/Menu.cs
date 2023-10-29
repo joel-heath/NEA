@@ -84,7 +84,12 @@ internal static class Menu
         while (choosing)
         {
             var changed = false;
-            ConsoleKey key = InputMethods.ReadKey(true, ct).Key;
+            var keyInfo = InputMethods.ReadKey(true, ct);
+            var key = keyInfo.Key;
+            if (key == ConsoleKey.Tab)
+            {
+                key = keyInfo.Modifiers == ConsoleModifiers.Shift ? ConsoleKey.UpArrow : ConsoleKey.DownArrow;
+            }
             switch (key)
             {
                 case ConsoleKey.UpArrow:

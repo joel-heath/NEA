@@ -139,6 +139,25 @@ public static class InputMethods
                     }
                     break;
 
+                case ConsoleKey.Tab:
+                    if (k.Modifiers == ConsoleModifiers.Shift)
+                    {
+                        if (y > 0)
+                        {
+                            y--;
+                            x = Math.Min(x, uInputs[y].Length);
+                        }
+                    }
+                    else
+                    {
+                        if (y < uInputs.Length - 1)
+                        {
+                            y++;
+                            x = Math.Min(x, uInputs[y].Length);
+                        }
+                    }
+                    break;
+
                 case ConsoleKey.Escape:
                     throw new EscapeException();
 
@@ -287,9 +306,17 @@ public static class InputMethods
 
                 case ConsoleKey.Tab:
                 case ConsoleKey.Spacebar:
-                    if (x < cols - 1) x++;
-                    else if (y < rows - 1) (x, y) = (0, y + 1);
-                    else entering = false;
+                    if (key.Modifiers == ConsoleModifiers.Shift)
+                    {
+                        if (x > 0) x--;
+                        else if (y > 0) (x, y) = (cols - 1, y - 1);
+                    }
+                    else
+                    {
+                        if (x < cols - 1) x++;
+                        else if (y < rows - 1) (x, y) = (0, y + 1);
+                        else entering = false;
+                    }
                     break;
 
                 case ConsoleKey.Enter:

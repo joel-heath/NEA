@@ -1,5 +1,4 @@
 ﻿using NEAConsole.Matrices;
-using System;
 
 namespace NEAConsole.Problems;
 internal class MatricesInversionProblem : IProblem

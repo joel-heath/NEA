@@ -12,6 +12,11 @@ public class DoubleAnswer : IAnswer
     public double Answer { get; set; }
     public DoubleAnswer(double answer) { Answer = answer; }
 }
+public class StringAnswer : IAnswer
+{
+    public string Answer { get; set; }
+    public StringAnswer(string answer) { Answer = answer; }
+}
 public class MatrixAnswer : IAnswer
 {
     public Matrix Answer { get; set; }

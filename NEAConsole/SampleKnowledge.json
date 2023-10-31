@@ -38,5 +38,22 @@
   {
     "name": "Simplex",
     "weight": 5
+  },
+  {
+    "name": "Statistics",
+    "children": [
+      {
+        "name": "PMCC",
+        "weight": 1
+      },
+      {
+        "name": "Regression",
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "name": "RPN",
+    "weight": 2
   }
 ]

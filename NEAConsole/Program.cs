@@ -109,7 +109,10 @@ internal class Program
 
     static void CSciMenu(Context context)
     {
+        IProblemGenerator[] options = { new RPNProblemGenerator() };
 
+        Menu.ExecuteMenu(options, "Choose a subject to revise", context);
+        Console.Clear();
     }
 
     static void TopicMenu(Context context)
@@ -118,7 +121,7 @@ internal class Program
         {
             ("Maths", MathsMenu),
             ("Further Maths", FMathsMenu),
-            ("Computer Science", CSciMenu),
+            ("Computer Science", CSciMenu)
         };
 
         Menu.ExecuteMenu(options, "Select a topic to revise", context);

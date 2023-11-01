@@ -14,11 +14,14 @@ internal class RPNProblemGenerator : IProblemGenerator
     {
         StringBuilder infix = new();
 
-        for (int i = 0; i < 2 * random.Next(2, 4) + 1; i++)
+        var tokens = 2 * random.Next(2, 4);
+        int digits;
+        for (int i = 0; i < tokens; i++)
         {
             if (i % 2 == 0)
             {
-                for (int j = 0; j < random.Next(1,2); j++)
+                digits = random.NextDouble() < 0.7 ? 1 : 2;
+                for (int j = 0; j < digits; j++)
                 {
                     infix.Append(random.Next(0, 10));
                 }
@@ -31,7 +34,8 @@ internal class RPNProblemGenerator : IProblemGenerator
             infix.Append(' ');
         }
 
-        for (int j = 0; j < random.Next(0, 2); j++)
+        digits = random.NextDouble() < 0.7 ? 1 : 2;
+        for (int j = 0; j < digits; j++)
         {
             infix.Append(random.Next(0, 10));
         }

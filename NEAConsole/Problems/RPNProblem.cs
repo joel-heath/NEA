@@ -14,7 +14,7 @@ internal class RPNProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = InputMethods.ReadLine(startingInput: (oldAnswer as StringAnswer)?.Answer, ct: ct).Trim().Replace('*', '×').Replace('/', '÷');
+        var answer = InputMethods.ReadLine(startingInput: (oldAnswer as StringAnswer)?.Answer, ct: ct).Trim().Replace('*', '×').Replace('x', '×').Replace('/', '÷');
 
         return new StringAnswer(answer);
     }

@@ -8,7 +8,8 @@ internal class Chi2Problem : IProblem
 
     public void Display()
     {
-        Console.WriteLine("Find the chi-squared test statistic for the following observed frequencies to 3 d.p." + Environment.NewLine);
+        Console.WriteLine("Find the chi-squared test statistic for the following observed frequencies to 3 d.p.");
+        Console.WriteLine("You do not need to merge classes with expected frequencies that are less than 5." + Environment.NewLine);
 
         UIMethods.DrawMatrix(data, resetY: false);
 

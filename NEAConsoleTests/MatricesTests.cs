@@ -13,7 +13,7 @@ public class MatricesTests
         => new(new int[] { mat1.Rows, mat1.Columns }.Concat(mat1.Select(i => (int)i)).Append(mat2.Columns).Concat(mat1.Select(i => (int)i)));
 
     private static FakeRandom MatrixDeterminantDataStreamGenerator(Matrix mat)
-    => new(new int[] { mat.Rows, mat.Columns }.Concat(mat.Select(i => (int)i)));
+        => new(new int[] { mat.Rows, mat.Columns }.Concat(mat.Select(i => (int)i)));
 
     [Test]
     public void AdditionTest()
@@ -64,28 +64,4 @@ public class MatricesTests
         Assert.That(TestHelpers.GenericTest(new MatricesDeterminantsProblemGenerator(MatrixDeterminantDataStreamGenerator(mat)), new IntAnswer(answer)));
         Assert.Pass();
     }
-
-    [Test]
-    public void InversionTest2x2()
-    {
-        var mat = new Matrix(new double[,]
-        {
-            { 8, 3 },
-            { 5, 2 }
-        });
-        var answer = new Matrix(new double[,] { { 2, -3 }, { -5, 8 } });
-
-        //Assert.That(TestHelpers.GenericTest(new MatricesInversionProblemGenerator(new(1234)), new MatrixAnswer(answer)));
-        Assert.Pass();
-
-        // [8 3]
-        // [5 2]
-    }
 }
-
-
-    /*
-     var pg = new ProblemGenerator(new(1234));
-     var kn = Skill.KnowledgeConstructor("SampleKnowledge.json");
-     var p = pg.Generate(kn);
-    */

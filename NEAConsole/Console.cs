@@ -1,18 +1,10 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using System.Threading.Tasks.Dataflow;
+﻿using System.Runtime.InteropServices;
 
 namespace NEAConsole;
-public record struct ConsoleMessage(string? Value, int Left, int Top, ConsoleColor ForegroundColor, ConsoleColor BackgroundColor, BufferBlock<byte>? BB, bool Pure = false, bool ClearRequested = false)
-{
-
-}
 
 public static class Console
 {
     private static readonly object lockObj = new();
-    //private static readonly BufferBlock<ConsoleMessage> bufferBlock = new();
 
     // utilising these properties rely on trusting that ALL OTHER THREADS are entirely pure
     public static int CursorLeft

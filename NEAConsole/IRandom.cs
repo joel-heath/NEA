@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NEAConsole;
+﻿namespace NEAConsole;
 public interface IRandom
 {
     int Next();

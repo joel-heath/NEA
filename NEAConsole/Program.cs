@@ -109,7 +109,7 @@ internal class Program
 
     static void CSciMenu(Context context)
     {
-        IProblemGenerator[] options = { new RPNProblemGenerator() };
+        IProblemGenerator[] options = { new RPNProblemGenerator(), new QuicksortProblemGenerator(), new MergeSortProblemGenerator(), new BubbleSortProblemGenerator() };
 
         Menu.ExecuteMenu(options, "Choose a subject to revise", context);
         Console.Clear();

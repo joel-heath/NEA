@@ -193,6 +193,104 @@ public static class InputMethods
         return outputs!;
     }
 
+    public static List<int> ReadList(string? startingVal = null, CancellationToken? ct = null, ReadValuesOptions options = default)
+    {
+        var entering = true;
+        var uInput = startingVal is null ? string.Empty : startingVal;
+        List<int>? output = null;
+
+        int x = uInput.Length, y = 0;
+        int yIndent = Console.CursorTop;
+        int xIndent = Console.CursorLeft;
+
+        while (entering)
+        {
+            Console.CursorTop = yIndent + y;
+            Console.CursorLeft = xIndent + x;
+
+            var k = ReadKey(true, ct);
+
+            if ('0' <= k.KeyChar && k.KeyChar <= '9' || k.KeyChar == ' ')
+            {
+                Console.Write(k.KeyChar);
+                Console.Write(uInput[x..]);
+                uInput = uInput[..x] + k.KeyChar + uInput[x..];
+                x++;
+                continue;
+            }
+            switch (k.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (x > 0) x--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (x < uInput.Length) x++;
+                    break;
+                case ConsoleKey.Home:
+                    x = 0;
+                    break;
+                case ConsoleKey.End:
+                    x = uInput.Length;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (x < uInput.Length)
+                    {
+                        Console.Write(uInput[(x + 1)..] + ' ');
+                        uInput = uInput[..x] + uInput[(x + 1)..];
+                    }
+                    break;
+                case ConsoleKey.Backspace:
+                    if (x > 0)
+                    {
+                        Console.CursorLeft--;
+                        Console.Write(uInput[x--..] + ' ');
+                        uInput = uInput[..x] + uInput[(x + 1)..];
+                    }
+                    break;
+
+                case ConsoleKey.Tab:
+                    if (k.Modifiers == ConsoleModifiers.Shift)
+                    {
+                        if (y > 0)
+                        {
+                            y--;
+                            x = Math.Min(x, uInput.Length);
+                        }
+                    }
+                    else
+                    {
+                        if (y < uInput.Length - 1)
+                        {
+                            y++;
+                            x = Math.Min(x, uInput.Length);
+                        }
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    throw new EscapeException();
+
+                case ConsoleKey.Enter:
+                    try
+                    {
+                        output = uInput.Split(' ').Where(i => i != string.Empty).Select(int.Parse).ToList();
+                    }
+                    catch (OverflowException) { output = null; } // number too massive
+                    catch (FormatException) { output = null; } // they put two decimal points or an f etc
+
+                    if (output is not null)
+                        entering = false;
+
+                    break;
+            }
+        }
+
+        if (options.NewLine) Console.WriteLine();
+
+        return output!;
+    }
+
     public static string ReadLine(bool newLine = true, string? startingInput = null, CancellationToken? ct = null)
     {
         bool entering = true;

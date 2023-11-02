@@ -26,11 +26,11 @@
     "name": "Graphs",
     "children": [
       {
-        "name": "Prims",
+        "name": "Prim's",
         "weight": 4
       },
       {
-        "name": "Dijkstras",
+        "name": "Dijkstra's",
         "weight": 4
       }
     ]
@@ -48,6 +48,23 @@
       },
       {
         "name": "Regression",
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "name": "Sorting",
+    "children": [
+      {
+        "name": "Quicksort",
+        "weight": 2
+      },
+      {
+        "name": "Merge Sort",
+        "weight": 2
+      },
+      {
+        "name": "Bubble Sort",
         "weight": 2
       }
     ]

@@ -22,7 +22,7 @@ internal class PMCCProblem : IProblem
     }
 
     public void DisplayAnswer(IAnswer answer)
-        => Console.WriteLine((answer as IntAnswer ?? throw new InvalidOperationException()).Answer);
+        => Console.WriteLine((answer as DoubleAnswer ?? throw new InvalidOperationException()).Answer);
 
     public bool EvaluateAnswer(IAnswer answer)
         => (answer as DoubleAnswer ?? throw new InvalidOperationException()).Answer == Math.Round(solution, 3, MidpointRounding.AwayFromZero);

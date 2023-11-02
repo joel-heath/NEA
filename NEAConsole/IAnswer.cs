@@ -22,15 +22,15 @@ public class MatrixAnswer : IAnswer
     public Matrix Answer { get; set; }
     public MatrixAnswer(Matrix answer) { Answer = answer; }
 }
+public class IntArrayAnswer : IAnswer
+{
+    public int[] Answer { get; set; }
+    public IntArrayAnswer(int[] answer) { Answer = answer; }
+}
 public class PrimsAnswer : IAnswer
 {
     public HashSet<(int row, int col)> Answer { get; set; }
     public PrimsAnswer(HashSet<(int row, int col)> answer) { Answer = answer; }
-}
-public class SimplexAnswer : IAnswer
-{
-    public int[] Answer { get; set; }
-    public SimplexAnswer(int[] answer) { Answer = answer; }
 }
 public class ManyAnswer<T> : IAnswer
 {

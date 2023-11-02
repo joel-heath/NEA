@@ -19,7 +19,7 @@ internal class SimplexProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null) // would be nice to be able to navigate up and down like in a matrix
     {
-        var answer = oldAnswer as SimplexAnswer ?? new SimplexAnswer(new int[solution.Length + 1]);
+        var answer = oldAnswer as IntArrayAnswer ?? new IntArrayAnswer(new int[solution.Length + 1]);
 
         string[] rawNums;
         if (oldAnswer is null)
@@ -115,7 +115,7 @@ internal class SimplexProblem : IProblem
         Console.WriteLine();
 
         // constant term is entered by user first, but is in array last... sighhhh
-        return new SimplexAnswer(rawNums.Skip(1).Select(int.Parse).Append(int.Parse(rawNums.First())).ToArray());
+        return new IntArrayAnswer(rawNums.Skip(1).Select(int.Parse).Append(int.Parse(rawNums.First())).ToArray());
     }
 
     private static void DisplayFirstAnswer(int count)
@@ -130,7 +130,7 @@ internal class SimplexProblem : IProblem
 
     public void DisplayAnswer(IAnswer answer)
     {
-        var attempt = (answer as SimplexAnswer ?? throw new InvalidOperationException()).Answer;
+        var attempt = (answer as IntArrayAnswer ?? throw new InvalidOperationException()).Answer;
         Console.WriteLine("P = " + attempt[^1]);
         for (int i = 0; i < attempt.Length - 1; i++)
         {
@@ -140,7 +140,7 @@ internal class SimplexProblem : IProblem
 
     public bool EvaluateAnswer(IAnswer answer)
     {
-        var attempt = (answer as SimplexAnswer ?? throw new InvalidOperationException()).Answer;
+        var attempt = (answer as IntArrayAnswer ?? throw new InvalidOperationException()).Answer;
         return attempt[solution.Length] == objective.Constant
                && !attempt.Take(solution.Length - 1).Where((n, i) => n != solution[i]).Any(); // Why not just attempt.All()? Because it doesn't have an (item, index) overload
     }

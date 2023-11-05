@@ -202,8 +202,8 @@ public class Exam
     public Exam(Skill knowledge, int questions)
     {
         questionCount = questions;
-        gen = new RandomProblemGenerator();
-        attempts = Enumerable.Range(0, questionCount).Select(i => ((IProblem problem, IAnswer? answer))(gen.Generate(knowledge), null)).ToList();
+        gen = new RandomProblemGenerator(knowledge);
+        attempts = Enumerable.Range(0, questionCount).Select(i => ((IProblem problem, IAnswer? answer))(gen.Generate(), null)).ToList();
         question = 1;
         totalSeconds = 120 * questionCount; // multiply each problem by its weight, however there is no link between problem and problem generator (and hence skill path...)
     }

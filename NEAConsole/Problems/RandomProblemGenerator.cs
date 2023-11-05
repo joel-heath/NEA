@@ -1,23 +1,14 @@
 ﻿namespace NEAConsole.Problems;
-internal class RandomProblemGenerator : IProblemGenerator
+public class RandomProblemGenerator
 {
-    public string DisplayText => "Random Questions";
-    public string SkillPath => "-"; // special symbol for not a valid ProblemGenerator to randomly select
     private readonly IRandom random;
+    private readonly Skill knowledge;
+    private readonly IReadOnlyList<IProblemGenerator> problemGenerators;
 
-    public IProblem Generate(Skill knowledge)
-    {
-        var generators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
-                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
-                            .Where(g => knowledge.Query(g.SkillPath, out _) && g.SkillPath != SkillPath).ToArray();
+    private static double GetScore(Skill skill)
+       => (double)(skill.TotalCorrect + 1) / (skill.TotalAttempts + 5) * (skill.LastRevised - new DateTime(2023, 1, 1)).TotalMinutes;
 
-        return generators[random.Next(generators.Length)].Generate(knowledge);
-    }
-
-    public static double GetScore(Skill skill)
-        => (double)(skill.TotalCorrect + 1) / (skill.TotalAttempts+5) * (skill.LastRevised - new DateTime(2023, 1, 1)).TotalMinutes;
-
+    // public for unit testing
     public IProblemGenerator GetNextBestPG(IList<(IProblemGenerator pg, Skill s)> skills)
     {
         IProblemGenerator minPG = skills.First().pg;
@@ -38,19 +29,25 @@ internal class RandomProblemGenerator : IProblemGenerator
         return minPG;
     }
 
-    public IProblem GenerateNextBest(Skill knowledge)
+    public (IProblem problem, string skillPath) GenerateNextBest()
     {
-        var generators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
-                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
-                            .Where(g => knowledge.Query(g.SkillPath, out _) && g.DisplayText != DisplayText).ToArray();
-
         //                                                                                              not sure if this where is needed    select is just to stop compiler whining
-        var skills = generators.Select(g => knowledge.Query(g.SkillPath, out Skill? s) ? (g, s) : (g, s)).Where(t => t.s is not null).Select(t => (t.g, t.s!)).ToList();
+        var skills = problemGenerators.Select(g => knowledge.Query(g.SkillPath, out Skill? s) ? (g, s) : (g, s)).Where(t => t.s is not null).Select(t => (t.g, t.s!)).ToList();
+        var gen = GetNextBestPG(skills);
 
-        return GetNextBestPG(skills).Generate(knowledge);
+        return (GetNextBestPG(skills).Generate(knowledge), gen.SkillPath);
     }
 
-    public RandomProblemGenerator() : this(new Random()) { }
-    public RandomProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
+    public IProblem Generate() => problemGenerators[random.Next(problemGenerators.Count)].Generate(knowledge);
+
+    public RandomProblemGenerator(Skill knowledge) : this(knowledge, new Random()) { }
+    public RandomProblemGenerator(Skill knowledge, IRandom randomNumberGenerator)
+    {
+        random = randomNumberGenerator;
+        this.knowledge = knowledge;
+        problemGenerators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
+                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
+                            .Where(g => knowledge.Query(g.SkillPath, out _)).ToList();
+    }
 }

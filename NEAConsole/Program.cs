@@ -132,14 +132,14 @@ internal class Program
     {
         if (!TryUpdateKnowledge(context.Knowledge)) return;
 
-        var gen = new RandomProblemGenerator();
+        var gen = new RandomProblemGenerator(context.Knowledge);
         bool @continue = true;
         while (@continue)
         {
             bool correct;
             var start = DateTime.Now;
 
-            var problem = gen.GenerateNextBest(context.Knowledge);
+            (var problem, var skillPath) = gen.GenerateNextBest();
             problem.Display();
 
             try
@@ -154,12 +154,10 @@ internal class Program
             {
                 context.Timer.TimeSinceLastBreak += DateTime.Now - start;
                 Console.Clear();
-                @continue = false;
                 return;
             }
 
-            // this is very inefficient
-            context.Knowledge.Query(((IProblemGenerator)Activator.CreateInstance(Assembly.GetExecutingAssembly().GetTypes().First(t => t.Name == problem.GetType().Name + "Generator"))!).SkillPath, out Skill? skill);
+            context.Knowledge.Query(skillPath, out Skill? skill); // ((IProblemGenerator)Activator.CreateInstance(Assembly.GetExecutingAssembly().GetTypes().First(t => t.Name == problem.GetType().Name + "Generator"))!).SkillPath, out Skill? skill);
             (skill ?? throw new Exception()).LastRevised = DateTime.Now;
             if (correct) skill.TotalCorrect++;
             skill.TotalAttempts++;

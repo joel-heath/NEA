@@ -22,11 +22,6 @@ public class MatrixAnswer : IAnswer
     public Matrix Answer { get; set; }
     public MatrixAnswer(Matrix answer) { Answer = answer; }
 }
-public class IntArrayAnswer : IAnswer
-{
-    public int[] Answer { get; set; }
-    public IntArrayAnswer(int[] answer) { Answer = answer; }
-}
 public class PrimsAnswer : IAnswer
 {
     public HashSet<(int row, int col)> Answer { get; set; }

@@ -15,17 +15,17 @@ internal class SortingProblem : IProblem
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null)
     {
-        var answer = InputMethods.ReadList(startingVal: oldAnswer is IntArrayAnswer oldAns ? string.Join(' ', oldAns.Answer) : string.Empty, ct: ct, options: new ReadValuesOptions { NewLine = true });
+        var answer = InputMethods.ReadList(startingVal: oldAnswer is ManyAnswer<int> oldAns ? string.Join(' ', oldAns.Answer) : string.Empty, ct: ct, options: new ReadValuesOptions { NewLine = true });
 
-        return new IntArrayAnswer(answer.ToArray());
+        return new ManyAnswer<int>(answer.ToArray());
     }
 
     public void DisplayAnswer(IAnswer answer)
-        => Console.WriteLine(string.Join(' ', (answer as IntArrayAnswer ?? throw new InvalidOperationException()).Answer));
+        => Console.WriteLine(string.Join(' ', (answer as ManyAnswer<int> ?? throw new InvalidOperationException()).Answer));
 
     public bool EvaluateAnswer(IAnswer answer)
     {
-        return (answer as IntArrayAnswer ?? throw new InvalidOperationException()).Answer.Select((x, i) => x == solution[i]).All(b => b);
+        return (answer as ManyAnswer<int> ?? throw new InvalidOperationException()).Answer.Select((x, i) => x == solution[i]).All(b => b);
     }
 
     public void Summarise(IAnswer? answer)

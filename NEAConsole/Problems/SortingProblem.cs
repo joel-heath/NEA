@@ -1,5 +1,6 @@
 ﻿namespace NEAConsole.Problems;
-internal class SortingProblem : IProblem
+
+public class SortingProblem : IProblem
 {
     private readonly int[] data, solution;
     private readonly SortType sortingAlgorithm;

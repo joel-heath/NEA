@@ -1,5 +1,6 @@
 ﻿namespace NEAConsole.Problems;
-internal class RPNProblem : IProblem
+
+public class RPNProblem : IProblem
 {
     private readonly string infix, postfix;
 

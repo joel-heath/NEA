@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole.Matrices;
+
 public static class MatrixUtils
 {
     static (double val, int row, int col) MinValue(Matrix m, HashSet<int> availableRows, HashSet<int> availableCols)

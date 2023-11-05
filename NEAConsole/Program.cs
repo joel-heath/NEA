@@ -1,11 +1,11 @@
 ﻿using NEAConsole.Problems;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 [assembly: InternalsVisibleTo("NEAConsoleTests")]
 
 namespace NEAConsole;
+
 internal class Program
 {
     private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",

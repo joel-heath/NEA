@@ -1,16 +1,8 @@
-﻿using System.ComponentModel;
+﻿namespace NEAConsole.Problems;
 
-namespace NEAConsole.Problems;
-internal enum SortType
-{
-    [Description("Quicksort")]
-    Quicksort,
-    [Description("Merge Sort")]
-    MergeSort,
-    [Description("Bubble Sort")]
-    BubbleSort
-};
-internal class SortingProblemGenerator
+public enum SortType { Quicksort, MergeSort, BubbleSort }
+
+public class SortingProblemGenerator
 {
     private readonly IRandom random;
     private readonly SortType sortType;
@@ -39,7 +31,7 @@ internal class SortingProblemGenerator
         => (random, this.sortType) = (randomNumberGenerator, sortType);
 }
 
-internal class QuicksortProblemGenerator : SortingProblemGenerator, IProblemGenerator
+public class QuicksortProblemGenerator : SortingProblemGenerator, IProblemGenerator
 {
     public string DisplayText => "Quicksort";
     public string SkillPath => "Sorting.Quicksort";
@@ -48,7 +40,7 @@ internal class QuicksortProblemGenerator : SortingProblemGenerator, IProblemGene
     public QuicksortProblemGenerator(IRandom randomNumberGenerator) : base(randomNumberGenerator, SortType.Quicksort) { }
 }
 
-internal class MergeSortProblemGenerator : SortingProblemGenerator, IProblemGenerator
+public class MergeSortProblemGenerator : SortingProblemGenerator, IProblemGenerator
 {
     public string DisplayText => "Merge Sort";
     public string SkillPath => "Sorting.Merge Sort";
@@ -57,7 +49,7 @@ internal class MergeSortProblemGenerator : SortingProblemGenerator, IProblemGene
     public MergeSortProblemGenerator(IRandom randomNumberGenerator) : base(randomNumberGenerator, SortType.MergeSort) { }
 }
 
-internal class BubbleSortProblemGenerator : SortingProblemGenerator, IProblemGenerator
+public class BubbleSortProblemGenerator : SortingProblemGenerator, IProblemGenerator
 {
     public string DisplayText => "Bubble Sort";
     public string SkillPath => "Sorting.Bubble Sort";

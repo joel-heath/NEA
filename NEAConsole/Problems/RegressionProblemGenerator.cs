@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Statistics;
 
 namespace NEAConsole.Problems;
-internal class RegressionProblemGenerator : IProblemGenerator
+
+public class RegressionProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Linear Regression";
     public string SkillPath => "Statistics.Regression";

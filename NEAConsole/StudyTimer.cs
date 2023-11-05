@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole;
+
 public class StudyTimer
 {
     public bool Enabled { get; set; }

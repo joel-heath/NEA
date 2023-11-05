@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 
 namespace NEAConsole.Matrices;
+
 public class Matrix : IEnumerable<double>
 {
     private readonly double[,] values;

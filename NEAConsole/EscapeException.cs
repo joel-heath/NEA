@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole;
+
 public class EscapeException : Exception
 {
     public EscapeException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }

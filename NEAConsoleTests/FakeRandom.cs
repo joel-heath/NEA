@@ -1,6 +1,7 @@
 ﻿using NEAConsole;
 
 namespace NEAConsoleTests;
+
 public class FakeRandom : IRandom
 {
     private readonly Queue<int> ints;

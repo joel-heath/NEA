@@ -1,10 +1,12 @@
 ﻿namespace NEAConsole;
+
 public record struct MenuOption(string DisplayText, Action<Context> OnSelected)
 {
     public readonly int Length => DisplayText.Length;
     public override readonly string ToString() => DisplayText;
     public static implicit operator MenuOption((string DisplayText, Action<Context> OnSelected) tuple) => new(tuple.DisplayText, tuple.OnSelected);
 }
+
 internal static class Menu
 {
     static void ListChoices(IList<MenuOption> options)

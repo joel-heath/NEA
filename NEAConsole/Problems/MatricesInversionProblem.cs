@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesInversionProblem : IProblem
+
+public class MatricesInversionProblem : IProblem
 {
     private readonly Matrix mat;
     private readonly Matrix solution;

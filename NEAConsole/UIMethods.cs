@@ -2,7 +2,7 @@
 
 namespace NEAConsole;
 
-public static class UIMethods
+internal static class UIMethods
 {
     /// <summary>
     /// Draws a matrix to the console

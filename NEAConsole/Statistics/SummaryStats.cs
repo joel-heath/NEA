@@ -2,7 +2,7 @@
 
 public readonly record struct SummaryStats
 {
-    public readonly int n;
+    public readonly uint n;
     public readonly double Σx, Σy, Σx2, Σy2, Σxy;
     public readonly double x̄, ȳ;
     public readonly double σx, σy, σx2, σy2;

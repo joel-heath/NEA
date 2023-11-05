@@ -2,23 +2,10 @@
 
 public class Regression
 {
-    private readonly IList<(double x, double y)> _data;
-    private readonly SummaryStats _stats;
-    public SummaryStats SummaryStatistics { get => _stats; }
-    public IList<(double x, double y)> Data { get => _data; }
-    //public void UpdateSummaryStats() { stats = new SummaryStats(_data); }
-
-    /// <summary>
-    /// Calculates the Person's Product-Moment Correlation Coefficient (r) value for a given set of data.
-    /// </summary>
-    /// <returns>The PMCC (-1 ≤ r ≤ 1).</returns>
-    public double PMCC() => _stats.Sxy / Math.Sqrt(_stats.Sxx * _stats.Syy);
     private class RankedItem // For Spearman's Rank
     {
-        public readonly double x;
-        public readonly double y;
-        public double xRank;
-        public double yRank;
+        public readonly double x, y;
+        public double xRank, yRank;
 
         public RankedItem(double x, double y, double xRank = -1, double yRank = -1)
         {
@@ -27,18 +14,28 @@ public class Regression
 
         public static implicit operator RankedItem((double x, double y) tuple) => new(tuple.x, tuple.y);
     };
+
+    public SummaryStats SummaryStats { get; }
+    public IList<(double x, double y)> Data { get; }
+
+    /// <summary>
+    /// Calculates the Person's Product-Moment Correlation Coefficient (r) value for a given set of data.
+    /// </summary>
+    /// <returns>The PMCC (-1 ≤ r ≤ 1).</returns>
+    public double PMCC() => SummaryStats.Sxy / Math.Sqrt(SummaryStats.Sxx * SummaryStats.Syy);
+
     /// <summary>
     /// Calculates the Spearman's Rank Correlation Coefficient (ρ / rs) value for a given set of data.
     /// </summary>
     /// <returns>The ρ value (-1 ≤ ρ ≤ 1).</returns>
     public double SpearmansRank()
     {
-        IEnumerable<RankedItem> items = _data.Select(d => (RankedItem)d).ToArray(); // .ToArray() IS ABSOLUTELY NECESSARY (Lazy evaluation, RankItems() includes a foreach)
+        IEnumerable<RankedItem> items = Data.Select(d => (RankedItem)d).ToArray(); // .ToArray() IS ABSOLUTELY NECESSARY (Lazy evaluation, RankItems() includes a foreach)
 
         RankItems(items, i => i.x, (i, r) => i.xRank = r); // Rank x values
         RankItems(items, i => i.y, (i, r) => i.yRank = r); // Rank y values
 
-        return 1 - 6 * items.Sum(r => (r.xRank - r.yRank) * (r.xRank - r.yRank)) / (_stats.n * (_stats.n * _stats.n - 1));
+        return 1 - 6 * items.Sum(r => (r.xRank - r.yRank) * (r.xRank - r.yRank)) / (SummaryStats.n * (SummaryStats.n * SummaryStats.n - 1));
     }
 
     /// <summary>
@@ -69,31 +66,29 @@ public class Regression
     /// <returns>The gradient followed by the y-intercept of the line in a ValueTuple<double></returns>
     public (double m, double c) LeastSquaresYonX()
     {
-        double b = _stats.Sxy / _stats.Sxx;
-        double c = b * -_stats.x̄ + _stats.ȳ;
+        double b = SummaryStats.Sxy / SummaryStats.Sxx;
+        double c = b * -SummaryStats.x̄ + SummaryStats.ȳ;
 
         return (b, c);
     }
+
     /// <summary>
     /// Calculates the X on Y Least Squares Regression Line.
     /// </summary>
     /// <returns>The gradient followed by the x-intercept of the line in a ValueTuple<double></returns>
     public (double m, double c) LeastSquaresXonY()
     {
-        double bʹ = _stats.Sxy / _stats.Syy;
-        double cʹ = bʹ * -_stats.ȳ + _stats.x̄;
+        double bʹ = SummaryStats.Sxy / SummaryStats.Syy;
+        double cʹ = bʹ * -SummaryStats.ȳ + SummaryStats.x̄;
 
         return (bʹ, cʹ);
     }
 
+    public Regression(IEnumerable<double> xValues, IEnumerable<double> yValues) : this(xValues.Zip(yValues)) { }
+
     public Regression(IEnumerable<(double x, double y)> data)
     {
-        _data = data.ToList();
-        _stats = new(_data);
-    }
-    public Regression(IEnumerable<double> xValues, IEnumerable<double> yValues)
-    {
-        _data = xValues.Zip(yValues).ToList();
-        _stats = new(_data);
+        Data = data.ToList();
+        SummaryStats = new(Data);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole;
+
 public interface IAnswer { }
 public class IntAnswer : IAnswer
 {

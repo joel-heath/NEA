@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole;
+
 public interface IProblem
 {
     void Display(); // Display the problem and - pure UI
@@ -14,6 +15,7 @@ public interface IProblem
     bool EvaluateAnswer(IAnswer answer); // Check if the user is correct - pure logic, unit tests
     void Summarise(IAnswer? answer); // Tell the user if they were right or wrong - pure UI
 }
+
 public interface IProblemGenerator
 {
     /// <summary>

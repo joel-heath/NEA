@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class Chi2Problem : IProblem
+
+public class Chi2Problem : IProblem
 {
     private readonly Matrix data;
     private readonly double solution;

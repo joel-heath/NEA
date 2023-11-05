@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole;
+
 public interface IRandom
 {
     int Next();
@@ -9,6 +10,7 @@ public interface IRandom
     int NextNotZero(int minValue, int maxValue);
     double NextDouble();
 }
+
 public class Random : IRandom
 {
     private readonly System.Random random;

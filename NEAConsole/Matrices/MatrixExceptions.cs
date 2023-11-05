@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole.Matrices;
+
 public class DimensionLessThanOneException : Exception
 {
     public DimensionLessThanOneException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }

@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class PrimsProblem : IProblem
+
+public class PrimsProblem : IProblem
 {
     private readonly Matrix adjacencyMatrix;
     private readonly HashSet<(int row, int col)> solution;

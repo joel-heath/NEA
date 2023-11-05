@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesInversionProblemGenerator : IProblemGenerator
+
+public class MatricesInversionProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Matrix Inversion";
     public string SkillPath => "Matrices.Determinants.Inversion";

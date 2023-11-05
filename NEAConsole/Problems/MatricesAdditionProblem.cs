@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesAdditionProblem : IProblem
+
+public class MatricesAdditionProblem : IProblem
 {
     private readonly Matrix mat1;
     private readonly Matrix mat2;

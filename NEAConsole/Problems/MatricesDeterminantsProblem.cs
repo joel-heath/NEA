@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesDeterminantsProblem : IProblem
+
+public class MatricesDeterminantsProblem : IProblem
 {
     private readonly Matrix matrix;
     private readonly double solution;

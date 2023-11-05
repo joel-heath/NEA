@@ -1,9 +1,10 @@
 ﻿using NEAConsole;
 
 namespace NEAConsoleTests;
-internal static class TestHelpers
+
+public static class TestHelpers
 {
-    internal static bool GenericTest(IProblemGenerator pg, IAnswer ans, Skill? knowledge = null)
+    public static bool GenericTest(IProblemGenerator pg, IAnswer ans, Skill? knowledge = null)
     {
         knowledge ??= Skill.KnowledgeConstructor("SampleKnowledge.json");
         var problem = pg.Generate(knowledge);

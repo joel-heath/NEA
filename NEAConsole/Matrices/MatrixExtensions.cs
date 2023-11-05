@@ -1,7 +1,5 @@
-﻿using System.Linq.Expressions;
-using System.Net.Security;
+﻿namespace NEAConsole.Matrices;
 
-namespace NEAConsole.Matrices;
 public static class MatrixExtensions
 {
     /// <summary>

@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Statistics;
 
 namespace NEAConsole.Problems;
-internal class Chi2ProblemGenerator : IProblemGenerator
+
+public class Chi2ProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Chi-Squared Statistic";
     public string SkillPath => "Statistics.Chi2";

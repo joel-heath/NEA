@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Statistics;
 
 namespace NEAConsole.Problems;
-internal class PMCCProblemGenerator : IProblemGenerator
+
+public class PMCCProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Product Moment Correlation Coefficient";
     public string SkillPath => "Statistics.PMCC";

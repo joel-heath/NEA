@@ -1,5 +1,6 @@
 ﻿namespace NEAConsole.Problems;
-internal class SimplexProblemGenerator : IProblemGenerator
+
+public class SimplexProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Simplex";
     public string SkillPath => "Simplex";

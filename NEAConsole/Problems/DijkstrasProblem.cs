@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class DijkstrasProblem : IProblem
+
+public class DijkstrasProblem : IProblem
 {
     private readonly Matrix graph;
     private readonly char startNode;

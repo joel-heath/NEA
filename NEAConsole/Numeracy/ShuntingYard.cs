@@ -1,4 +1,5 @@
 ﻿namespace JH24Utils.Numeracy;
+
 public partial class ShuntingYard
 {
     public static Queue<Token> InfixToPostfix(Queue<Token> tokens)

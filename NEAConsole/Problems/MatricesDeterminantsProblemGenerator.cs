@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesDeterminantsProblemGenerator : IProblemGenerator
+
+public class MatricesDeterminantsProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Matrix Determinants";
     public string SkillPath => "Matrices.Determinants";

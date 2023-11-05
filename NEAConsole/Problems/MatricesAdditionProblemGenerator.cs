@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class MatricesAdditionProblemGenerator : IProblemGenerator
+
+public class MatricesAdditionProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Matrix Addition";
     public string SkillPath => "Matrices.Addition";

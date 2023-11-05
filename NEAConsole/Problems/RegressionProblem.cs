@@ -1,5 +1,6 @@
 ﻿namespace NEAConsole.Problems;
-internal class RegressionProblem : IProblem
+
+public class RegressionProblem : IProblem
 {
     private readonly IList<(double x, double y)> data;
     private readonly double[] solution;

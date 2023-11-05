@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole;
+
 public static class IProblemGeneratorExtensions
 {
     public static MenuOption ToMenuOption(this IProblemGenerator problemGenerator) => new(problemGenerator.DisplayText, (context) =>

@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole.Problems;
+
 public class RandomProblemGenerator
 {
     private readonly IRandom random;

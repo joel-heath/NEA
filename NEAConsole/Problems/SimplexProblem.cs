@@ -1,5 +1,6 @@
 ﻿namespace NEAConsole.Problems;
-internal class SimplexProblem : IProblem
+
+public class SimplexProblem : IProblem
 {
     private readonly SimplexInequality objective;
     private readonly SimplexInequality[] constraints;

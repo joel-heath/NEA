@@ -1,5 +1,6 @@
-﻿namespace NEAConsole;
-using System.Text.Json;
+﻿using System.Text.Json;
+
+namespace NEAConsole;
 
 public class Skill
 {

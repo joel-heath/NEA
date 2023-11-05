@@ -1,6 +1,7 @@
 ﻿using NEAConsole.Problems;
 
 namespace NEAConsole;
+
 public class Exam
 {
     private int question;

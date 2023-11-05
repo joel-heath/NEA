@@ -1,5 +1,6 @@
 ﻿namespace NEAConsole.Problems;
-internal class PMCCProblem : IProblem
+
+public class PMCCProblem : IProblem
 {
     private readonly IList<(double x, double y)> data;
     private readonly double solution;

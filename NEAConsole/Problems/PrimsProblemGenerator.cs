@@ -1,7 +1,8 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class PrimsProblemGenerator : IProblemGenerator
+
+public class PrimsProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Prim's Algorithm";
     public string SkillPath => "Graphs.Prim's";

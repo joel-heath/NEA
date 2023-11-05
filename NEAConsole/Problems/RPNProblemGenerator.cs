@@ -2,7 +2,8 @@
 using System.Text;
 
 namespace NEAConsole.Problems;
-internal class RPNProblemGenerator : IProblemGenerator
+
+public class RPNProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Reverse Polish Notation";
     public string SkillPath => "RPN";

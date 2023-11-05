@@ -3,6 +3,7 @@ using NEAConsole.Problems;
 using Random = NEAConsole.Random;
 
 namespace NEAConsoleTests;
+
 public class GraphsTests
 {
     [SetUp]

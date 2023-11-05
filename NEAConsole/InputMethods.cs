@@ -1,6 +1,7 @@
 ﻿using NEAConsole.Matrices;
 
 namespace NEAConsole;
+
 public struct ReadValuesOptions
 {
     public bool NewLine { get; set; }
@@ -13,7 +14,8 @@ public struct ReadValuesOptions
     /// </summary>
     public bool DoubleRules { get; set; }
 }
-public static class InputMethods
+
+internal static class InputMethods
 {
     public static void Wait(string message = "Press any key to continue...", CancellationToken? ct = null)
     {

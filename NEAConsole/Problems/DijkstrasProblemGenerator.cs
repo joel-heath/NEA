@@ -2,7 +2,8 @@
 using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
-internal class DijkstrasProblemGenerator : IProblemGenerator
+
+public class DijkstrasProblemGenerator : IProblemGenerator
 {
     public string DisplayText => "Dijkstra's";
     public string SkillPath => "Graphs.Dijkstra's";

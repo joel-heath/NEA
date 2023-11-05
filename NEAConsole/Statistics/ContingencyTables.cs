@@ -1,4 +1,5 @@
 ﻿namespace NEAConsole.Statistics;
+
 public static class ContingencyTables
 {
     public static double CalculateChiSquared(double[,] fo)

@@ -2,15 +2,15 @@
 
 public class SortingProblem : IProblem
 {
-    private readonly int[] data, solution;
+    private readonly int[] unsorted, sorted;
     private readonly SortType sortingAlgorithm;
     private readonly bool ascending;
 
     public void Display()
     {
-        Console.WriteLine($"Apply the {sortingAlgorithm} to sort the following collection into ascending order." + Environment.NewLine);
+        Console.WriteLine($"Apply the {sortingAlgorithm} to sort the following collection into {(ascending ? "a" : "de")}scending order." + Environment.NewLine);
 
-        Console.WriteLine("Unsorted: " + string.Join(' ', data));
+        Console.WriteLine("Unsorted: " + string.Join(' ', unsorted));
         Console.Write("Sorted: ");
     }
 
@@ -26,7 +26,7 @@ public class SortingProblem : IProblem
 
     public bool EvaluateAnswer(IAnswer answer)
     {
-        return (answer as ManyAnswer<int> ?? throw new InvalidOperationException()).Answer.Select((x, i) => x == solution[i]).All(b => b);
+        return (answer as ManyAnswer<int> ?? throw new InvalidOperationException()).Answer.Select((x, i) => x == sorted[i]).All(b => b);
     }
 
     public void Summarise(IAnswer? answer)
@@ -40,14 +40,15 @@ public class SortingProblem : IProblem
         }
         else
         {
-            Console.WriteLine($"Incorrect. The correct answer was: {string.Join(' ', data)}");
+            Console.WriteLine($"Incorrect. The correct answer was: {string.Join(' ', sorted)}");
         }
     }
 
-    public SortingProblem(int[] unsorted, int[] sorted, SortType sortingAlgorithm)
+    public SortingProblem(int[] unsorted, int[] sorted, bool isAscending, SortType sortingAlgorithm)
     {
-        data = unsorted;
-        solution = sorted;
+        this.unsorted = unsorted;
+        this.sorted = sorted;
+        ascending = isAscending;
         this.sortingAlgorithm = sortingAlgorithm;
     }
 }

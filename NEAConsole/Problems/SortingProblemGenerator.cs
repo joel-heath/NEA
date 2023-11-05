@@ -9,6 +9,8 @@ public class SortingProblemGenerator
 
     public IProblem Generate(Skill knowledge)
     {
+        bool isAscending = random.NextDouble() < 0.5;
+
         int n = random.Next(5, 8);
 
         var data = new int[n];
@@ -18,13 +20,15 @@ public class SortingProblemGenerator
             data[i] = random.Next(2, 20);
         }
 
-        return new SortingProblem(data, (sortType switch
+        var sorted = sortType switch
         {
             SortType.Quicksort => data.QuickSort(),
             SortType.MergeSort => data.MergeSort(),
             SortType.BubbleSort => data.BubbleSort(),
             _ => throw new InvalidOperationException()
-        }).ToArray(), sortType);
+        };
+
+        return new SortingProblem(data, isAscending ? sorted.ToArray() : sorted.Reverse().ToArray(), isAscending, sortType);
     }
 
     public SortingProblemGenerator(IRandom randomNumberGenerator, SortType sortType)

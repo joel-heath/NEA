@@ -8,9 +8,9 @@ namespace NEAConsole;
 
 internal class Program
 {
-    private const string USER_KNOWLEDGE_PATH = "UserKnowledge.json",
-                         SAMPLE_KNOWLEDGE_PATH = "SampleKnowledge.json",
-                         EXAM_PROFILES_PATH = "ExamProfiles.bin";
+    private readonly string USER_KNOWLEDGE_PATH = Path.Combine(AppContext.BaseDirectory, "UserKnowledge.json"),
+                            SAMPLE_KNOWLEDGE_PATH = Path.Combine(AppContext.BaseDirectory, "SampleKnowledge.json"),
+                            EXAM_PROFILES_PATH = Path.Combine(AppContext.BaseDirectory, "ExamProfiles.bin");
 
     /// <summary>
     /// If the user's context.Knowledge tree is completely unknown, asks the user to update their context.Knowledge tree, specifying which topics they know.

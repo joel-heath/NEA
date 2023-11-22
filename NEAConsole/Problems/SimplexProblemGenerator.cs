@@ -33,6 +33,23 @@ public class SimplexProblemGenerator : IProblemGenerator
             constraints[dimensions - 1].Constant += remainder * solution[i];
         }
 
+        // Two-stage! Will do this by generating a redundant contraint that takes the origin out the feasible region
+        // so x >= 1, y >=2, z >= 6 etc. constant must be greater than 0 to actually take origin out, and must be less than or equal to
+        // the solutions corresponding ordinate in order to not change the maximal solution.
+        if (random.NextDouble() < 0.5)
+        {
+            int variable = random.Next(0, dimensions);
+            int[] coeffs = new int[dimensions];
+            
+            var coefficient = random.Next(1, 6);
+            coeffs[variable] = coefficient;
+            var maxConstant = coefficient * solution[variable];
+            
+            int constant = random.Next(1, maxConstant + 1);
+
+            constraints = constraints.Append(new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.GreaterThan)).ToArray();
+        }
+
         SimplexInequality objective = GenerateObjectiveFunction(dimensions, solution, constraints);
 
         return new SimplexProblem(objective, constraints, solution);

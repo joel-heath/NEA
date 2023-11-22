@@ -1,12 +1,8 @@
 ﻿namespace NEAConsole.Problems;
 
-public class SimplexProblemGenerator : IProblemGenerator
+public static class SimplexProblemGenerator
 {
-    public string DisplayText => "Simplex";
-    public string SkillPath => "Simplex";
-    private readonly IRandom random;
-
-    public IProblem Generate(Skill knowledge)
+    public static IProblem Generate(bool twoStage, IRandom random)
     {
         int dimensions = random.Next(2, 4);
         int[] solution = Enumerable.Range(0, dimensions).Select(n => random.Next(2, 6)).ToArray();
@@ -15,7 +11,7 @@ public class SimplexProblemGenerator : IProblemGenerator
 
         for (int i = 0; i < dimensions; i++)
         {
-            constraints[i] = CreateConstraint(dimensions, solution);
+            constraints[i] = CreateConstraint(dimensions, solution, random);
         }
 
         // make sure objective is integers (make constraints divisible by dimensions)
@@ -36,7 +32,7 @@ public class SimplexProblemGenerator : IProblemGenerator
         // Two-stage! Will do this by generating a redundant contraint that takes the origin out the feasible region
         // so x >= 1, y >=2, z >= 6 etc. constant must be greater than 0 to actually take origin out, and must be less than or equal to
         // the solutions corresponding ordinate in order to not change the maximal solution.
-        if (random.NextDouble() < 0.5)
+        if (twoStage)
         {
             int variable = random.Next(0, dimensions);
             int[] coeffs = new int[dimensions];
@@ -55,7 +51,7 @@ public class SimplexProblemGenerator : IProblemGenerator
         return new SimplexProblem(objective, constraints, solution);
     }
 
-    private SimplexInequality CreateConstraint(int dimensions, int[] solution)
+    private static SimplexInequality CreateConstraint(int dimensions, int[] solution, IRandom random)
     {
         int[] coeffs = new int[dimensions];
         var constant = 0;
@@ -89,7 +85,30 @@ public class SimplexProblemGenerator : IProblemGenerator
 
         return new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.LessThan);
     }
+}
 
-    public SimplexProblemGenerator() : this(new Random()) { }
-    public SimplexProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
+public class OneStageSimplexProblemGenerator : IProblemGenerator
+{
+    public string DisplayText => "One-stage Simplex";
+    public string SkillPath => "Simplex.One-stage";
+    private readonly IRandom random;
+
+    public IProblem Generate(Skill knowledge)
+        => SimplexProblemGenerator.Generate(false, random);
+
+    public OneStageSimplexProblemGenerator() : this(new Random()) { }
+    public OneStageSimplexProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
+}
+
+public class TwoStageSimplexProblemGenerator : IProblemGenerator
+{
+    public string DisplayText => "Two-stage Simplex";
+    public string SkillPath => "Simplex.Two-stage";
+    private readonly IRandom random;
+
+    public IProblem Generate(Skill knowledge)
+        => SimplexProblemGenerator.Generate(true, random);
+
+    public TwoStageSimplexProblemGenerator() : this(new Random()) { }
+    public TwoStageSimplexProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

@@ -37,7 +37,16 @@
   },
   {
     "name": "Simplex",
-    "weight": 5
+    "children": [
+      {
+        "name": "One-stage",
+        "weight": 5
+      },
+      {
+        "name": "Two-stage",
+        "weight": 7
+      }
+    ]
   },
   {
     "name": "Statistics",

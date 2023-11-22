@@ -1,4 +1,7 @@
-﻿namespace NEAConsole.Problems;
+﻿using NEAConsole.Matrices;
+using System.ComponentModel.Design;
+
+namespace NEAConsole.Problems;
 
 public class SimplexProblem : IProblem
 {
@@ -8,14 +11,17 @@ public class SimplexProblem : IProblem
 
     public void Display()
     {
-
+#if DEBUG
+        DebugDisplay();
+#else
         Console.WriteLine($"Maximise P = {objective.ToObjectiveString()}");
         Console.WriteLine($"Subject to:");
 
-        for (int i = 0; i < solution.Length; i++)
+        for (int i = 0; i < constraints.Length; i++)
         {
             Console.WriteLine($"    {constraints[i]}");
         }
+#endif
     }
 
     public IAnswer GetAnswer(IAnswer? oldAnswer = null, CancellationToken? ct = null) // would be nice to be able to navigate up and down like in a matrix
@@ -164,6 +170,28 @@ public class SimplexProblem : IProblem
                 Console.WriteLine((char)('x' + i) + " = " + solution[i]);
             }
         }
+    }
+
+    /// <summary>
+    /// Writes the linear program in common LP solver format
+    /// </summary>
+    /// <param name="m">Matrix to be drawn.</param>
+    private void DebugDisplay()
+    {
+        for (int i = 0; i < solution.Length; i++)
+        {
+            Console.WriteLine($"var x{i+1} >= 0;");
+        }
+        
+        Console.WriteLine($"maximize z: {objective.ToObjectiveString(true)};");
+
+        for (int i = 0; i < constraints.Length; i++)
+        {
+            Console.WriteLine($"subject to c{i+1}: {constraints[i].ToDebugString()};");
+        }
+
+        Console.WriteLine("end;");
+        Console.WriteLine();
     }
 
     public SimplexProblem(SimplexInequality objective, SimplexInequality[] constraints, int[] solution)

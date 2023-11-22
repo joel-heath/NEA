@@ -19,8 +19,8 @@ public record class SimplexInequality
     /// Does NOT simplify a + -b to a - b
     /// </summary>
     /// <returns></returns>
-    //public override string ToString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}{(char)(i + 'x')}"))
-    //                                        + $" {(int)Inequality switch { 0 => "<=", 1 => ">=", _ => "=" }} {Constant}";
+    public string ToDebugString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}*x{i + 1}"))
+                                    + $" {(int)Inequality switch { 0 => "<=", 1 => ">=", _ => "=" }} {Constant}";
     public override string ToString()
     {
         string inequality = string.Empty;
@@ -39,6 +39,8 @@ public record class SimplexInequality
 
         return inequality;
     }
-    public string ToObjectiveString() => string.Join(" + ", Coefficients.Select((c, i) => $"{c}{(char)(i + 'x')}"));
+    public string ToObjectiveString(bool debugMode = false)
+        => debugMode ? string.Join(" + ", Coefficients.Select((c, i) => $"{c}*x{i + 1}"))
+                     : string.Join(" + ", Coefficients.Select((c, i) => $"{c}{(char)(i + 'x')}"));
 
 }

@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class Chi2ProblemGenerator : IProblemGenerator
+public class Chi2ProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Chi-Squared Statistic";
     public string SkillPath => "Statistics.Chi2";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -26,5 +26,4 @@ public class Chi2ProblemGenerator : IProblemGenerator
     }
 
     public Chi2ProblemGenerator() : this(new Random()) { }
-    public Chi2ProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

@@ -43,7 +43,7 @@ public static class SimplexProblemGenerator
             
             int constant = random.Next(1, maxConstant + 1);
 
-            constraints = constraints.Append(new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.GreaterThan)).ToArray();
+            constraints = [.. constraints, new SimplexInequality(coeffs, constant, SimplexInequality.InequalityType.GreaterThan)];
         }
 
         SimplexInequality objective = GenerateObjectiveFunction(dimensions, solution, constraints);
@@ -87,28 +87,26 @@ public static class SimplexProblemGenerator
     }
 }
 
-public class OneStageSimplexProblemGenerator : IProblemGenerator
+public class OneStageSimplexProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "One-stage Simplex";
     public string SkillPath => "Simplex.One-stage";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
         => SimplexProblemGenerator.Generate(false, random);
 
     public OneStageSimplexProblemGenerator() : this(new Random()) { }
-    public OneStageSimplexProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }
 
-public class TwoStageSimplexProblemGenerator : IProblemGenerator
+public class TwoStageSimplexProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Two-stage Simplex";
     public string SkillPath => "Simplex.Two-stage";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
         => SimplexProblemGenerator.Generate(true, random);
 
     public TwoStageSimplexProblemGenerator() : this(new Random()) { }
-    public TwoStageSimplexProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

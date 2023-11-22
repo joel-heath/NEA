@@ -1,9 +1,9 @@
 ﻿namespace NEAConsole.Problems;
 
-public class PMCCProblem : IProblem
+public class PMCCProblem(IList<(double x, double y)> data, double solution) : IProblem
 {
-    private readonly IList<(double x, double y)> data;
-    private readonly double solution;
+    private readonly IList<(double x, double y)> data = data;
+    private readonly double solution = solution;
 
     public void Display()
     {
@@ -41,11 +41,5 @@ public class PMCCProblem : IProblem
         {
             Console.WriteLine($"Incorrect. The correct answer was {solution}.");
         }
-    }
-
-    public PMCCProblem(IList<(double x, double y)> data, double solution)
-    {
-        this.data = data;
-        this.solution = solution;
     }
 }

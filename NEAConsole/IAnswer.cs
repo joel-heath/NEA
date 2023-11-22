@@ -3,33 +3,27 @@
 namespace NEAConsole;
 
 public interface IAnswer { }
-public class IntAnswer : IAnswer
+public class IntAnswer(int answer) : IAnswer
 {
-    public int Answer { get; set; }
-    public IntAnswer(int answer) { Answer = answer; }
+    public int Answer { get; set; } = answer;
 }
-public class DoubleAnswer : IAnswer
+public class DoubleAnswer(double answer) : IAnswer
 {
-    public double Answer { get; set; }
-    public DoubleAnswer(double answer) { Answer = answer; }
+    public double Answer { get; set; } = answer;
 }
-public class StringAnswer : IAnswer
+public class StringAnswer(string answer) : IAnswer
 {
-    public string Answer { get; set; }
-    public StringAnswer(string answer) { Answer = answer; }
+    public string Answer { get; set; } = answer;
 }
-public class MatrixAnswer : IAnswer
+public class MatrixAnswer(Matrix answer) : IAnswer
 {
-    public Matrix Answer { get; set; }
-    public MatrixAnswer(Matrix answer) { Answer = answer; }
+    public Matrix Answer { get; set; } = answer;
 }
-public class PrimsAnswer : IAnswer
+public class PrimsAnswer(HashSet<(int row, int col)> answer) : IAnswer
 {
-    public HashSet<(int row, int col)> Answer { get; set; }
-    public PrimsAnswer(HashSet<(int row, int col)> answer) { Answer = answer; }
+    public HashSet<(int row, int col)> Answer { get; set; } = answer;
 }
-public class ManyAnswer<T> : IAnswer
+public class ManyAnswer<T>(T[] answer) : IAnswer
 {
-    public T[] Answer { get; set; }
-    public ManyAnswer(T[] answer) { Answer = answer; }
+    public T[] Answer { get; set; } = answer;
 }

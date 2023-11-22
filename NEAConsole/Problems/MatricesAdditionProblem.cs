@@ -2,12 +2,12 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesAdditionProblem : IProblem
+public class MatricesAdditionProblem(Matrix mat1, Matrix mat2, char operand, Matrix solution) : IProblem
 {
-    private readonly Matrix mat1;
-    private readonly Matrix mat2;
-    private readonly Matrix solution;
-    private readonly char operand;
+    private readonly Matrix mat1 = mat1;
+    private readonly Matrix mat2 = mat2;
+    private readonly Matrix solution = solution;
+    private readonly char operand = operand;
 
     public void Display()
     {
@@ -59,13 +59,5 @@ public class MatricesAdditionProblem : IProblem
             UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
-    }
-
-    public MatricesAdditionProblem(Matrix mat1, Matrix mat2, char operand, Matrix solution)
-    {
-        this.mat1 = mat1;
-        this.mat2 = mat2;
-        this.operand = operand;
-        this.solution = solution;
     }
 }

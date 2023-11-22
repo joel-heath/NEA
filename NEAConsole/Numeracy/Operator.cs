@@ -1,4 +1,4 @@
-﻿namespace JH24Utils.Numeracy;
+﻿namespace NEAConsole.Numeracy;
 
 public enum Operator
 {
@@ -54,5 +54,5 @@ partial class ShuntingYard
         { Operator.Power, false }
     };
 
-    private static readonly HashSet<Operator> Functions = new() { Operator.Sin, Operator.Cos, Operator.Tan, Operator.Max, Operator.Min };
+    private static readonly HashSet<Operator> Functions = [Operator.Sin, Operator.Cos, Operator.Tan, Operator.Max, Operator.Min];
 }

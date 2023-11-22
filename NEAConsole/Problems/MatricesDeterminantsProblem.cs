@@ -2,10 +2,10 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesDeterminantsProblem : IProblem
+public class MatricesDeterminantsProblem(Matrix matrix, double solution) : IProblem
 {
-    private readonly Matrix matrix;
-    private readonly double solution;
+    private readonly Matrix matrix = matrix;
+    private readonly double solution = solution;
 
     public void Display()
     {
@@ -47,11 +47,5 @@ public class MatricesDeterminantsProblem : IProblem
         {
             Console.WriteLine($"Incorrect. The correct answer was {solution}.");
         }
-    }
-
-    public MatricesDeterminantsProblem(Matrix matrix, double solution)
-    {
-        this.matrix = matrix;
-        this.solution = solution;
     }
 }

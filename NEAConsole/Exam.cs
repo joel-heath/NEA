@@ -77,7 +77,7 @@ public class Exam
             {
                 try
                 {
-                    var choice = Menu.ExamMenu(new string[] { "<-", $"Question {question}/{questionCount}", "->" }, question, cts.Token);
+                    var choice = Menu.ExamMenu(["<-", $"Question {question}/{questionCount}", "->"], question, cts.Token);
                     question += choice;
                 }
                 catch (EscapeException)
@@ -132,7 +132,7 @@ public class Exam
                 else Console.WriteLine("You did not enter an answer.");
                 p.Summarise(a);
 
-                var choice = Menu.ExamMenu(new string[] { "<-", $"Question {question}/{questionCount}", "->" }, question);
+                var choice = Menu.ExamMenu(["<-", $"Question {question}/{questionCount}", "->"], question);
                 question += choice;
             }
             catch (EscapeException)

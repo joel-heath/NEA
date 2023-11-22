@@ -1,10 +1,10 @@
 ﻿namespace NEAConsole.Problems;
 
-public class SortingProblem : IProblem
+public class SortingProblem(int[] unsorted, int[] sorted, bool ascending, SortType sortingAlgorithm) : IProblem
 {
-    private readonly int[] unsorted, sorted;
-    private readonly SortType sortingAlgorithm;
-    private readonly bool ascending;
+    private readonly int[] unsorted = unsorted, sorted = sorted;
+    private readonly SortType sortingAlgorithm = sortingAlgorithm;
+    private readonly bool ascending = ascending;
 
     public void Display()
     {
@@ -18,7 +18,7 @@ public class SortingProblem : IProblem
     {
         var answer = InputMethods.ReadList(startingVal: oldAnswer is ManyAnswer<int> oldAns ? string.Join(' ', oldAns.Answer) : string.Empty, ct: ct, options: new ReadValuesOptions { NewLine = true });
 
-        return new ManyAnswer<int>(answer.ToArray());
+        return new ManyAnswer<int>([.. answer]);
     }
 
     public void DisplayAnswer(IAnswer answer)
@@ -42,13 +42,5 @@ public class SortingProblem : IProblem
         {
             Console.WriteLine($"Incorrect. The correct answer was: {string.Join(' ', sorted)}");
         }
-    }
-
-    public SortingProblem(int[] unsorted, int[] sorted, bool isAscending, SortType sortingAlgorithm)
-    {
-        this.unsorted = unsorted;
-        this.sorted = sorted;
-        ascending = isAscending;
-        this.sortingAlgorithm = sortingAlgorithm;
     }
 }

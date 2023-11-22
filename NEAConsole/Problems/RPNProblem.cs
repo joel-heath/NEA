@@ -1,8 +1,8 @@
 ﻿namespace NEAConsole.Problems;
 
-public class RPNProblem : IProblem
+public class RPNProblem(string infix, string postfix) : IProblem
 {
-    private readonly string infix, postfix;
+    private readonly string infix = infix, postfix = postfix;
 
     public void Display()
     {
@@ -39,11 +39,5 @@ public class RPNProblem : IProblem
         {
             Console.WriteLine($"Incorrect. The correct answer was: {postfix}.");
         }
-    }
-
-    public RPNProblem(string infix, string postfix)
-    {
-        this.infix = infix;
-        this.postfix = postfix;
     }
 }

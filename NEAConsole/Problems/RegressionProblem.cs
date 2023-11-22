@@ -1,10 +1,10 @@
 ﻿namespace NEAConsole.Problems;
 
-public class RegressionProblem : IProblem
+public class RegressionProblem(IList<(double x, double y)> data, (double m, double c) solution) : IProblem
 {
-    private readonly IList<(double x, double y)> data;
-    private readonly double[] solution;
-    private readonly string[] solutionNames = { "m", "c" };
+    private readonly IList<(double x, double y)> data = data;
+    private readonly double[] solution = [solution.m, solution.c];
+    private readonly string[] solutionNames = ["m", "c"];
 
 
     public void Display()
@@ -56,11 +56,5 @@ public class RegressionProblem : IProblem
                 Console.WriteLine($"{solutionNames[i]} = {solution[i]}");
             }
         }
-    }
-
-    public RegressionProblem(IList<(double x, double y)> data, (double m, double c) solution)
-    {
-        this.data = data;
-        this.solution = new double[] { solution.m, solution.c };
     }
 }

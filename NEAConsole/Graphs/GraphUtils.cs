@@ -12,7 +12,7 @@ public static class GraphUtils
     public static Dictionary<INode, int> Dijkstras(INode start)
     {
         Dictionary<INode, int> connections = new() { { start, 0 } };
-        Dictionary<INode, int> paths = new();
+        Dictionary<INode, int> paths = [];
 
         while (connections.Count > 0)
         {
@@ -40,7 +40,7 @@ public static class GraphUtils
     public static IReadOnlyCollection<Node> CreateGraph(Matrix adjacencyMatrix)
     {
         List<Node> nodes = new(adjacencyMatrix.Rows);
-        Dictionary<string, (Node node, (string name, int weight)[] connections)> nodeLegend = new();
+        Dictionary<string, (Node node, (string name, int weight)[] connections)> nodeLegend = [];
         for (int i = 0; i < adjacencyMatrix.Rows; i++)
         {
             (string, int)[] connections = new (string, int)[adjacencyMatrix.Columns];
@@ -48,7 +48,7 @@ public static class GraphUtils
             {
                 connections[j] = ($"{j}", (int)adjacencyMatrix[i, j]);
             }
-            Node node = new(new());
+            Node node = new([]);
             nodes.Add(node);
             nodeLegend.Add($"{i}", (node, connections));
         }
@@ -70,7 +70,7 @@ public static class GraphUtils
     {
         //List<Node> nodes = new(adjacencyMatrix.Rows);
         //      node id     node         (node id, connection weight) array
-        Dictionary<int, (Node node, (int id, int weight)[] connections)> nodeLegend = new();
+        Dictionary<int, (Node node, (int id, int weight)[] connections)> nodeLegend = [];
         for (int i = 0; i < adjacencyMatrix.Rows; i++)
         {
             (int, int)[] connections = new (int, int)[adjacencyMatrix.Columns];
@@ -78,7 +78,7 @@ public static class GraphUtils
             {
                 connections[j] = (j, (int)adjacencyMatrix[i, j]);
             }
-            Node node = new(new());
+            Node node = new([]);
             //nodes.Add(node);
             nodeLegend.Add(i, (node, connections));
         }
@@ -93,15 +93,15 @@ public static class GraphUtils
 
     public static HashSet<Node> CreateGraph(string input)
     {
-        HashSet<Node> nodes = new();
-        Dictionary<string, (Node node, (string name, int weight)[] connections)> nodeLegend = new();
+        HashSet<Node> nodes = [];
+        Dictionary<string, (Node node, (string name, int weight)[] connections)> nodeLegend = [];
         string[] lines = input.Split("\r\n");
         for (int i = 0; i < lines.Length; i++)
         {
             string[] words = lines[i].Split(',');
             string name = words[0];
             (string, int)[] connections = words[1..].Select(c => c.Split(':')).Select(c => (c[0], int.Parse(c[1]))).ToArray();
-            Node node = new(new());
+            Node node = new([]);
             nodes.Add(node);
             nodeLegend.Add(name, (node, connections));
         }

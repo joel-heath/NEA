@@ -40,13 +40,13 @@ internal static class InputMethods
     }
 
     public static int ReadInt(bool newLine = true, bool natural = true, int? startingNum = null, CancellationToken? ct = null)
-        => ReadInts(new string[] { string.Empty }, startingNum is null ? null : new int[] { startingNum.Value }, natural, newLine, ct)[0];
+        => ReadInts([string.Empty], startingNum is null ? null : [startingNum.Value], natural, newLine, ct)[0];
     public static double ReadDouble(bool newLine = true, double? startingNum = null, CancellationToken? ct = null)
-        => ReadDoubles(new string[] { string.Empty }, startingNum is null ? null : new double[] { startingNum.Value }, newLine, ct)[0];
+        => ReadDoubles([string.Empty], startingNum is null ? null : [startingNum.Value], newLine, ct)[0];
 
     public static double[] ReadDoubles(string[] prompts, double[]? startingVals = null, bool newLine = true, CancellationToken? ct = null)
     {
-        char[] validChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-' };
+        char[] validChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-'];
         var vals = startingVals?.Select(x => x.ToString()).ToArray();
         Func<string, double> parser = double.Parse;
         var opts = new ReadValuesOptions() { DoubleRules = true, NewLine = newLine };
@@ -56,7 +56,7 @@ internal static class InputMethods
 
     public static int[] ReadInts(string[] prompts, int[]? startingVals = null, bool natural = true, bool newLine = true, CancellationToken? ct = null)
     {
-        char[] validChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        char[] validChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         var vals = startingVals?.Select(x => x.ToString()).ToArray();
         Func<string, int> parser = int.Parse;
         var opts = new ReadValuesOptions() { IntRules = !natural, NewLine = newLine };
@@ -66,9 +66,9 @@ internal static class InputMethods
 
     private static T[] ReadValues<T>(string[] prompts, char[] validChars, Func<string, T> parser, string[]? startingVals = null, CancellationToken? ct = null, ReadValuesOptions options = default)
     {
-        prompts = prompts.ToArray(); // NOT PURE
+        prompts = [.. prompts]; // NOT PURE
         bool entering = true;
-        string[] uInputs = startingVals is null ? Enumerable.Repeat(string.Empty, prompts.Length).ToArray() : startingVals.ToArray();
+        string[] uInputs = startingVals is null ? [..Enumerable.Repeat(string.Empty, prompts.Length)] : [.. startingVals];
         T[]? outputs = null;
 
         int x = uInputs[0].Length, y = 0;

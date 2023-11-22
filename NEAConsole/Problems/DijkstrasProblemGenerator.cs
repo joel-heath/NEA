@@ -3,11 +3,11 @@ using NEAConsole.Matrices;
 
 namespace NEAConsole.Problems;
 
-public class DijkstrasProblemGenerator : IProblemGenerator
+public class DijkstrasProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Dijkstra's";
     public string SkillPath => "Graphs.Dijkstra's";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -70,7 +70,7 @@ public class DijkstrasProblemGenerator : IProblemGenerator
     public static (Node start, Node finish) CreateGraph(Matrix adjacencyMatrix)
     {
         //      node id     node         (node id, connection weight) array
-        Dictionary<int, (Node node, List<(int id, int weight)> connections)> nodeLegend = new(); // could just be an array?
+        Dictionary<int, (Node node, List<(int id, int weight)> connections)> nodeLegend = []; // could just be an array?
         for (int i = 0; i < adjacencyMatrix.Rows; i++)
         {
             List<(int, int)> connections = new(adjacencyMatrix.Columns);
@@ -79,7 +79,7 @@ public class DijkstrasProblemGenerator : IProblemGenerator
                 if (adjacencyMatrix[i, j] == 0) continue;
                 connections.Add((j, (int)adjacencyMatrix[i, j]));
             }
-            Node node = new(new());
+            Node node = new([]);
             nodeLegend.Add(i, (node, connections));
         }
 
@@ -92,5 +92,4 @@ public class DijkstrasProblemGenerator : IProblemGenerator
     }
 
     public DijkstrasProblemGenerator() : this(new Random()) { }
-    public DijkstrasProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

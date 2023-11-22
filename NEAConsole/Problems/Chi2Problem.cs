@@ -2,10 +2,10 @@
 
 namespace NEAConsole.Problems;
 
-public class Chi2Problem : IProblem
+public class Chi2Problem(double[,] data, double solution) : IProblem
 {
-    private readonly Matrix data;
-    private readonly double solution;
+    private readonly Matrix data = new(data);
+    private readonly double solution = solution;
 
     public void Display()
     {
@@ -45,11 +45,5 @@ public class Chi2Problem : IProblem
         {
             Console.WriteLine($"Incorrect. The correct answer was {solution}.");
         }
-    }
-
-    public Chi2Problem(double[,] data, double solution)
-    {
-        this.data = new(data);
-        this.solution = solution;
     }
 }

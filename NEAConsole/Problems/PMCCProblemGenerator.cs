@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class PMCCProblemGenerator : IProblemGenerator
+public class PMCCProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Product Moment Correlation Coefficient";
     public string SkillPath => "Statistics.PMCC";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -35,5 +35,4 @@ public class PMCCProblemGenerator : IProblemGenerator
     }
 
     public PMCCProblemGenerator() : this(new Random()) { }
-    public PMCCProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

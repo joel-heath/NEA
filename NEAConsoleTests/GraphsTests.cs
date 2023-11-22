@@ -29,7 +29,7 @@ public class GraphsTests
     [Test]
     public void PrimsTest()
     {
-        Assert.That(TestHelpers.GenericTest(new PrimsProblemGenerator(new Random(1234)), new PrimsAnswer(new() { (1, 0), (2, 1), (5, 1), (8, 5), (4, 2), (3, 2), (7, 3), (6, 5) })));
+        Assert.That(TestHelpers.GenericTest(new PrimsProblemGenerator(new Random(1234)), new PrimsAnswer([(1, 0), (2, 1), (5, 1), (8, 5), (4, 2), (3, 2), (7, 3), (6, 5)])));
         Assert.Pass();
 
         // [9 3  0 0  0  0  0 0  0 ]

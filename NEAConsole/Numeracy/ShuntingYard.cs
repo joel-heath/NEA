@@ -1,4 +1,4 @@
-﻿namespace JH24Utils.Numeracy;
+﻿namespace NEAConsole.Numeracy;
 
 public partial class ShuntingYard
 {

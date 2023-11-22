@@ -1,11 +1,11 @@
 ﻿namespace NEAConsole;
 
-public class StudyTimer
+public class StudyTimer(TimeSpan timeSinceLastBreak, TimeSpan studyLength, TimeSpan breakLength, bool enabled)
 {
-    public bool Enabled { get; set; }
-    public TimeSpan TimeSinceLastBreak { get; set; }
-    public TimeSpan StudyLength { get; set; }
-    public TimeSpan BreakLength { get; set; }
+    public bool Enabled { get; set; } = enabled;
+    public TimeSpan TimeSinceLastBreak { get; set; } = timeSinceLastBreak;
+    public TimeSpan StudyLength { get; set; } = studyLength;
+    public TimeSpan BreakLength { get; set; } = breakLength;
     public bool TimeForBreak => Enabled && TimeSinceLastBreak > StudyLength;
     public void UseBreak()
     {
@@ -43,11 +43,4 @@ public class StudyTimer
     }
 
     public StudyTimer() : this(TimeSpan.Zero, TimeSpan.FromMinutes(25), TimeSpan.FromMinutes(5), true) { }
-    public StudyTimer(TimeSpan timeSinceLastBreak, TimeSpan studyLength, TimeSpan breakLength, bool enabled)
-    {
-        TimeSinceLastBreak = timeSinceLastBreak;
-        StudyLength = studyLength;
-        BreakLength = breakLength;
-        Enabled = enabled;
-    }
 }

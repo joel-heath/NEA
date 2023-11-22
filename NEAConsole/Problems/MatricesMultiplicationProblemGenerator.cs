@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesMultiplicationProblemGenerator : IProblemGenerator
+public class MatricesMultiplicationProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Matrix Multiplication";
     public string SkillPath => "Matrices.Multiplication";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -21,5 +21,4 @@ public class MatricesMultiplicationProblemGenerator : IProblemGenerator
     }
 
     public MatricesMultiplicationProblemGenerator() : this(new Random()) { }
-    public MatricesMultiplicationProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

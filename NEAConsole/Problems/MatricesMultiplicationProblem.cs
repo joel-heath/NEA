@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesMultiplicationProblem : IProblem
+public class MatricesMultiplicationProblem(Matrix mat1, Matrix mat2, Matrix solution) : IProblem
 {
-    private readonly Matrix mat1;
-    private readonly Matrix mat2;
-    private readonly Matrix solution;
+    private readonly Matrix mat1 = mat1;
+    private readonly Matrix mat2 = mat2;
+    private readonly Matrix solution = solution;
 
     public void Display()
     {
@@ -62,12 +62,5 @@ public class MatricesMultiplicationProblem : IProblem
             UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
-    }
-
-    public MatricesMultiplicationProblem(Matrix mat1, Matrix mat2, Matrix solution)
-    {
-        this.mat1 = mat1;
-        this.mat2 = mat2;
-        this.solution = solution;
     }
 }

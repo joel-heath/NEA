@@ -7,7 +7,7 @@ public class SortingProblemGenerator
     private readonly IRandom random;
     private readonly SortType sortType;
 
-    public IProblem Generate(Skill knowledge)
+    protected IProblem Generate()
     {
         bool isAscending = random.NextDouble() < 0.5;
 
@@ -35,29 +35,32 @@ public class SortingProblemGenerator
         => (random, this.sortType) = (randomNumberGenerator, sortType);
 }
 
-public class QuicksortProblemGenerator : SortingProblemGenerator, IProblemGenerator
+public class QuicksortProblemGenerator(IRandom randomNumberGenerator) : SortingProblemGenerator(randomNumberGenerator, SortType.Quicksort), IProblemGenerator
 {
     public string DisplayText => "Quicksort";
     public string SkillPath => "Sorting.Quicksort";
 
+    public IProblem Generate(Skill knowledge) => Generate();
+
     public QuicksortProblemGenerator() : this(new Random()) { }
-    public QuicksortProblemGenerator(IRandom randomNumberGenerator) : base(randomNumberGenerator, SortType.Quicksort) { }
 }
 
-public class MergeSortProblemGenerator : SortingProblemGenerator, IProblemGenerator
+public class MergeSortProblemGenerator(IRandom randomNumberGenerator) : SortingProblemGenerator(randomNumberGenerator, SortType.MergeSort), IProblemGenerator
 {
     public string DisplayText => "Merge Sort";
     public string SkillPath => "Sorting.Merge Sort";
 
+    public IProblem Generate(Skill knowledge) => Generate();
+
     public MergeSortProblemGenerator() : this(new Random()) { }
-    public MergeSortProblemGenerator(IRandom randomNumberGenerator) : base(randomNumberGenerator, SortType.MergeSort) { }
 }
 
-public class BubbleSortProblemGenerator : SortingProblemGenerator, IProblemGenerator
+public class BubbleSortProblemGenerator(IRandom randomNumberGenerator) : SortingProblemGenerator(randomNumberGenerator, SortType.BubbleSort), IProblemGenerator
 {
     public string DisplayText => "Bubble Sort";
     public string SkillPath => "Sorting.Bubble Sort";
 
+    public IProblem Generate(Skill knowledge) => Generate();
+
     public BubbleSortProblemGenerator() : this(new Random()) { }
-    public BubbleSortProblemGenerator(IRandom randomNumberGenerator) : base(randomNumberGenerator, SortType.BubbleSort) { }
 }

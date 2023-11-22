@@ -2,10 +2,10 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesInversionProblem : IProblem
+public class MatricesInversionProblem(Matrix mat, Matrix solution) : IProblem
 {
-    private readonly Matrix mat;
-    private readonly Matrix solution;
+    private readonly Matrix mat = mat;
+    private readonly Matrix solution = solution;
 
     public void Display()
     {
@@ -56,11 +56,5 @@ public class MatricesInversionProblem : IProblem
             UIMethods.DrawMatrix(solution, false);
             Console.WriteLine();
         }
-    }
-
-    public MatricesInversionProblem(Matrix mat, Matrix solution)
-    {
-        this.mat = mat;
-        this.solution = solution;
     }
 }

@@ -1,10 +1,13 @@
 ﻿namespace NEAConsole.Problems;
 
-public class RandomProblemGenerator
+public class RandomProblemGenerator(Skill knowledge, IRandom randomNumberGenerator)
 {
-    private readonly IRandom random;
-    private readonly Skill knowledge;
-    private readonly IReadOnlyList<IProblemGenerator> problemGenerators;
+    private readonly IRandom random = randomNumberGenerator;
+    private readonly Skill knowledge = knowledge;
+    private readonly IReadOnlyList<IProblemGenerator> problemGenerators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
+                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
+                            .Where(g => knowledge.Query(g.SkillPath, out _)).ToList();
 
     private static double GetScore(Skill skill)
        => (double)(skill.TotalCorrect + 1) / (skill.TotalAttempts + 5) * (skill.LastRevised - new DateTime(2023, 1, 1)).TotalMinutes;
@@ -42,13 +45,4 @@ public class RandomProblemGenerator
     public IProblem Generate() => problemGenerators[random.Next(problemGenerators.Count)].Generate(knowledge);
 
     public RandomProblemGenerator(Skill knowledge) : this(knowledge, new Random()) { }
-    public RandomProblemGenerator(Skill knowledge, IRandom randomNumberGenerator)
-    {
-        random = randomNumberGenerator;
-        this.knowledge = knowledge;
-        problemGenerators = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                            .Where(t => t.GetInterfaces().Contains(typeof(IProblemGenerator)))
-                            .Select(t => (IProblemGenerator)Activator.CreateInstance(t)!)
-                            .Where(g => knowledge.Query(g.SkillPath, out _)).ToList();
-    }
 }

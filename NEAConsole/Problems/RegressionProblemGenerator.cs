@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class RegressionProblemGenerator : IProblemGenerator
+public class RegressionProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Linear Regression";
     public string SkillPath => "Statistics.Regression";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -19,5 +19,4 @@ public class RegressionProblemGenerator : IProblemGenerator
     }
 
     public RegressionProblemGenerator() : this(new Random()) { }
-    public RegressionProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

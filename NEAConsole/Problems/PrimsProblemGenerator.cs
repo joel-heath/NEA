@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class PrimsProblemGenerator : IProblemGenerator
+public class PrimsProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Prim's Algorithm";
     public string SkillPath => "Graphs.Prim's";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -49,5 +49,4 @@ public class PrimsProblemGenerator : IProblemGenerator
     }
 
     public PrimsProblemGenerator() : this(new Random()) { }
-    public PrimsProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

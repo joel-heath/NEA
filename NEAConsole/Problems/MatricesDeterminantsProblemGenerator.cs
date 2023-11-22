@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesDeterminantsProblemGenerator : IProblemGenerator
+public class MatricesDeterminantsProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Matrix Determinants";
     public string SkillPath => "Matrices.Determinants";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -17,5 +17,4 @@ public class MatricesDeterminantsProblemGenerator : IProblemGenerator
     }
 
     public MatricesDeterminantsProblemGenerator() : this(new Random()) { }
-    public MatricesDeterminantsProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

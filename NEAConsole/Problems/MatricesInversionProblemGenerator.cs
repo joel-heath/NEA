@@ -2,11 +2,11 @@
 
 namespace NEAConsole.Problems;
 
-public class MatricesInversionProblemGenerator : IProblemGenerator
+public class MatricesInversionProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Matrix Inversion";
     public string SkillPath => "Matrices.Determinants.Inversion";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
     public IProblem Generate(Skill knowledge)
     {
@@ -56,5 +56,4 @@ public class MatricesInversionProblemGenerator : IProblemGenerator
     }
 
     public MatricesInversionProblemGenerator() : this(new Random()) { }
-    public MatricesInversionProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

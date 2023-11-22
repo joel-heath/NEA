@@ -58,16 +58,16 @@ public class Skill
         }
     }
 
+    static readonly JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
     public void ResetKnowledge(string treeJSONPath)
-    {
-        Children = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-    }
+        => Children = JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), options)!;
+
     public static Skill KnowledgeConstructor(string treeJSONPath)
-        => KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!);
+        => KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(File.ReadAllText(treeJSONPath), options)!);
     public static Skill KnowledgeConstructor(Skill[] skills)
         => new(string.Empty, true, 0, 0, 0, DateTime.MinValue, skills);
 
     //[JsonConstructor]
     public Skill(string name, bool known, int weight, int totalCorrect, int totalAttempts, DateTime lastRevised, Skill[]? children)
-        => (Name, Known, Weight, TotalCorrect, TotalAttempts, LastRevised, Children) = (name, known, weight, totalCorrect, totalAttempts, lastRevised, children ?? Array.Empty<Skill>());
+        => (Name, Known, Weight, TotalCorrect, TotalAttempts, LastRevised, Children) = (name, known, weight, totalCorrect, totalAttempts, lastRevised, children ?? []);
 }

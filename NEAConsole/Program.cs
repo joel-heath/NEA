@@ -85,7 +85,7 @@ internal class Program
 
     static void MathsMenu(Context context)
     {
-        IProblemGenerator[] options = { new PMCCProblemGenerator(), new RegressionProblemGenerator() };
+        IProblemGenerator[] options = [new PMCCProblemGenerator(), new RegressionProblemGenerator()];
 
         Menu.ExecuteMenu(options, "Choose a subject to revise", context);
         Console.Clear();
@@ -93,7 +93,7 @@ internal class Program
 
     static void MatricesMenu(Context context)
     {
-        IProblemGenerator[] options = { new MatricesAdditionProblemGenerator(), new MatricesMultiplicationProblemGenerator(), new MatricesDeterminantsProblemGenerator(), new MatricesInversionProblemGenerator() }; // Hypothesis Testing
+        IProblemGenerator[] options = [new MatricesAdditionProblemGenerator(), new MatricesMultiplicationProblemGenerator(), new MatricesDeterminantsProblemGenerator(), new MatricesInversionProblemGenerator()]; // Hypothesis Testing
 
         Menu.ExecuteMenu(options, "Choose a subject to revise", context);
         Console.Clear();
@@ -101,7 +101,7 @@ internal class Program
 
     static void FMathsMenu(Context context)
     {
-        IProblemGenerator[] options = { new OneStageSimplexProblemGenerator(), new TwoStageSimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator(), new Chi2ProblemGenerator() };
+        IProblemGenerator[] options = [new OneStageSimplexProblemGenerator(), new TwoStageSimplexProblemGenerator(), new PrimsProblemGenerator(), new DijkstrasProblemGenerator(), new Chi2ProblemGenerator()];
 
         Menu.ExecuteMenu(options.Select(o => o.ToMenuOption()).Prepend(("Matrices", MatricesMenu)), "Choose a subject to revise", context);
         Console.Clear();
@@ -109,7 +109,7 @@ internal class Program
 
     static void CSciMenu(Context context)
     {
-        IProblemGenerator[] options = { new RPNProblemGenerator(), new QuicksortProblemGenerator(), new MergeSortProblemGenerator(), new BubbleSortProblemGenerator() };
+        IProblemGenerator[] options = [new RPNProblemGenerator(), new QuicksortProblemGenerator(), new MergeSortProblemGenerator(), new BubbleSortProblemGenerator()];
 
         Menu.ExecuteMenu(options, "Choose a subject to revise", context);
         Console.Clear();
@@ -167,16 +167,19 @@ internal class Program
         }
     }
 
+    static readonly JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
+
     static Exam? OfferExamProfiles()
     {
-        List<(string name, Exam? exam)> profiles = new();
+        List<(string name, Exam? exam)> profiles = [];
 
         using var br = new BinaryReader(new FileStream(EXAM_PROFILES_PATH, FileMode.OpenOrCreate));
         while (br.BaseStream.Position < br.BaseStream.Length)
         {
             var name = br.ReadString();
             var questions = br.ReadInt32();
-            var knowledge = Skill.KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(br.ReadString(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!);
+            
+            var knowledge = Skill.KnowledgeConstructor(JsonSerializer.Deserialize<Skill[]>(br.ReadString(), options)!);
 
             profiles.Add((name, new Exam(knowledge, questions)));
         }

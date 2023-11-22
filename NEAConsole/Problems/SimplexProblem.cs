@@ -1,13 +1,10 @@
-﻿using NEAConsole.Matrices;
-using System.ComponentModel.Design;
+﻿namespace NEAConsole.Problems;
 
-namespace NEAConsole.Problems;
-
-public class SimplexProblem : IProblem
+public class SimplexProblem(SimplexInequality objective, SimplexInequality[] constraints, int[] solution) : IProblem
 {
-    private readonly SimplexInequality objective;
-    private readonly SimplexInequality[] constraints;
-    private readonly int[] solution;
+    private readonly SimplexInequality objective = objective;
+    private readonly SimplexInequality[] constraints = constraints;
+    private readonly int[] solution = solution;
 
     public void Display()
     {
@@ -192,12 +189,5 @@ public class SimplexProblem : IProblem
 
         Console.WriteLine("end;");
         Console.WriteLine();
-    }
-
-    public SimplexProblem(SimplexInequality objective, SimplexInequality[] constraints, int[] solution)
-    {
-        this.objective = objective;
-        this.constraints = constraints;
-        this.solution = solution;
     }
 }

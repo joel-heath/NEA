@@ -2,12 +2,12 @@
 
 namespace NEAConsole.Problems;
 
-public class DijkstrasProblem : IProblem
+public class DijkstrasProblem(Matrix graph, char startNode, char endNode, int solution) : IProblem
 {
-    private readonly Matrix graph;
-    private readonly char startNode;
-    private readonly char endNode;
-    private readonly int solution; // distance
+    private readonly Matrix graph = graph;
+    private readonly char startNode = startNode;
+    private readonly char endNode = endNode;
+    private readonly int solution = solution; // distance
 
     public void Display()
     {
@@ -48,13 +48,5 @@ public class DijkstrasProblem : IProblem
         {
             Console.WriteLine($"Incorrect, the correct answer was {solution}");
         }
-    }
-
-    public DijkstrasProblem(Matrix graph, char startNode, char endNode, int solution)
-    {
-        this.graph = graph;
-        this.startNode = startNode;
-        this.endNode = endNode;
-        this.solution = solution;
     }
 }

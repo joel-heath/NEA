@@ -1,15 +1,15 @@
-﻿using JH24Utils.Numeracy;
+﻿using NEAConsole.Numeracy;
 using System.Text;
 
 namespace NEAConsole.Problems;
 
-public class RPNProblemGenerator : IProblemGenerator
+public class RPNProblemGenerator(IRandom randomNumberGenerator) : IProblemGenerator
 {
     public string DisplayText => "Reverse Polish Notation";
     public string SkillPath => "RPN";
-    private readonly IRandom random;
+    private readonly IRandom random = randomNumberGenerator;
 
-    private static readonly char[] operators = { '+', '-', '×', '÷' };
+    private static readonly char[] operators = ['+', '-', '×', '÷'];
 
     public IProblem Generate(Skill knowledge)
     {
@@ -49,5 +49,4 @@ public class RPNProblemGenerator : IProblemGenerator
     }
 
     public RPNProblemGenerator() : this(new Random()) { }
-    public RPNProblemGenerator(IRandom randomNumberGenerator) => random = randomNumberGenerator;
 }

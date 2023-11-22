@@ -1,4 +1,4 @@
-﻿namespace JH24Utils.Numeracy;
+﻿namespace NEAConsole.Numeracy;
 
 partial class ShuntingYard
 {
@@ -44,7 +44,7 @@ partial class ShuntingYard
             return op is null ? _number.ToString()! : Opcodes.First(o => o.Value == op)!.Key;
         }
 
-        private static readonly HashSet<char> DecimalTokens = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+        private static readonly HashSet<char> DecimalTokens = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
 
         public static Queue<Token> Tokenize(string input)
         {

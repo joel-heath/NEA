@@ -2,10 +2,10 @@
 
 namespace NEAConsole.Problems;
 
-public class PrimsProblem : IProblem
+public class PrimsProblem(Matrix adjacencyMatrix, HashSet<(int row, int col)> solution) : IProblem
 {
-    private readonly Matrix adjacencyMatrix;
-    private readonly HashSet<(int row, int col)> solution;
+    private readonly Matrix adjacencyMatrix = adjacencyMatrix;
+    private readonly HashSet<(int row, int col)> solution = solution;
 
     public void Display()
     {
@@ -144,22 +144,16 @@ public class PrimsProblem : IProblem
                     break;
 
                 case ConsoleKey.Backspace:
-                    if (chosenEdges.Contains((y, x)))
-                    {
-                        chosenEdges.Remove((y, x));
-                    }
+                    chosenEdges.Remove((y, x));
                     break;
 
                 case ConsoleKey.Spacebar:
                     var coords = (y, x);
-                    if (chosenEdges.Contains(coords))
-                    {
-                        chosenEdges.Remove(coords);
-                    }
-                    else if (adjacency[y, x] != 0)
-                    {
-                        chosenEdges.Add(coords);
-                    }
+                    if (!chosenEdges.Remove(coords))
+                        if (adjacency[y, x] != 0)
+                        {
+                            chosenEdges.Add(coords);
+                        }
                     break;
 
                 case ConsoleKey.Enter:
@@ -177,11 +171,5 @@ public class PrimsProblem : IProblem
         Console.CursorVisible = true;
         Console.CursorTop = initY + adjacency.Rows;
         return chosenEdges;
-    }
-
-    public PrimsProblem(Matrix adjacencyMatrix, HashSet<(int row, int col)> solution)
-    {
-        this.adjacencyMatrix = adjacencyMatrix;
-        this.solution = solution;
     }
 }

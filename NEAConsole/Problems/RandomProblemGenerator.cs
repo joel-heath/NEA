@@ -10,7 +10,7 @@ public class RandomProblemGenerator(Skill knowledge, IRandom randomNumberGenerat
                             .Where(g => knowledge.Query(g.SkillPath, out _)).ToList();
 
     private static double GetScore(Skill skill)
-       => (double)(skill.TotalCorrect + 1) / (skill.TotalAttempts + 5) * (skill.LastRevised - new DateTime(2023, 1, 1)).TotalMinutes;
+       => (double)(skill.TotalCorrect + 1) / (skill.TotalAttempts + 5) * (skill.LastRevised - new DateTime(2023, 1, 1)).TotalMinutes * skill.Weight;
 
     // public for unit testing
     public IProblemGenerator GetNextBestPG(IList<(IProblemGenerator pg, Skill s)> skills)

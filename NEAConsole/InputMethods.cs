@@ -77,8 +77,11 @@ internal static class InputMethods
 
         for (int i = 0; i < prompts.Length; i++)
         {
-            if (prompts[i] == string.Empty) continue;
-            Console.WriteLine(prompts[i] += " = ");
+            if (prompts[i] != string.Empty)
+            {
+                Console.Write(prompts[i] += " = ");
+            }
+            Console.WriteLine(uInputs[i]);
         }
 
         while (entering)

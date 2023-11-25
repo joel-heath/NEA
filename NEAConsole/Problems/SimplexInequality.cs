@@ -24,14 +24,26 @@ public record class SimplexInequality
     public override string ToString()
     {
         string inequality = string.Empty;
+        int firstCoefficient = 0;
         for (int i = 0; i < Coefficients.Length; i++)
         {
-            if (Coefficients[i] == 0) continue;
-            if (i != 0)
+            if (Coefficients[i] == 0)
+            {
+                if (firstCoefficient > -1) firstCoefficient = i + 1;
+                continue;
+            }
+            if (i == firstCoefficient)
+            {
+                firstCoefficient = -1;
+            }
+            else
             {
                 inequality += Coefficients[i] > 0 ? " + " : " - ";
             }
-            inequality += Coefficients[i];
+            if (Coefficients[i] != 1)
+            {
+                inequality += Math.Abs(Coefficients[i]);
+            }
             inequality += (char)('x' + i);
         }
 

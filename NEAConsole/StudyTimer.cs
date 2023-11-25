@@ -7,7 +7,7 @@ public class StudyTimer(TimeSpan timeSinceLastBreak, TimeSpan studyLength, TimeS
     public TimeSpan StudyLength { get; set; } = studyLength;
     public TimeSpan BreakLength { get; set; } = breakLength;
     public bool TimeForBreak => Enabled && TimeSinceLastBreak > StudyLength;
-    public void UseBreak()
+    public async Task UseBreak()
     {
         Console.WriteLine($"You've been studying for over {StudyLength.Minutes} minutes! Do you want to take a break?");
         if (Menu.Affirm())
@@ -23,20 +23,20 @@ public class StudyTimer(TimeSpan timeSinceLastBreak, TimeSpan studyLength, TimeS
                 catch (KeyNotFoundException) { }
                 finally { cts.Cancel(); }
             });
-            var timer = Task.Run(() => Exam.WriteTimer(timeRemaining));
-
-            while (!cts.Token.IsCancellationRequested && (timeRemaining.Seconds > 0 || timeRemaining > TimeSpan.Zero)) // do our actual calculation for whether time is up based on datetimes, more accurately
-            {
-                Thread.Sleep(second);
+            Exam.WriteTimer(timeRemaining);
+            var examTimer = Task.Delay(timeRemaining, cts.Token);
+            var timeRemainingWriter = new Timer((_) => {
                 timeRemaining -= second;
-                timer = Task.Run(() => Exam.WriteTimer(timeRemaining));
-            }
+                Exam.WriteTimer(timeRemaining);
+            }, null, second, second);
 
+            await Task.WhenAny(affirmation, examTimer);
             cts.Cancel();
 
-            while (!affirmation.IsCompletedSuccessfully || !timer.IsCompletedSuccessfully) { }
+            timeRemainingWriter.Dispose();
+            await affirmation;
             affirmation.Dispose();
-            timer.Dispose();
+            examTimer.Dispose();
         }
         TimeSinceLastBreak = TimeSpan.Zero;
         Console.Clear();

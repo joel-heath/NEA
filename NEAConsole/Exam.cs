@@ -25,6 +25,7 @@ public class Exam
             catch (EscapeException) { return false; }
             return true;
         });
+        WriteTimer(timeRemaining);
         var examTimer = Task.Delay(timeRemaining, cts.Token);
         var timeRemainingWriter = new Timer((_) => {
             timeRemaining -= second;            
@@ -60,7 +61,7 @@ public class Exam
     private void UseExam(CancellationTokenSource cts, StudyTimer timer)
     {
         var start = DateTime.Now;
-
+        
         while (question < attempts.Count + 1) // needs to become until time is up
         {
             Console.WriteLine('[' + new string('#', question) + new string(' ', questionCount - question) + ']'); // progress bar
@@ -178,25 +179,7 @@ public class Exam
                 }
             }
         }
-
-        bool noneKnown = true;
-        foreach (var child in chosenKnowledge.Children)
-        {
-            if ((child.Children.Length > 0 && child.Children.Any(c => c.Known)) || child.Children.Length == 0 && child.Known)
-            {
-                noneKnown = false;
-                child.Known = true;
-            }
-        }
-
-        if (noneKnown)
-        {
-            Console.WriteLine($"You cannot start a mock exam without any topics.");
-            InputMethods.Wait(string.Empty);
-            Console.Clear();
-            return null;
-        }
-
+        
         return chosenKnowledge;
     }
 

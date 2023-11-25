@@ -12,6 +12,20 @@ internal class Program
                                    SAMPLE_KNOWLEDGE_PATH = Path.Combine(AppContext.BaseDirectory, "SampleKnowledge.json"),
                                    EXAM_PROFILES_PATH = Path.Combine(AppContext.BaseDirectory, "ExamProfiles.bin");
 
+    static bool NoSkillsKnown(Skill knowledge)
+    {
+        bool noneKnown = true;
+        foreach (var child in knowledge.Children)
+        {
+            if ((child.Children.Length > 0 && child.Children.Any(c => c.Known)) || child.Children.Length == 0 && child.Known)
+            {
+                child.Known = true;
+                noneKnown = false;
+            }
+        }
+        return noneKnown;
+    }
+
     /// <summary>
     /// If the user's context.Knowledge tree is completely unknown, asks the user to update their context.Knowledge tree, specifying which topics they know.
     /// </summary>
@@ -21,14 +35,14 @@ internal class Program
     static bool TryUpdateKnowledge(Skill knowledge, string quizTitle = "use random questions")
     {
         // or a while? NO, client chose to have it this way
-        if (knowledge.Children.All(s => !s.Known))
+        if (NoSkillsKnown(knowledge))
         {
             Console.WriteLine($"To {quizTitle} you must first enter the topics you know.");
             InputMethods.Wait(string.Empty);
             Console.Clear();
             UpdateKnowledge(knowledge, false);
 
-            if (knowledge.Children.All(s => !s.Known))
+            if (NoSkillsKnown(knowledge))
             {
                 Console.WriteLine($"You cannot {quizTitle} if you do not know any topics.");
                 InputMethods.Wait(string.Empty);
@@ -64,17 +78,22 @@ internal class Program
             ("Study Break Timer", (c) => {
                 Console.WriteLine($"Do you want to {(c.Timer.Enabled ? "dis" : "en")}able the timer? ");
                 if (Menu.Affirm()) c.Timer.Enabled = !c.Timer.Enabled;
-                Console.CursorTop += 2;
+                Console.CursorTop += 3;
                 Console.Write("How many minutes do you want to study for? ");
-                c.Timer.StudyLength = TimeSpan.FromMinutes(InputMethods.ReadInt(startingNum:c.Timer.StudyLength.Minutes));
+                c.Timer.StudyLength = TimeSpan.FromMinutes(InputMethods.ReadInt(startingNum:(int)c.Timer.StudyLength.TotalMinutes));
                 Console.Write("How many minutes should the break be? ");
-                c.Timer.BreakLength = TimeSpan.FromMinutes(InputMethods.ReadInt(startingNum:c.Timer.BreakLength.Minutes));
+                c.Timer.BreakLength = TimeSpan.FromMinutes(InputMethods.ReadInt(startingNum:(int)c.Timer.BreakLength.TotalMinutes));
+                Console.Clear();
             }),
 #if DEBUG
             ("Clear Knowledge", (c) =>
             {
                 File.WriteAllBytes(USER_KNOWLEDGE_PATH, File.ReadAllBytes(SAMPLE_KNOWLEDGE_PATH));
                 c.Knowledge.ResetKnowledge(SAMPLE_KNOWLEDGE_PATH);
+            }),
+            ("Delete Exam Profiles", (c) =>
+            {
+                File.Delete(EXAM_PROFILES_PATH);
             })
 #endif
         };
@@ -163,7 +182,7 @@ internal class Program
             skill.TotalAttempts++;
 
             context.Timer.TimeSinceLastBreak += DateTime.Now - start;
-            if (context.Timer.TimeForBreak) context.Timer.UseBreak();
+            if (context.Timer.TimeForBreak) context.Timer.UseBreak().Wait();
         }
     }
 
@@ -198,9 +217,10 @@ internal class Program
     static void MockExam(Context context)
     {
         var exam = OfferExamProfiles();
+        Console.Clear();
         if (exam is null)
         {
-            TryUpdateKnowledge(context.Knowledge, "start a mock exam");
+            if (!TryUpdateKnowledge(context.Knowledge, "start a mock exam")) return;
             Skill? chosenKnowledge = Exam.CreateKnowledge(USER_KNOWLEDGE_PATH);
             if (chosenKnowledge is null) return;
             Console.Write("How many questions would you like in the mock exam? ");
@@ -210,7 +230,7 @@ internal class Program
             Console.WriteLine("Would you like to save this exam profile?");
             if (Menu.Affirm())
             {
-                Console.CursorTop += 2;
+                Console.CursorTop += 3;
                 Console.Write("Profile name: ");
                 var name = InputMethods.ReadLine();
 
@@ -234,14 +254,14 @@ internal class Program
             throw ex.InnerException;
         }
 
-        if (context.Timer.TimeForBreak) context.Timer.UseBreak();
+        if (context.Timer.TimeForBreak) context.Timer.UseBreak().Wait();
     }
 
     static void Main()//string[] args)
     {
         if (!File.Exists(USER_KNOWLEDGE_PATH)) File.WriteAllBytes(USER_KNOWLEDGE_PATH, File.ReadAllBytes(SAMPLE_KNOWLEDGE_PATH));
         Context context = new(Skill.KnowledgeConstructor(USER_KNOWLEDGE_PATH), new());
-        
+
         var options = new MenuOption[]
         {
             ("Mock Exam", MockExam),

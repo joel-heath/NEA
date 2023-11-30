@@ -53,9 +53,12 @@ public class Exam
     public static void WriteTimer(TimeSpan remaining)
     {
         int returnX = Console.CursorLeft, returnY = Console.CursorTop;
-        Console.SetCursorPosition(Console.WindowWidth - 8, 0);
-        Console.Write($"{remaining.Hours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}");
-        Console.SetCursorPosition(returnX, returnY);
+        lock (Console.Lock)
+        {
+            Console.SetCursorPosition(Console.WindowWidth - 8, 0);
+            Console.Write($"{remaining.Hours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}");
+            Console.SetCursorPosition(returnX, returnY);
+        }
     }
 
     private void UseExam(CancellationTokenSource cts, StudyTimer timer)

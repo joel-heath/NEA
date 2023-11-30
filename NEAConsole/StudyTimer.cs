@@ -9,18 +9,19 @@ public class StudyTimer(TimeSpan timeSinceLastBreak, TimeSpan studyLength, TimeS
     public bool TimeForBreak => Enabled && TimeSinceLastBreak > StudyLength;
     public async Task UseBreak()
     {
-        Console.WriteLine($"You've been studying for over {StudyLength.Minutes} minutes! Do you want to take a break?");
+        Console.WriteLine($"You've been studying for over {StudyLength.Minutes} minute{(StudyLength.Minutes > 1 ? "s" : "")}! Do you want to take a break?");
         if (Menu.Affirm())
         {
+            Console.CursorTop += 3;
             CancellationTokenSource cts = new();
-            Console.WriteLine($"Take a rest for the next {BreakLength.Minutes} minutes.");
+            Console.WriteLine($"Take a rest for the next {BreakLength.Minutes} minute{(StudyLength.Minutes > 1 ? "s" : "")}.");
             var timeRemaining = BreakLength;
             var second = TimeSpan.FromSeconds(1);
 
             var affirmation = Task.Run(() =>
             {
                 try { InputMethods.Wait("Press any key to skip the break.", cts.Token); }
-                catch (KeyNotFoundException) { }
+                catch (EscapeException) { }
                 finally { cts.Cancel(); }
             });
             Exam.WriteTimer(timeRemaining);

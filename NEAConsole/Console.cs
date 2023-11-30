@@ -4,21 +4,21 @@ namespace NEAConsole;
 
 public static class Console
 {
-    private static readonly object lockObj = new();
+    public static readonly object Lock = new();
 
     // utilising these properties rely on trusting that ALL OTHER THREADS are entirely pure
     public static int CursorLeft
     {
         get
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 return System.Console.CursorLeft;
             }
         }
         set
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 System.Console.CursorLeft = value;
             }
@@ -28,14 +28,14 @@ public static class Console
     {
         get
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 return System.Console.CursorTop;
             }
         }
         set
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 System.Console.CursorTop = value;
             }
@@ -45,14 +45,14 @@ public static class Console
     {
         get
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 return System.Console.ForegroundColor;
             }
         }
         set
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 System.Console.ForegroundColor = value;
             }
@@ -62,14 +62,14 @@ public static class Console
     {
         get
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 return System.Console.BackgroundColor;
             }
         }
         set
         {
-            lock (lockObj)
+            lock (Lock)
             {
                 System.Console.BackgroundColor = value;
             }
@@ -107,7 +107,7 @@ public static class Console
 
     public static void SetCursorPosition(int left, int top)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             CursorLeft = left;
             CursorTop = top;
@@ -115,7 +115,7 @@ public static class Console
     }
     public static void Clear()
     {
-        lock (lockObj)
+        lock (Lock)
         {
             System.Console.Clear();
         }
@@ -125,14 +125,14 @@ public static class Console
     public static void WriteLine(string? value) => Write(value + Environment.NewLine);
     public static void Write(string? value)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             System.Console.Write(value);
         }
     }
     public static void WritePure(string? value, int left, int top)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             var (oldLeft, oldTop) = System.Console.GetCursorPosition();
             System.Console.SetCursorPosition(left, top);
@@ -144,7 +144,7 @@ public static class Console
     // NOTHING NEW BELOW: just all boring functions to accept all inputs
     public static void Write(char? value)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             System.Console.Write(value);
         }
@@ -152,7 +152,7 @@ public static class Console
 
     public static void WriteLine(int? value)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             System.Console.WriteLine(value);
         }
@@ -160,7 +160,7 @@ public static class Console
 
     public static void WriteLine(object? value)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             System.Console.WriteLine(value);
         }
@@ -168,7 +168,7 @@ public static class Console
 
     public static void Write(double[]? value)
     {
-        lock (lockObj)
+        lock (Lock)
         {
             System.Console.Write(value);
         }

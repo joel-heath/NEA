@@ -228,9 +228,10 @@ internal class Program
             exam = new(chosenKnowledge, questionCount);
 
             Console.WriteLine("Would you like to save this exam profile?");
-            if (Menu.Affirm())
+            var choice = Menu.Affirm();
+            Console.CursorTop += 3;
+            if (choice)
             {
-                Console.CursorTop += 3;
                 Console.Write("Profile name: ");
                 var name = InputMethods.ReadLine();
 
@@ -238,9 +239,8 @@ internal class Program
                 br.Write(name);
                 br.Write(questionCount);
                 br.Write(JsonSerializer.Serialize(chosenKnowledge.Children));
+                Console.WriteLine();
             }
-
-            Console.WriteLine();
         }
         
         var t = exam.Begin(context.Timer);
